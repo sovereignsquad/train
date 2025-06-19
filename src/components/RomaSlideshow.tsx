@@ -8,10 +8,17 @@ const RomaSlideshow = () => {
         <div style={{ aspectRatio: '9 / 8', width: '100%', maxWidth: '100vw' }}>
           <iframe
             src={slideshowUrl}
-            style={{ width: '100%', height: '100%', border: 'none' }}
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              border: 'none',
+              transform: 'scale(1)',
+              transformOrigin: 'top left'
+            }}
             className="rounded-md border-2 border-roma-gold/30"
             title="Roma Slideshow"
             allowFullScreen
+            scrolling="no"
           />
         </div>
       </div>
