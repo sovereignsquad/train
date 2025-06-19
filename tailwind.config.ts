@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,12 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				roma: {
+					red: '#8B1538',
+					gold: '#FECA57',
+					orange: '#FF6B35',
+					dark: '#2C1810'
 				}
 			},
 			borderRadius: {
@@ -84,11 +91,37 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'gradient-shift': {
+					'0%, 100%': {
+						'background-position': '0% 50%'
+					},
+					'50%': {
+						'background-position': '100% 50%'
+					}
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'gradient-shift': 'gradient-shift 8s ease infinite',
+				'fade-in': 'fade-in 0.6s ease-out'
+			},
+			backgroundImage: {
+				'roma-gradient': 'linear-gradient(-45deg, #8B1538, #FF6B35, #FECA57, #8B1538, #FF6B35)',
+			},
+			backgroundSize: {
+				'400%': '400% 400%'
 			}
 		}
 	},
