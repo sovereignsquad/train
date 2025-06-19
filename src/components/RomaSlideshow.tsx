@@ -5,16 +5,13 @@ const RomaSlideshow = () => {
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
       <div className="relative max-w-6xl w-full">
-        <div className="aspect-[16/18] w-full max-h-[85vh]">
+        <div style={{ aspectRatio: '9 / 8', width: '100%', maxWidth: '100vw' }}>
           <iframe
             src={slideshowUrl}
-            className="w-full h-full rounded-md border-2 border-roma-gold/30"
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            className="rounded-md border-2 border-roma-gold/30"
             title="Roma Slideshow"
             allowFullScreen
-            style={{
-              border: 'none',
-              borderRadius: '8px'
-            }}
           />
         </div>
       </div>
