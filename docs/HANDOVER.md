@@ -36,6 +36,8 @@ Implemented:
 - ratchet decision fields on run records
 - `ratchet` endpoint
 - git head / dirty-state capture at ratchet time
+- guarded accepted-run commit behavior
+- guarded rejected-run restore behavior
 
 ### What Was Verified
 
@@ -46,14 +48,17 @@ Verified:
 - better run replaces best-so-far
 - worse run is rejected while preserving project best state
 - project-state endpoint reflects best run and last run correctly
+- accepted runs create a git commit when only the mutable artifact is dirty
+- rejected runs restore the mutable artifact cleanly
+- unrelated dirty files block ratchet mutation with a 409 fail-closed response
 
 ### What Needs To Happen Next
 
 Next expected work:
 
-1. verify ratchet decisions across multiple runs
-2. decide whether to automate git keep/revert now or after the repo is cleaner
-3. replace the placeholder mythology execution path with real benchmark behavior later
+1. decide whether `ISSUE-5` is complete enough to close
+2. replace the placeholder mythology execution path with real benchmark behavior later
+3. improve failure-path handling and migration strategy
 4. prepare the handoff for the next lane
 
 ### Watch Carefully

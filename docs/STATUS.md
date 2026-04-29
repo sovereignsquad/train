@@ -74,26 +74,29 @@ Verified locally:
 - `GET /v1/runs/{id}`
 - end-to-end bounded subprocess execution through the placeholder mythology benchmark
 - best-score updates across multiple runs with accepted and rejected outcomes
+- accepted runs create a git commit when only the mutable artifact is dirty
+- rejected runs restore the mutable artifact cleanly
+- unrelated dirty files block ratchet mutation with a fail-closed response
 
 ## Current Gaps
 
 Still missing on the critical path:
 
 - real mythology benchmark implementation beyond placeholder execution
-- actual git keep/revert behavior rather than git-state capture only
+- broader git mutation support beyond the single declared mutable artifact
 
 ## Immediate Next Steps
 
-1. Verify ratchet decisions end to end.
-2. Decide how far to push actual git keep/revert behavior on a currently dirty repo.
-3. Replace placeholder mythology execution with real benchmark behavior in later work.
-4. Decide whether `ISSUE-5` should be split between decision logic and true git mutation behavior.
+1. Decide whether `ISSUE-5` is complete enough to close.
+2. Replace placeholder mythology execution with real benchmark behavior in later work.
+3. Improve failure-path handling and migration strategy.
+4. Decide whether broader git mutation support belongs in a separate issue.
 
 ## Current Risks
 
 - the local DB schema currently uses a dev-safe reset instead of formal migrations
 - the mythology benchmark currently uses a placeholder execution script, not a real training loop
-- the ratchet currently captures git state but does not yet perform automatic commit/reset behavior
+- git mutation currently supports only the declared mutable artifact path
 
 ## Blockers
 
