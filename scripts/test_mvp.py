@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
+import os
 from pathlib import Path
 
 
@@ -34,6 +36,12 @@ def wait_for_api() -> None:
 
 
 def main() -> None:
+    temp_dir = Path(tempfile.mkdtemp(prefix="autotrain-mvp-"))
+    database_url = f"sqlite:///{temp_dir / 'mvp.db'}"
+    env = os.environ.copy()
+    env["DATABASE_URL"] = database_url
+    env["AUTOTRAIN_ENV"] = "local"
+
     server = subprocess.Popen(
         [
             "uv",
@@ -46,6 +54,7 @@ def main() -> None:
             "8000",
         ],
         cwd=ROOT,
+        env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
