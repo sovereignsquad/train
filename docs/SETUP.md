@@ -39,6 +39,7 @@ Current scaffold:
 - `FastAPI` local API
 - `SQLite` database initialized on API startup
 - engine contract with project registry and run lifecycle endpoints
+- real local mythology benchmark with deterministic prep and `val_bpb` scoring
 
 Optional local integrations later:
 
@@ -71,6 +72,12 @@ Current command sequence:
 ```bash
 uv sync
 uv run uvicorn autotrain_api.main:app --reload
+```
+
+MVP smoke test:
+
+```bash
+uv run python scripts/test_mvp.py
 ```
 
 ## Planned Setup Scripts
