@@ -25,6 +25,7 @@ If the git worktree contains changes outside the declared mutable artifact:
 
 - ratchet mutation is blocked
 - the run remains recorded
+- the blocked state and error message are persisted on the run record
 - manual cleanup is required before retrying
 
 This is intentional.

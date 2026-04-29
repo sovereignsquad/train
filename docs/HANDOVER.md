@@ -51,6 +51,7 @@ Verified:
 - accepted runs create a git commit when only the mutable artifact is dirty
 - rejected runs restore the mutable artifact cleanly
 - unrelated dirty files block ratchet mutation with a 409 fail-closed response
+- blocked ratchet attempts persist the blocked state and error message on the run record
 
 ### What Needs To Happen Next
 

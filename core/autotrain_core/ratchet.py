@@ -70,7 +70,12 @@ def apply_ratchet_decision(db: Session, run: RunRecord) -> RunRecord:
     run.git_head_before = git_head
     run.git_worktree_dirty = git_dirty
 
-    _apply_git_mutation(run)
+    try:
+        _apply_git_mutation(run)
+    except RatchetError as exc:
+        _persist_blocked_ratchet_state(db, run, project_state, str(exc), git_head)
+        raise
+
     git_head_after, git_dirty_after = get_git_state()
     run.git_head_after = git_head_after
     run.git_worktree_dirty = git_dirty_after
@@ -187,3 +192,26 @@ def commit_mutable_artifact(path: str, run: RunRecord) -> None:
 
 def restore_mutable_artifact(path: str) -> None:
     subprocess.run(["git", "restore", "--", path], cwd=ROOT_DIR, check=True)
+
+
+def _persist_blocked_ratchet_state(
+    db: Session,
+    run: RunRecord,
+    project_state: ProjectState | None,
+    message: str,
+    git_head_before: str | None,
+) -> None:
+    git_head_after, git_dirty_after = get_git_state()
+    run.git_action = GitAction.BLOCKED
+    run.error_message = message
+    run.git_head_before = git_head_before
+    run.git_head_after = git_head_after
+    run.git_worktree_dirty = git_dirty_after
+
+    if project_state is not None:
+        project_state.git_head = git_head_after
+        project_state.git_worktree_dirty = git_dirty_after
+        db.add(project_state)
+
+    db.add(run)
+    db.commit()

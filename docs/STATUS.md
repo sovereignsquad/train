@@ -77,6 +77,7 @@ Verified locally:
 - accepted runs create a git commit when only the mutable artifact is dirty
 - rejected runs restore the mutable artifact cleanly
 - unrelated dirty files block ratchet mutation with a fail-closed response
+- blocked ratchet attempts persist `git_action=blocked` and a recovery message on the run record
 
 ## Current Gaps
 
