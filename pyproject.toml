@@ -1,0 +1,43 @@
+[project]
+name = "autotrain"
+version = "0.1.0"
+description = "Provider-neutral autonomous optimization platform"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Sovereign Squad" }
+]
+dependencies = [
+  "fastapi>=0.116.0",
+  "pydantic-settings>=2.11.0",
+  "sqlalchemy>=2.0.40",
+  "uvicorn>=0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.0",
+  "ruff>=0.12.0",
+]
+
+[build-system]
+requires = ["setuptools>=80.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["core", "services/api"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".",
+  "core",
+  "services/api",
+]
