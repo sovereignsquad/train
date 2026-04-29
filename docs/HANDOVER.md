@@ -27,7 +27,7 @@ Keep this document concise and current.
 
 Last completed increment:
 
-- first ratchet decision layer increment for `ISSUE-5`
+- MVP testable baseline with real local benchmark and ratchet flow
 
 Implemented:
 
@@ -38,6 +38,8 @@ Implemented:
 - git head / dirty-state capture at ratchet time
 - guarded accepted-run commit behavior
 - guarded rejected-run restore behavior
+- isolated MVP smoke test command
+- real local mythology benchmark scoring path
 
 ### What Was Verified
 
@@ -52,15 +54,16 @@ Verified:
 - rejected runs restore the mutable artifact cleanly
 - unrelated dirty files block ratchet mutation with a 409 fail-closed response
 - blocked ratchet attempts persist the blocked state and error message on the run record
+- the repository reaches a clean end-to-end MVP smoke pass with `uv run python scripts/test_mvp.py`
 
 ### What Needs To Happen Next
 
 Next expected work:
 
-1. decide whether `ISSUE-5` is complete enough to close
-2. replace the placeholder mythology execution path with real benchmark behavior later
+1. decide how to handle `ISSUE-7` against the current MVP baseline
+2. decide when to start `ISSUE-3` for agent integration
 3. improve failure-path handling and migration strategy
-4. prepare the handoff for the next lane
+4. prepare the next lane after MVP testability
 
 ### Watch Carefully
 

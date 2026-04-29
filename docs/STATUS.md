@@ -18,17 +18,18 @@ Update this document whenever the active implementation state changes materially
 
 Phase:
 
-- ratchet and ledger foundation
+- MVP testable baseline reached
 
 Primary active issue:
 
-- `ISSUE-5`
+- no active implementation lane currently required for baseline MVP testing
 
 Board intent:
 
 - `ISSUE-2` completed
 - `ISSUE-4` completed
-- `ISSUE-5` in progress
+- `ISSUE-5` completed
+- `ISSUE-6` completed
 
 ## Current Reality
 
@@ -51,6 +52,7 @@ The repository currently has:
 - project state ledger
 - best-score comparison model
 - git-state capture during ratchet evaluation
+- a reproducible MVP smoke test
 - placeholder mythology benchmark files:
   - `prepare.py`
   - `train.py`
@@ -78,6 +80,7 @@ Verified locally:
 - rejected runs restore the mutable artifact cleanly
 - unrelated dirty files block ratchet mutation with a fail-closed response
 - blocked ratchet attempts persist `git_action=blocked` and a recovery message on the run record
+- the repository can be validated end to end with `uv run python scripts/test_mvp.py`
 
 ## Current Gaps
 
@@ -88,10 +91,10 @@ Still missing on the critical path:
 
 ## Immediate Next Steps
 
-1. Decide whether `ISSUE-5` is complete enough to close.
-2. Replace placeholder mythology execution with real benchmark behavior in later work.
+1. Decide whether `ISSUE-7` should stay blocked on agent integration or be split.
+2. Decide when to implement the `Mistral Vibe` adapter lane in `ISSUE-3`.
 3. Improve failure-path handling and migration strategy.
-4. Decide whether broader git mutation support belongs in a separate issue.
+4. Replace the tiny mythology benchmark with a richer benchmark when ready.
 
 ## Current Risks
 
@@ -116,4 +119,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- `ISSUE-5`
+- `ISSUE-3` or `ISSUE-7`, depending on whether the next step is agent integration or proof expansion
