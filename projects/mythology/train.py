@@ -3,3 +3,5 @@
 
 def training_hint() -> str:
     return "mythology benchmark mutable artifact placeholder"
+
+# accepted-change
