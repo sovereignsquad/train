@@ -49,6 +49,7 @@ def init_db() -> None:
         "mutable_artifact",
         "runner_key",
         "ratchet_decision",
+        "git_action",
         "best_metric_before",
         "best_metric_after",
         "git_head_before",

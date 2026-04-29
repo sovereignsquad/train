@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-from autotrain_core.models import MetricDirection, RatchetDecision, RunStatus
+from autotrain_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
 
 
 class RunCreate(BaseModel):
@@ -67,6 +67,7 @@ class RunRead(BaseModel):
     mutable_artifact: str | None
     runner_key: str | None
     ratchet_decision: RatchetDecision
+    git_action: GitAction
     best_metric_before: float | None
     best_metric_after: float | None
     git_head_before: str | None

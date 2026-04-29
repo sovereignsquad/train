@@ -1,9 +1,17 @@
 import subprocess
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from autotrain_core.config import ROOT_DIR
-from autotrain_core.models import MetricDirection, ProjectState, RatchetDecision, RunRecord, RunStatus
+from autotrain_core.models import (
+    GitAction,
+    MetricDirection,
+    ProjectState,
+    RatchetDecision,
+    RunRecord,
+    RunStatus,
+)
 
 
 class RatchetError(ValueError):
@@ -60,8 +68,14 @@ def apply_ratchet_decision(db: Session, run: RunRecord) -> RunRecord:
         run.best_metric_after = project_state.best_metric_value
 
     run.git_head_before = git_head
-    run.git_head_after = git_head
     run.git_worktree_dirty = git_dirty
+
+    _apply_git_mutation(run)
+    git_head_after, git_dirty_after = get_git_state()
+    run.git_head_after = git_head_after
+    run.git_worktree_dirty = git_dirty_after
+    project_state.git_head = git_head_after
+    project_state.git_worktree_dirty = git_dirty_after
 
     db.add(project_state)
     db.add(run)
@@ -101,3 +115,75 @@ def get_git_state() -> tuple[str | None, bool | None]:
         return head, bool(dirty)
     except Exception:
         return head, None
+
+
+def _apply_git_mutation(run: RunRecord) -> None:
+    if not run.mutable_artifact:
+        run.git_action = GitAction.NONE
+        return
+
+    allowed_path = run.mutable_artifact
+    changed_paths = get_changed_paths()
+    if not changed_paths:
+        run.git_action = GitAction.NONE
+        return
+
+    disallowed_paths = [path for path in changed_paths if path != allowed_path]
+    if disallowed_paths:
+        run.git_action = GitAction.BLOCKED
+        raise RatchetError(
+            "Git mutation blocked because files outside the mutable artifact changed: "
+            + ", ".join(disallowed_paths)
+        )
+
+    if run.ratchet_decision == RatchetDecision.ACCEPTED:
+        commit_mutable_artifact(allowed_path, run)
+        run.git_action = GitAction.COMMITTED
+        return
+
+    if run.ratchet_decision == RatchetDecision.REJECTED:
+        restore_mutable_artifact(allowed_path)
+        run.git_action = GitAction.RESTORED
+        return
+
+    run.git_action = GitAction.NONE
+
+
+def get_changed_paths() -> list[str]:
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=ROOT_DIR,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    paths: list[str] = []
+    for raw_line in result.stdout.splitlines():
+        line = raw_line.rstrip()
+        if not line:
+            continue
+        path = line[3:]
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        paths.append(path)
+    return paths
+
+
+def commit_mutable_artifact(path: str, run: RunRecord) -> None:
+    subprocess.run(["git", "add", path], cwd=ROOT_DIR, check=True)
+    subprocess.run(
+        [
+            "git",
+            "commit",
+            "-m",
+            f"ratchet: accept run {run.id} for {run.project_key}",
+        ],
+        cwd=ROOT_DIR,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+
+def restore_mutable_artifact(path: str) -> None:
+    subprocess.run(["git", "restore", "--", path], cwd=ROOT_DIR, check=True)

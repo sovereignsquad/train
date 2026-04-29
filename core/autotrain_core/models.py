@@ -27,6 +27,13 @@ class RatchetDecision(StrEnum):
     NOT_APPLICABLE = "not_applicable"
 
 
+class GitAction(StrEnum):
+    NONE = "none"
+    COMMITTED = "committed"
+    RESTORED = "restored"
+    BLOCKED = "blocked"
+
+
 class RunRecord(Base):
     __tablename__ = "run_records"
 
@@ -51,6 +58,10 @@ class RunRecord(Base):
     ratchet_decision: Mapped[RatchetDecision] = mapped_column(
         Enum(RatchetDecision),
         default=RatchetDecision.NOT_APPLICABLE,
+    )
+    git_action: Mapped[GitAction] = mapped_column(
+        Enum(GitAction),
+        default=GitAction.NONE,
     )
     best_metric_before: Mapped[float | None] = mapped_column(Float, nullable=True)
     best_metric_after: Mapped[float | None] = mapped_column(Float, nullable=True)

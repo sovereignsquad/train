@@ -208,6 +208,7 @@ This layout is a target contract, not the current completed state.
 - [Repository Contract](./docs/REPOSITORY_CONTRACT.md)
 - [Setup](./docs/SETUP.md)
 - [Environment](./docs/ENVIRONMENT.md)
+- [Recovery](./docs/RECOVERY.md)
 - [Status](./docs/STATUS.md)
 - [Handover](./docs/HANDOVER.md)
 - [Brain](./docs/BRAIN.md)
