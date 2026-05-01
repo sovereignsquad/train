@@ -50,24 +50,27 @@ function MetricValue({ value }: { value: number | null }) {
 
 function StatusBadge({ value }: { value: string | boolean | null }) {
   if (typeof value === "boolean") {
-    return <Badge color={value ? "teal" : "gray"}>{value ? "yes" : "no"}</Badge>;
+    const tone = value ? "success" : "neutral";
+    return <Badge className={`status-badge status-badge--${tone}`}>{value ? "yes" : "no"}</Badge>;
   }
 
   if (value === null) {
-    return <Badge color="gray">n/a</Badge>;
+    return <Badge className="status-badge status-badge--neutral">n/a</Badge>;
   }
 
   const normalized = value.toLowerCase();
-  const color =
+  const tone =
     normalized === "accepted" || normalized === "succeeded" || normalized === "ok"
-      ? "teal"
+      ? "success"
       : normalized === "rejected"
-        ? "orange"
+        ? "warning"
         : normalized === "failed" || normalized === "blocked"
-          ? "red"
-          : "gray";
+          ? "danger"
+          : normalized === "resume" || normalized === "running" || normalized === "reachable"
+            ? "info"
+            : "neutral";
 
-  return <Badge color={color}>{value}</Badge>;
+  return <Badge className={`status-badge status-badge--${tone}`}>{value}</Badge>;
 }
 
 function ErrorBlock({ title, message }: { title: string; message: string | null }) {
@@ -103,8 +106,8 @@ export default async function Home() {
           <Paper className="hero" radius="xl" p="xl">
             <Group justify="space-between" align="flex-start" gap="xl">
               <Stack gap="md" maw={760}>
-                <Badge color="amber" size="lg" variant="light">
-                  {"{train}"} MVP operator
+                <Badge className="status-badge status-badge--warning" size="lg" variant="light">
+                  train operator surface
                 </Badge>
                 <Title order={1} size={44} lh={1.02}>
                   Local control surface for the autonomous experiment engine.
@@ -127,8 +130,8 @@ export default async function Home() {
           </Paper>
 
           <SimpleGrid cols={{ base: 1, md: 4 }} spacing="lg">
-            <Card className="panel" radius="xl" padding="lg">
-              <Text c="dimmed" fz={12} fw={700} tt="uppercase">
+            <Card className="panel metric-card" radius="xl" padding="lg">
+              <Text className="metric-card__label">
                 Service
               </Text>
               <Title order={3}>{health?.service ?? "unavailable"}</Title>
@@ -137,8 +140,8 @@ export default async function Home() {
                 <Badge variant="outline">{health?.environment ?? "unknown"}</Badge>
               </Group>
             </Card>
-            <Card className="panel" radius="xl" padding="lg">
-              <Text c="dimmed" fz={12} fw={700} tt="uppercase">
+            <Card className="panel metric-card" radius="xl" padding="lg">
+              <Text className="metric-card__label">
                 Registered Projects
               </Text>
               <Title order={3}>{projects.length}</Title>
@@ -146,8 +149,8 @@ export default async function Home() {
                 Bound by a single mutable artifact and one machine-readable score.
               </Text>
             </Card>
-            <Card className="panel" radius="xl" padding="lg">
-              <Text c="dimmed" fz={12} fw={700} tt="uppercase">
+            <Card className="panel metric-card" radius="xl" padding="lg">
+              <Text className="metric-card__label">
                 Runs Logged
               </Text>
               <Title order={3}>{runs.length}</Title>
@@ -155,8 +158,8 @@ export default async function Home() {
                 Lifecycle + ratchet state persisted in local SQLite.
               </Text>
             </Card>
-            <Card className="panel" radius="xl" padding="lg">
-              <Text c="dimmed" fz={12} fw={700} tt="uppercase">
+            <Card className="panel metric-card" radius="xl" padding="lg">
+              <Text className="metric-card__label">
                 Recovery
               </Text>
               <Title order={3}>{operator?.recoverable_runs.length ?? 0}</Title>
@@ -164,8 +167,8 @@ export default async function Home() {
                 Recoverable runs derived from durable heartbeat and lease state.
               </Text>
             </Card>
-            <Card className="panel" radius="xl" padding="lg">
-              <Text c="dimmed" fz={12} fw={700} tt="uppercase">
+            <Card className="panel metric-card" radius="xl" padding="lg">
+              <Text className="metric-card__label">
                 Agent Adapter
               </Text>
               <Title order={3}>{agent?.name ?? "unknown"}</Title>
@@ -179,7 +182,7 @@ export default async function Home() {
           <Grid gap="lg">
             <Grid.Col span={{ base: 12, lg: 7 }}>
               {data.runs.ok ? (
-                <Card className="panel" radius="xl" padding="lg">
+                <Card className="panel section-panel" radius="xl" padding="lg">
                   <Group justify="space-between" mb="md">
                     <div>
                       <Title order={3}>Recent Runs</Title>
@@ -238,7 +241,7 @@ export default async function Home() {
             <Grid.Col span={{ base: 12, lg: 5 }}>
               <Stack gap="lg">
                 {data.projectStates.ok ? (
-                  <Card className="panel" radius="xl" padding="lg">
+                  <Card className="panel section-panel" radius="xl" padding="lg">
                     <Title order={3}>Project State</Title>
                     <Text c="dimmed" size="sm" mb="md">
                       Best-so-far state that drives the ratchet.
@@ -258,13 +261,13 @@ export default async function Home() {
                           <Divider my="sm" />
                           <Group grow>
                             <div>
-                              <Text c="dimmed" size="xs" tt="uppercase">
+                              <Text className="section-label">
                                 Best run
                               </Text>
                               <Text fw={700}>{state.best_run_id ?? "n/a"}</Text>
                             </div>
                             <div>
-                              <Text c="dimmed" size="xs" tt="uppercase">
+                              <Text className="section-label">
                                 Best metric
                               </Text>
                               <MetricValue value={state.best_metric_value} />
@@ -279,28 +282,28 @@ export default async function Home() {
                 )}
 
                 {data.operatorStatus.ok && operator ? (
-                  <Card className="panel" radius="xl" padding="lg">
+                  <Card className="panel section-panel" radius="xl" padding="lg">
                     <Title order={3}>Operator Status</Title>
                     <Text c="dimmed" size="sm" mb="md">
                       Durable health signals for unattended sessions and safe resume planning.
                     </Text>
                     <Group grow mb="md">
-                      <Paper className="panel-alt" radius="lg" p="md">
-                        <Text c="dimmed" size="xs" tt="uppercase">
-                          Running
-                        </Text>
+                        <Paper className="panel-alt" radius="lg" p="md">
+                          <Text className="section-label">
+                            Running
+                          </Text>
                         <Text fw={700}>{operator.running_runs}</Text>
                       </Paper>
-                      <Paper className="panel-alt" radius="lg" p="md">
-                        <Text c="dimmed" size="xs" tt="uppercase">
-                          Healthy
-                        </Text>
+                        <Paper className="panel-alt" radius="lg" p="md">
+                          <Text className="section-label">
+                            Healthy
+                          </Text>
                         <Text fw={700}>{operator.healthy_running_runs}</Text>
                       </Paper>
-                      <Paper className="panel-alt" radius="lg" p="md">
-                        <Text c="dimmed" size="xs" tt="uppercase">
-                          Stalled
-                        </Text>
+                        <Paper className="panel-alt" radius="lg" p="md">
+                          <Text className="section-label">
+                            Stalled
+                          </Text>
                         <Text fw={700}>{operator.stalled_runs}</Text>
                       </Paper>
                     </Group>
@@ -331,7 +334,7 @@ export default async function Home() {
                             ) : null}
                             <form action={resumeRunAction}>
                               <input type="hidden" name="runId" value={run.id} />
-                              <Button mt="md" radius="xl" size="xs" type="submit" variant="light">
+                              <Button className="resume-button" mt="md" radius="xl" size="xs" type="submit">
                                 Resume From Checkpoint
                               </Button>
                             </form>
@@ -349,29 +352,29 @@ export default async function Home() {
                 )}
 
                 {data.agentStatus.ok ? (
-                  <Card className="panel" radius="xl" padding="lg">
+                  <Card className="panel section-panel" radius="xl" padding="lg">
                     <Title order={3}>Vibe Adapter</Title>
                     <Text c="dimmed" size="sm" mb="md">
                       Canonical bootstrap surface for the first supported agent adapter.
                     </Text>
                     <List spacing="xs" size="sm">
                       <List.Item>
-                        Executable: <Code>{agent?.resolved_executable ?? agent?.executable}</Code>
+                        Executable: <span className="code-pill">{agent?.resolved_executable ?? agent?.executable}</span>
                       </List.Item>
                       <List.Item>
-                        Version: <Code>{agent?.version ?? "unknown"}</Code>
+                        Version: <span className="code-pill">{agent?.version ?? "unknown"}</span>
                       </List.Item>
                       <List.Item>
-                        Contract home: <Code>{agent?.contract_home ?? "unknown"}</Code>
+                        Contract home: <span className="code-pill">{agent?.contract_home ?? "unknown"}</span>
                       </List.Item>
                       <List.Item>
-                        Runtime home: <Code>{agent?.runtime_home ?? "unknown"}</Code>
+                        Runtime home: <span className="code-pill">{agent?.runtime_home ?? "unknown"}</span>
                       </List.Item>
                     </List>
                     {agent?.issues.length ? (
                       <>
                         <Divider my="md" />
-                        <List spacing="xs" size="sm">
+                        <List className="issue-list" spacing="xs" size="sm">
                           {agent.issues.map((issue) => (
                             <List.Item key={issue}>{issue}</List.Item>
                           ))}
@@ -383,7 +386,7 @@ export default async function Home() {
                   <ErrorBlock title="Vibe Adapter" message={data.agentStatus.error} />
                 )}
 
-                <Card className="panel" radius="xl" padding="lg">
+                <Card className="panel section-panel" radius="xl" padding="lg">
                   <Title order={3}>Providers</Title>
                   <Text c="dimmed" size="sm" mb="md">
                     Hosted and local model backends stay below the engine contract.

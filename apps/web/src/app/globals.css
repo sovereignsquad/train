@@ -1,3 +1,5 @@
+@import "./constellation.css";
+
 :root {
   color-scheme: light;
 }
@@ -9,12 +11,12 @@ body {
 
 body {
   margin: 0;
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--cds-font-family-sans);
   background:
-    radial-gradient(circle at top left, rgba(247, 214, 116, 0.32), transparent 30%),
-    radial-gradient(circle at top right, rgba(190, 215, 235, 0.36), transparent 28%),
-    linear-gradient(180deg, #fbfaf6 0%, #f1ede1 100%);
-  color: #211c16;
+    radial-gradient(circle at top left, rgba(207, 161, 68, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(24, 105, 93, 0.12), transparent 24%),
+    linear-gradient(180deg, var(--cds-surface-canvas) 0%, #efe6d8 100%);
+  color: var(--cds-text-primary);
 }
 
 * {
@@ -27,24 +29,114 @@ a {
 
 .page-shell {
   min-height: 100vh;
+  padding: var(--cds-space-xl) 0;
 }
 
 .hero {
   background:
-    linear-gradient(135deg, rgba(255, 248, 223, 0.92), rgba(234, 240, 244, 0.92)),
-    #ffffff;
-  border: 1px solid rgba(33, 28, 22, 0.08);
-  box-shadow: 0 20px 60px rgba(64, 46, 18, 0.08);
+    radial-gradient(circle at top right, rgba(207, 161, 68, 0.18), transparent 28%),
+    linear-gradient(140deg, rgba(255, 252, 247, 0.98), rgba(234, 225, 211, 0.92));
+  border: 1px solid var(--cds-border-soft);
+  box-shadow: var(--cds-shadow-lg);
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(33, 28, 22, 0.08);
-  box-shadow: 0 18px 40px rgba(69, 53, 25, 0.08);
+  background: color-mix(in srgb, var(--cds-surface-elevated) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cds-border-soft) 88%, white);
+  box-shadow: var(--cds-shadow-md);
   backdrop-filter: blur(18px);
 }
 
 .panel-alt {
-  background: rgba(249, 245, 236, 0.88);
-  border: 1px solid rgba(33, 28, 22, 0.08);
+  background: color-mix(in srgb, var(--cds-surface-sidebar) 62%, white);
+  border: 1px solid color-mix(in srgb, var(--cds-border-soft) 92%, white);
+}
+
+.metric-card {
+  min-height: 176px;
+}
+
+.metric-card__label,
+.section-label {
+  color: var(--cds-text-tertiary);
+  font-size: var(--cds-font-size-xs);
+  font-weight: var(--cds-font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.code-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--cds-radius-sm);
+  border: 1px solid var(--cds-border-soft);
+  background: color-mix(in srgb, var(--cds-surface-sidebar) 75%, white);
+  font-family: var(--cds-font-family-mono);
+  font-size: 12px;
+}
+
+.status-badge {
+  border-radius: var(--cds-radius-full);
+  border: 1px solid transparent;
+  text-transform: capitalize;
+}
+
+.status-badge--success {
+  color: var(--cds-status-success);
+  background: color-mix(in srgb, var(--cds-status-success) 14%, white);
+}
+
+.status-badge--warning {
+  color: var(--cds-status-warning);
+  background: color-mix(in srgb, var(--cds-status-warning) 14%, white);
+}
+
+.status-badge--danger {
+  color: var(--cds-status-danger);
+  background: color-mix(in srgb, var(--cds-status-danger) 14%, white);
+}
+
+.status-badge--info,
+.status-badge--neutral {
+  color: var(--cds-status-info);
+  background: color-mix(in srgb, var(--cds-status-info) 12%, white);
+}
+
+.section-panel {
+  overflow: hidden;
+}
+
+.section-panel .mantine-Table-table,
+.section-panel table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.section-panel th {
+  color: var(--cds-text-tertiary);
+  font-size: var(--cds-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.section-panel td {
+  border-color: color-mix(in srgb, var(--cds-border-soft) 90%, white);
+}
+
+.section-panel tr:hover td {
+  background: color-mix(in srgb, var(--cds-surface-sidebar) 50%, white);
+}
+
+.resume-button {
+  background: var(--cds-accent-primary);
+  color: var(--cds-text-inverse);
+}
+
+.resume-button:hover {
+  background: #9f4d25;
+}
+
+.issue-list {
+  color: var(--cds-text-secondary);
 }

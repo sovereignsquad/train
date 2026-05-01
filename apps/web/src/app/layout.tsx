@@ -19,8 +19,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "{train} operator",
-  description: "Local operator dashboard for the {train} MVP",
+  title: "train operator",
+  description: "Local operator dashboard for the train MVP",
 };
 
 export default function RootLayout({

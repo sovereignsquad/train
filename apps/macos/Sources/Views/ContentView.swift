@@ -35,15 +35,19 @@ struct ContentView: View {
     @State private var selectedPage: SidebarPage? = .overview
 
     var body: some View {
-        NavigationSplitView {
-            List(SidebarPage.allCases, selection: $selectedPage) { page in
-                Label(page.title, systemImage: page.icon)
-                    .tag(page)
+        ConstellationShell {
+            NavigationSplitView {
+                List(SidebarPage.allCases, selection: $selectedPage) { page in
+                    Label(page.title, systemImage: page.icon)
+                        .tag(page)
+                }
+                .navigationSplitViewColumnWidth(min: 160, ideal: 200)
+                .scrollContentBackground(.hidden)
+            } detail: {
+                detailContent
+                    .frame(minWidth: 760, minHeight: 620)
+                    .background(Color.clear)
             }
-            .navigationSplitViewColumnWidth(min: 160, ideal: 200)
-        } detail: {
-            detailContent
-                .frame(minWidth: 760, minHeight: 620)
         }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
@@ -109,10 +113,10 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundStyle(ConstellationPalette.textPrimary)
                     Text(subtitle)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(ConstellationPalette.textSecondary)
                 }
                 if !viewModel.lastRefreshError.isEmpty {
                     errorBanner(viewModel.lastRefreshError)
@@ -130,11 +134,11 @@ struct ContentView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 Text("Native operator shell for the local experiment engine.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(ConstellationPalette.textSecondary)
                 if let repositoryRoot = viewModel.processSupervisor.repositoryRoot {
                     Text(repositoryRoot.path)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(ConstellationPalette.textSecondary.opacity(0.7))
                         .textSelection(.enabled)
                 }
             }
@@ -143,7 +147,7 @@ struct ContentView: View {
     }
 
     private var engineCard: some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 10) {
                 statusRow("Engine Status", viewModel.processSupervisor.status.rawValue.capitalized)
                 statusRow("Engine Message", viewModel.processSupervisor.statusMessage)
@@ -170,9 +174,10 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        } label: {
             Label("Engine Supervisor", systemImage: "terminal")
+                .font(.headline)
         }
+        .constellationPanel()
     }
 
     private var overviewGrid: some View {
@@ -180,7 +185,7 @@ struct ContentView: View {
             GridItem(.flexible()),
             GridItem(.flexible()),
         ], spacing: 16) {
-            GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Health")
                         .font(.headline)
@@ -195,8 +200,9 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .constellationPanel()
 
-            GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Operator")
                         .font(.headline)
@@ -212,8 +218,9 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .constellationPanel()
 
-            GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Agent")
                         .font(.headline)
@@ -228,8 +235,9 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .constellationPanel()
 
-            GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Providers")
                         .font(.headline)
@@ -255,11 +263,12 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .constellationPanel()
         }
     }
 
     private var runsSection: some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Recent Runs")
                     .font(.headline)
@@ -296,13 +305,14 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        } label: {
             Label("Runs", systemImage: "list.bullet.rectangle")
+                .font(.headline)
         }
+        .constellationPanel()
     }
 
     private var recoverySection: some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Recovery")
                     .font(.headline)
@@ -342,13 +352,14 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        } label: {
             Label("Recovery Actions", systemImage: "arrow.clockwise")
+                .font(.headline)
         }
+        .constellationPanel()
     }
 
     private var logsSection: some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 12) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 6) {
                     ForEach(Array(viewModel.processSupervisor.logs.enumerated()), id: \.offset) { _, line in
@@ -360,15 +371,16 @@ struct ContentView: View {
                 }
             }
             .frame(minHeight: 220, maxHeight: 420)
-        } label: {
             Label("Engine Logs", systemImage: "doc.text")
+                .font(.headline)
         }
+        .constellationPanel()
     }
 
     private func statusRow(_ title: String, _ value: String) -> some View {
         HStack(alignment: .top) {
             Text(title)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(ConstellationPalette.textSecondary)
                 .frame(width: 120, alignment: .leading)
             Text(value)
                 .textSelection(.enabled)
@@ -380,26 +392,26 @@ struct ContentView: View {
     private func errorBanner(_ message: String) -> some View {
         HStack {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.yellow)
+                .foregroundStyle(ConstellationPalette.warning)
             Text(message)
                 .font(.caption)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.yellow.opacity(0.12))
+        .background(ConstellationPalette.warning.opacity(0.12))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func color(for status: String) -> Color {
         switch status.lowercased() {
         case "accepted", "succeeded":
-            return .green
+            return ConstellationPalette.success
         case "rejected":
-            return .orange
+            return ConstellationPalette.warning
         case "failed":
-            return .red
+            return ConstellationPalette.danger
         default:
-            return .secondary
+            return ConstellationPalette.textSecondary
         }
     }
 }

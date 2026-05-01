@@ -106,11 +106,13 @@ struct ProjectManagementView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .constellationPanel()
         }
     }
 
     private var projectDetailPane: some View {
-        GroupBox {
+        Group {
             if let selectedProject {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -130,6 +132,7 @@ struct ProjectManagementView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
         }
+        .constellationPanel()
     }
 
     private func projectRow(_ project: ProjectPayload) -> some View {
@@ -182,7 +185,7 @@ struct ProjectManagementView: View {
     }
 
     private func executionSection(for project: ProjectPayload) -> some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 10) {
                 infoRow("Metric", "\(project.metricName) / \(project.metricDirection)")
                 infoRow(
@@ -194,24 +197,24 @@ struct ProjectManagementView: View {
                 infoRow("Entrypoint", project.executionEntrypoint)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        } label: {
             Text("Execution Contract")
                 .font(.headline)
         }
+        .constellationInset()
     }
 
     private func artifactSection(for project: ProjectPayload) -> some View {
-        GroupBox {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 12) {
                 artifactReadList("Autonomous Mutable Artifacts", items: project.autonomousMutableArtifacts)
                 artifactReadList("Setup Artifacts", items: project.setupArtifacts)
                 artifactReadList("Dependency Artifacts", items: project.dependencyArtifacts)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        } label: {
             Text("Artifacts")
                 .font(.headline)
         }
+        .constellationInset()
     }
 
     private func artifactReadList(_ title: String, items: [String]) -> some View {
@@ -224,7 +227,7 @@ struct ProjectManagementView: View {
                     .padding(.vertical, 4)
                     .padding(.horizontal, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.secondary.opacity(0.08))
+                    .background(ConstellationPalette.panelAlt.opacity(0.9))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .textSelection(.enabled)
             }
