@@ -31,7 +31,7 @@ final class ProcessSupervisorService: ObservableObject {
         repositoryRoot = ProjectLocator.resolveRepositoryRoot()
         apiBaseURL = URL(string: "http://\(host):\(preferredPort)")
         activePort = preferredPort
-        databaseURL = "sqlite:///\(appSupportDirectory().appendingPathComponent("state/autotrain.db").path)"
+        databaseURL = "sqlite:///\(appSupportDirectory().appendingPathComponent("state/train.db").path)"
     }
 
     func startEngine() {
@@ -48,16 +48,16 @@ final class ProcessSupervisorService: ObservableObject {
         guard let repositoryRoot else {
             status = .failed
             statusMessage = "Repository root could not be resolved."
-            appendLog("Repository root missing. Set AUTOTRAIN_REPO_ROOT or run from the autotrain repository.")
+            appendLog("Repository root missing. Set TRAIN_REPO_ROOT or run from the train repository.")
             return
         }
         guard let uvExecutable = ProjectLocator.resolveExecutable(
             named: "uv",
-            overrideEnvKey: "AUTOTRAIN_UV_EXECUTABLE"
+            overrideEnvKey: "TRAIN_UV_EXECUTABLE"
         ) else {
             status = .failed
             statusMessage = "The uv executable could not be resolved."
-            appendLog("uv executable missing. Install uv or set AUTOTRAIN_UV_EXECUTABLE to an absolute executable path.")
+            appendLog("uv executable missing. Install uv or set TRAIN_UV_EXECUTABLE to an absolute executable path.")
             return
         }
         uvExecutablePath = uvExecutable.path
@@ -66,7 +66,7 @@ final class ProcessSupervisorService: ObservableObject {
         let logsDirectory = stateDirectory.appendingPathComponent("logs", isDirectory: true)
         let runtimeDirectory = stateDirectory.appendingPathComponent("runtime", isDirectory: true)
         let logFileURL = logsDirectory.appendingPathComponent("engine.log")
-        databaseURL = "sqlite:///\(stateDirectory.appendingPathComponent("state/autotrain.db").path)"
+        databaseURL = "sqlite:///\(stateDirectory.appendingPathComponent("state/train.db").path)"
 
         do {
             try FileManager.default.createDirectory(at: stateDirectory, withIntermediateDirectories: true)
@@ -111,14 +111,14 @@ final class ProcessSupervisorService: ObservableObject {
         process.arguments = [
             "run",
             "uvicorn",
-            "autotrain_api.main:app",
+            "train_api.main:app",
             "--host",
             host,
             "--port",
             String(selectedPort),
         ]
         var env = ProcessInfo.processInfo.environment
-        env["AUTOTRAIN_ENV"] = "local"
+        env["TRAIN_ENV"] = "local"
         env["APP_HOST"] = host
         env["APP_PORT"] = String(selectedPort)
         env["DATABASE_URL"] = databaseURL
@@ -225,7 +225,7 @@ final class ProcessSupervisorService: ObservableObject {
 
     private func appSupportDirectory() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return base.appendingPathComponent("Autotrain", isDirectory: true)
+        return base.appendingPathComponent("Train", isDirectory: true)
     }
 
     private func appendLog(_ line: String) {
@@ -247,7 +247,7 @@ final class ProcessSupervisorService: ObservableObject {
     private func isHealthyEngine(at baseURL: URL) async -> Bool {
         do {
             let health = try await APIClient(baseURL: baseURL).get("health", as: HealthPayload.self)
-            return health.service == "autotrain-api" && health.status == "ok"
+            return health.service == "train-api" && health.status == "ok"
         } catch {
             return false
         }

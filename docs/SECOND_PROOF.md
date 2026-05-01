@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the second platform-validation pass for `autotrain`.
+This document records the second platform-validation pass for `train`.
 
 It proves that the platform works beyond:
 

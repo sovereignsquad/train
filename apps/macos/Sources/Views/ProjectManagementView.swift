@@ -66,7 +66,7 @@ struct ProjectManagementView: View {
         .alert(item: $deleteCandidate) { project in
             Alert(
                 title: Text("Delete \(project.name)?"),
-                message: Text("This removes the managed project definition from autotrain."),
+                message: Text("This removes the managed project definition from train."),
                 primaryButton: .destructive(Text("Delete")) {
                     viewModel.deleteProject(project.key)
                     if selectedProjectKey == project.key {

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how `autotrain` work is coordinated.
+This document defines how `train` work is coordinated.
 
 The goal is to make delivery strict, predictable, and low-ambiguity:
 
@@ -229,12 +229,12 @@ Keep naming rigid:
 
 Use:
 
-- `Autotrain: <outcome>`
+- `Train: <outcome>`
 
 Examples:
 
-- `Autotrain: Build the engine-level experiment runner and metric contract`
-- `Autotrain: Add provider adapters for hosted and local model backends`
+- `Train: Build the engine-level experiment runner and metric contract`
+- `Train: Add provider adapters for hosted and local model backends`
 
 ### Branches
 

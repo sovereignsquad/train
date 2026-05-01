@@ -3,7 +3,7 @@ import Foundation
 enum ProjectLocator {
     static func resolveRepositoryRoot() -> URL? {
         let env = ProcessInfo.processInfo.environment
-        if let override = env["AUTOTRAIN_REPO_ROOT"] {
+        if let override = env["TRAIN_REPO_ROOT"] {
             let url = URL(fileURLWithPath: override)
             if isRepositoryRoot(url) {
                 return url
@@ -20,7 +20,7 @@ enum ProjectLocator {
             return candidate
         }
 
-        let sharedProjects = URL(fileURLWithPath: "/Users/Shared/Projects/autotrain")
+        let sharedProjects = URL(fileURLWithPath: "/Users/Shared/Projects/train")
         if isRepositoryRoot(sharedProjects) {
             return sharedProjects
         }
@@ -46,8 +46,8 @@ enum ProjectLocator {
     private static func isRepositoryRoot(_ url: URL) -> Bool {
         let markerPaths = [
             "pyproject.toml",
-            "services/api/autotrain_api/main.py",
-            "core/autotrain_core",
+            "services/api/train_api/main.py",
+            "core/train_core",
             "projects/mythology/program.md",
         ]
         return markerPaths.allSatisfy { marker in

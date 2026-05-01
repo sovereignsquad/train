@@ -1,4 +1,4 @@
-from autotrain_core.providers import get_provider_adapter, list_provider_adapters
+from train_core.providers import get_provider_adapter, list_provider_adapters
 
 
 def test_provider_registry_has_hosted_and_local_paths() -> None:

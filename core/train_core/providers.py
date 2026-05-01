@@ -3,7 +3,7 @@ from enum import StrEnum
 import json
 from urllib import error, request
 
-from autotrain_core.config import settings
+from train_core.config import settings
 
 
 class ProviderKind(StrEnum):
@@ -39,7 +39,7 @@ PROVIDERS: dict[str, ProviderAdapterDefinition] = {
         key="mistral-api",
         name="Mistral API",
         kind=ProviderKind.HOSTED,
-        description="First hosted provider adapter for autotrain.",
+        description="First hosted provider adapter for train.",
         base_url=settings.mistral_api_base_url,
         requires_api_key=True,
     ),
@@ -47,7 +47,7 @@ PROVIDERS: dict[str, ProviderAdapterDefinition] = {
         key="ollama",
         name="Ollama",
         kind=ProviderKind.LOCAL,
-        description="First local provider adapter for autotrain via the Ollama HTTP API.",
+        description="First local provider adapter for train via the Ollama HTTP API.",
         base_url=settings.ollama_base_url,
         requires_api_key=False,
     ),

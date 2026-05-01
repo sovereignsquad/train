@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from autotrain_core.providers import get_provider_status, list_provider_adapters, serialize_provider_status
+from train_core.providers import get_provider_status, list_provider_adapters, serialize_provider_status
 
 
 def main() -> None:

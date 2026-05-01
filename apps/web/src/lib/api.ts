@@ -110,7 +110,7 @@ export type ApiResult<T> = {
 };
 
 export function getApiBaseUrl(): string {
-  return process.env.AUTOTRAIN_API_URL || DEFAULT_API_URL;
+  return process.env.TRAIN_API_URL || DEFAULT_API_URL;
 }
 
 async function fetchJson<T>(path: string): Promise<ApiResult<T>> {

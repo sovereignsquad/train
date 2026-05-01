@@ -99,7 +99,7 @@ def create_clean_worktree(temp_dir: Path) -> Path:
     )
     if status.stdout.strip():
         subprocess.run(
-            ["git", "commit", "-m", "test: snapshot current autotrain worktree"],
+            ["git", "commit", "-m", "test: snapshot current train worktree"],
             cwd=worktree_dir,
             check=True,
             stdout=subprocess.DEVNULL,
@@ -109,13 +109,13 @@ def create_clean_worktree(temp_dir: Path) -> Path:
 
 
 def main() -> None:
-    temp_dir = Path(tempfile.mkdtemp(prefix="autotrain-mvp-"))
+    temp_dir = Path(tempfile.mkdtemp(prefix="train-mvp-"))
     worktree_dir = create_clean_worktree(temp_dir)
     database_url = f"sqlite:///{temp_dir / 'mvp.db'}"
     log_path = temp_dir / "api.log"
     env = os.environ.copy()
     env["DATABASE_URL"] = database_url
-    env["AUTOTRAIN_ENV"] = "local"
+    env["TRAIN_ENV"] = "local"
 
     log_file = log_path.open("w", encoding="utf-8")
     server = subprocess.Popen(
@@ -123,7 +123,7 @@ def main() -> None:
             "uv",
             "run",
             "uvicorn",
-            "autotrain_api.main:app",
+            "train_api.main:app",
             "--host",
             "127.0.0.1",
             "--port",

@@ -83,7 +83,7 @@ Current command sequence:
 
 ```bash
 uv sync
-uv run uvicorn autotrain_api.main:app --reload
+uv run uvicorn train_api.main:app --reload
 ```
 
 Vibe bootstrap:
@@ -98,7 +98,7 @@ Local UI:
 ```bash
 cd apps/web
 npm install
-AUTOTRAIN_API_URL=http://127.0.0.1:8000 npm run dev
+TRAIN_API_URL=http://127.0.0.1:8000 npm run dev
 ```
 
 Native shell:
@@ -107,13 +107,13 @@ Native shell:
 cd apps/macos
 swift build -c release
 bash Scripts/build-bundle.sh
-open dist/Autotrain.app
+open dist/Train.app
 ```
 
 If the native shell cannot resolve `uv` from its launch environment, set:
 
 ```bash
-export AUTOTRAIN_UV_EXECUTABLE="$(command -v uv)"
+export TRAIN_UV_EXECUTABLE="$(command -v uv)"
 ```
 
 MVP smoke test:

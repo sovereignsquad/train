@@ -1,5 +1,5 @@
 [project]
-name = "autotrain"
+name = "train"
 version = "0.1.0"
 description = "Provider-neutral autonomous optimization platform"
 readme = "README.md"

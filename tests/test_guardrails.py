@@ -1,5 +1,5 @@
-from autotrain_core.guardrails import GuardrailError, classify_changed_paths, validate_run_budget, validate_autonomous_workspace
-from autotrain_core.projects import get_project
+from train_core.guardrails import GuardrailError, classify_changed_paths, validate_run_budget, validate_autonomous_workspace
+from train_core.projects import get_project
 
 
 def test_budget_bounds_are_enforced() -> None:

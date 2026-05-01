@@ -1,6 +1,6 @@
 # Helpdesk Benchmark
 
-This is the second reference benchmark for `autotrain`.
+This is the second reference benchmark for `train`.
 
 Purpose:
 

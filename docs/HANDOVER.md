@@ -27,7 +27,7 @@ Keep this document concise and current.
 
 Last completed increment:
 
-- native macOS shell UX recovery
+- repository-wide rename to `train`
 
 Implemented:
 
@@ -42,16 +42,16 @@ Implemented:
 - updated MVP smoke test that snapshots the current worktree into a temporary clean git worktree
 - proof runner in `scripts/prove_vibe_cycle.py`
 - runtime `VIBE_HOME` isolation so Vibe metadata no longer blocks ratchet mutation
-- project-level autonomous guardrails in `core/autotrain_core/guardrails.py`
-- pre-execution guardrail enforcement in `core/autotrain_core/runner.py`
-- ratchet-side guardrail classification in `core/autotrain_core/ratchet.py`
-- provider adapter registry in `core/autotrain_core/providers.py`
+- project-level autonomous guardrails in `core/train_core/guardrails.py`
+- pre-execution guardrail enforcement in `core/train_core/runner.py`
+- ratchet-side guardrail classification in `core/train_core/ratchet.py`
+- provider adapter registry in `core/train_core/providers.py`
 - provider API surfaces:
   - `GET /v1/providers`
   - `GET /v1/providers/{provider_key}`
 - live provider probe script:
   - `scripts/check_providers.py`
-- operator recovery layer in `core/autotrain_core/operator.py`
+- operator recovery layer in `core/train_core/operator.py`
 - operator API surfaces:
   - `GET /v1/operator/status`
   - `POST /v1/runs/{run_id}/heartbeat`
@@ -66,7 +66,7 @@ Implemented:
 - local engine supervisor and API dashboard in the Swift shell
 - bundle scripts for local desktop artifacts
 - release-check scaffold against GitHub releases
-- deterministic `uv` discovery with `AUTOTRAIN_UV_EXECUTABLE` override support
+- deterministic `uv` discovery with `TRAIN_UV_EXECUTABLE` override support
 - attach-to-existing-engine or next-free-port fallback when `8420` is already occupied
 - managed project registry in the API with create, read, update, and delete support
 - dedicated native Projects workspace separating managed projects from built-in templates
@@ -74,6 +74,9 @@ Implemented:
 - replaced raw artifact blobs with file selectors and editable artifact lists
 - restructured the project editor into responsive native sections
 - replaced the Projects page card wall with a native list-detail layout
+- added a deterministic app icon generation pipeline and embedded `.icns` bundle icon
+- renamed the core package, API package, repo-local Vibe contract, native app target, bundle, and GitHub remote from `autotrain` to `train`
+- refreshed the generated app icon from the old `AT` monogram to a `T` mark aligned with the new app name
 - recorded the UI failure and recovery standard in `docs/UI_UX_RECOVERY.md`
 - project contract metadata for:
   - autonomous mutable artifacts
@@ -122,6 +125,7 @@ Verified:
   - engine launch path in non-interactive app context
 - live HTTP CRUD verification for managed projects
 - warning-free Swift rebuild after the UI recovery pass
+- full rename validation for Python, web, macOS bundle, MVP smoke test, and GitHub remote
 
 ### What Needs To Happen Next
 

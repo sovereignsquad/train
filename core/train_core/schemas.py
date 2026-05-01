@@ -2,9 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-from autotrain_core.agents import AgentMode
-from autotrain_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
-from autotrain_core.providers import ProviderKind
+from train_core.agents import AgentMode
+from train_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
+from train_core.providers import ProviderKind
 
 
 class RunCreate(BaseModel):

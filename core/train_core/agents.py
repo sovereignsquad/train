@@ -4,8 +4,8 @@ from pathlib import Path
 import shutil
 import subprocess
 
-from autotrain_core.config import ROOT_DIR, settings
-from autotrain_core.projects import get_project, get_project_root
+from train_core.config import ROOT_DIR, settings
+from train_core.projects import get_project, get_project_root
 
 
 class AgentMode(StrEnum):
@@ -56,7 +56,7 @@ AGENT_ADAPTERS: dict[str, AgentAdapterDefinition] = {
         key="mistral-vibe",
         name="Mistral Vibe",
         description=(
-            "First supported coding-agent adapter for autotrain. It provides a deterministic "
+            "First supported coding-agent adapter for train. It provides a deterministic "
             "bootstrap path without coupling the platform to a single provider or benchmark."
         ),
         executable=settings.mistral_vibe_executable,
@@ -86,7 +86,7 @@ def get_vibe_agent_config_path() -> Path:
 
 
 def get_vibe_prompt_path() -> Path:
-    return get_vibe_contract_dir() / "prompts" / "autotrain.md"
+    return get_vibe_contract_dir() / "prompts" / "train.md"
 
 
 def get_vibe_runtime_home() -> Path:
@@ -238,7 +238,7 @@ def _build_vibe_prompt(*, project_key: str, mode: AgentMode, objective: str | No
     )
 
     lines = [
-        "Follow the autotrain project contract strictly.",
+        "Follow the train project contract strictly.",
         f"Project key: {project.key}",
         f"Project root: {project_root}",
         f"Mutable artifact: {ROOT_DIR / project.mutable_artifact}",

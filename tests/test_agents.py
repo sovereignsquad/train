@@ -1,5 +1,5 @@
-from autotrain_core.agents import AgentMode, build_agent_launch_plan, get_agent_status
-from autotrain_core.config import ROOT_DIR
+from train_core.agents import AgentMode, build_agent_launch_plan, get_agent_status
+from train_core.config import ROOT_DIR
 
 
 def test_plan_launch_is_interactive() -> None:
@@ -36,5 +36,5 @@ def test_vibe_status_uses_repo_local_contract_files() -> None:
     assert status.contract_home.endswith("/.vibe")
     assert status.runtime_home.endswith("/artifacts/local/vibe-home")
     assert status.config_path.endswith("/.vibe/config.toml")
-    assert status.agent_config_path.endswith("/.vibe/agents/autotrain.toml")
-    assert status.prompt_path.endswith("/.vibe/prompts/autotrain.md")
+    assert status.agent_config_path.endswith("/.vibe/agents/train.toml")
+    assert status.prompt_path.endswith("/.vibe/prompts/train.md")

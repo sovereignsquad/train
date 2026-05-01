@@ -1,6 +1,6 @@
 # Mythology Benchmark
 
-This is the first reference benchmark for `autotrain`.
+This is the first reference benchmark for `train`.
 
 Purpose:
 

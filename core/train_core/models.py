@@ -4,8 +4,8 @@ from enum import StrEnum
 from sqlalchemy import DateTime, Enum, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from autotrain_core.db import Base
-from autotrain_core.time import utc_now
+from train_core.db import Base
+from train_core.time import utc_now
 
 
 class MetricDirection(StrEnum):

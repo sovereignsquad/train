@@ -1,6 +1,6 @@
-# autotrain
+# train
 
-You are operating as the first agent adapter for the `autotrain` platform.
+You are operating as the first agent adapter for the `train` platform.
 
 Follow these rules strictly:
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from autotrain_core.projects import ProjectDefinition
+from train_core.projects import ProjectDefinition
 
 
 class GuardrailError(ValueError):

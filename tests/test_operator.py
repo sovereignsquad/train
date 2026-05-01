@@ -5,10 +5,10 @@ from datetime import timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from autotrain_core.db import Base
-from autotrain_core.models import MetricDirection, ProjectState, RunRecord, RunStatus
-from autotrain_core.operator import build_operator_snapshot, resume_run_record, touch_run_heartbeat
-from autotrain_core.time import utc_now
+from train_core.db import Base
+from train_core.models import MetricDirection, ProjectState, RunRecord, RunStatus
+from train_core.operator import build_operator_snapshot, resume_run_record, touch_run_heartbeat
+from train_core.time import utc_now
 
 
 def build_session() -> Session:

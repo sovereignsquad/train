@@ -1,12 +1,12 @@
-# Autotrain macOS App Plan
+# Train macOS App Plan
 
 ## Purpose
 
-This document defines the plan to deliver `autotrain` as a native macOS application.
+This document defines the plan to deliver `train` as a native macOS application.
 
 It is based on:
 
-- the current `autotrain` browser-first local platform
+- the current `train` browser-first local platform
 - the delivery patterns documented in `/Users/Shared/Projects/claude/calendar-agent/DEVELOPMENT.md`
 - the `calendar-agent` SwiftPM app structure, bundle scripts, release flow, and update-system implementation
 
@@ -35,14 +35,14 @@ The goal is not just to wrap a browser view. The goal is to build a native opera
 
 ### Lessons We Should Not Copy Blindly
 
-1. We should not rewrite the `autotrain` engine in Swift.
-   Reason: unlike the old Python/PyQt calendar app, `autotrain`'s core value is already in Python and is the right technology for experiment orchestration, benchmarks, adapters, and ML-adjacent work.
+1. We should not rewrite the `train` engine in Swift.
+   Reason: unlike the old Python/PyQt calendar app, `train`'s core value is already in Python and is the right technology for experiment orchestration, benchmarks, adapters, and ML-adjacent work.
 2. We should not treat Python bundling as an afterthought.
-   Reason: this is the main delivery risk for `autotrain`, and it must be designed explicitly.
+   Reason: this is the main delivery risk for `train`, and it must be designed explicitly.
 
 ## Strategic Product Decision
 
-`autotrain` should become a hybrid native app:
+`train` should become a hybrid native app:
 
 - Native shell: `Swift` + `SwiftUI`
 - Core engine: existing `Python` platform
@@ -75,7 +75,7 @@ Responsibilities:
 
 Suggested modules:
 
-- `AutotrainApp.swift`
+- `TrainApp.swift`
 - `AppViewModel.swift`
 - `ProcessSupervisorService.swift`
 - `EngineHealthService.swift`
@@ -107,17 +107,17 @@ Use macOS app-owned paths, not repo-relative paths, in the shipped product.
 Suggested paths:
 
 - app support root:
-  - `~/Library/Application Support/Autotrain/`
+  - `~/Library/Application Support/Train/`
 - engine state:
-  - `~/Library/Application Support/Autotrain/state/`
+  - `~/Library/Application Support/Train/state/`
 - database:
-  - `~/Library/Application Support/Autotrain/state/autotrain.db`
+  - `~/Library/Application Support/Train/state/train.db`
 - logs:
-  - `~/Library/Application Support/Autotrain/logs/`
+  - `~/Library/Application Support/Train/logs/`
 - downloaded resources:
-  - `~/Library/Application Support/Autotrain/resources/`
+  - `~/Library/Application Support/Train/resources/`
 - runtime work:
-  - `~/Library/Application Support/Autotrain/runtime/`
+  - `~/Library/Application Support/Train/runtime/`
 
 ## Delivery Decision: Browser UI vs Native UI
 
@@ -161,7 +161,7 @@ Pros:
 - keeps Swift app thin
 - avoids shipping a giant app bundle
 - lets us version and replace the engine/runtime independently
-- aligns better with `autotrain`'s fast-moving Python core
+- aligns better with `train`'s fast-moving Python core
 
 Cons:
 
@@ -172,7 +172,7 @@ This should be MVP.
 
 ### Recommended Runtime Plan
 
-For the first native `autotrain` app:
+For the first native `train` app:
 
 1. ship a native Swift app only
 2. on first launch, bootstrap a managed local runtime into App Support:
@@ -370,7 +370,7 @@ We should reuse the `calendar-agent` release model with two important modificati
 - manual "Check for Updates" action
 - download/install/restart flow
 
-### What To Extend For Autotrain
+### What To Extend For Train
 
 We have two update planes:
 
@@ -418,7 +418,7 @@ apps/macos/
   Package.swift
   Info.plist
   Sources/
-    AutotrainApp.swift
+    TrainApp.swift
     AppViewModel.swift
     Services/
     Views/
@@ -604,7 +604,7 @@ Mitigation:
 
 ## Exact Recommendation
 
-Build `autotrain` as a native SwiftUI macOS operator app with a managed local Python engine.
+Build `train` as a native SwiftUI macOS operator app with a managed local Python engine.
 
 Do not:
 

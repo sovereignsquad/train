@@ -4,12 +4,12 @@ from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
-from autotrain_core.config import ROOT_DIR, settings
-from autotrain_core.guardrails import GuardrailError, validate_autonomous_workspace, validate_run_budget
-from autotrain_core.models import RunRecord, RunStatus
-from autotrain_core.projects import ProjectDefinition, build_run_command, get_project
-from autotrain_core.schemas import ExecutionResult, RunComplete, RunCreate
-from autotrain_core.time import utc_now
+from train_core.config import ROOT_DIR, settings
+from train_core.guardrails import GuardrailError, validate_autonomous_workspace, validate_run_budget
+from train_core.models import RunRecord, RunStatus
+from train_core.projects import ProjectDefinition, build_run_command, get_project
+from train_core.schemas import ExecutionResult, RunComplete, RunCreate
+from train_core.time import utc_now
 
 
 class RunnerError(ValueError):

@@ -8,7 +8,7 @@ final class UpdateService: ObservableObject {
     @Published var releaseURL: URL?
     @Published var errorMessage: String = ""
 
-    private let releaseEndpoint = URL(string: "https://api.github.com/repos/sovereignsquad/autotrain/releases/latest")!
+    private let releaseEndpoint = URL(string: "https://api.github.com/repos/sovereignsquad/train/releases/latest")!
 
     func checkForUpdates() {
         guard !isChecking else { return }

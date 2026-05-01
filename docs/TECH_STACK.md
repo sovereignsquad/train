@@ -2,7 +2,7 @@
 
 ## Decision Summary
 
-`autotrain` is a Python-first platform with a local-first runtime and an optional hosted control plane.
+`train` is a Python-first platform with a local-first runtime and an optional hosted control plane.
 
 The stack and architecture should be implemented in an open-source-friendly way under `Apache-2.0`, with clean boundaries between reusable platform logic and optional integrations.
 

@@ -1,9 +1,9 @@
 import json
 import subprocess
 
-from autotrain_core.db import SessionLocal, init_db
-from autotrain_core.models import MetricDirection
-from autotrain_core.projects import (
+from train_core.db import SessionLocal, init_db
+from train_core.models import MetricDirection
+from train_core.projects import (
     ProjectMutation,
     create_managed_project,
     delete_managed_project,
@@ -11,7 +11,7 @@ from autotrain_core.projects import (
     list_projects,
     update_managed_project,
 )
-from autotrain_core.ratchet import is_better_metric
+from train_core.ratchet import is_better_metric
 
 
 def test_project_registry_contains_second_project() -> None:

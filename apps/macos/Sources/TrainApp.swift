@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @main
-struct AutotrainApp: App {
+struct TrainApp: App {
     @StateObject private var viewModel = AppViewModel()
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
@@ -21,7 +21,7 @@ struct AutotrainApp: App {
         .defaultSize(width: 1280, height: 860)
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About Autotrain") {
+                Button("About Train") {
                     NSApp.orderFrontStandardAboutPanel(nil)
                 }
             }

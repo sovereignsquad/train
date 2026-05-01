@@ -6,9 +6,9 @@ import sys
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
-from autotrain_core.config import ROOT_DIR
-from autotrain_core.db import SessionLocal
-from autotrain_core.models import ManagedProject, MetricDirection
+from train_core.config import ROOT_DIR
+from train_core.db import SessionLocal
+from train_core.models import ManagedProject, MetricDirection
 
 
 @dataclass(frozen=True)
@@ -61,7 +61,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         key="helpdesk",
         name="Helpdesk Intent Benchmark",
         description=(
-            "Second reference benchmark for autotrain using deterministic helpdesk intent "
+            "Second reference benchmark for train using deterministic helpdesk intent "
             "classification to validate a maximize-metric project shape."
         ),
         mutable_artifact="projects/helpdesk/train.py",
@@ -88,7 +88,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         key="mythology",
         name="Mythology Benchmark",
         description=(
-            "First reference benchmark for autotrain using mythology and folktales as "
+            "First reference benchmark for train using mythology and folktales as "
             "the proving ground for the general-purpose platform contract."
         ),
         mutable_artifact="projects/mythology/train.py",

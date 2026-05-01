@@ -2,9 +2,9 @@ import subprocess
 
 from sqlalchemy.orm import Session
 
-from autotrain_core.config import ROOT_DIR
-from autotrain_core.guardrails import GuardrailError, validate_autonomous_workspace
-from autotrain_core.models import (
+from train_core.config import ROOT_DIR
+from train_core.guardrails import GuardrailError, validate_autonomous_workspace
+from train_core.models import (
     GitAction,
     MetricDirection,
     ProjectState,
@@ -12,7 +12,7 @@ from autotrain_core.models import (
     RunRecord,
     RunStatus,
 )
-from autotrain_core.projects import get_project
+from train_core.projects import get_project
 
 class RatchetError(ValueError):
     """Raised when a ratchet decision cannot be applied."""

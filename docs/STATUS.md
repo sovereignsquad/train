@@ -18,11 +18,11 @@ Update this document whenever the active implementation state changes materially
 
 Phase:
 
-- native macOS shell UX recovery completed
+- repository-wide rename to `train` completed
 
 Primary active issue:
 
-- no blocker remains on the native shell scaffold; next lane should move to runtime bootstrap and packaged desktop delivery
+- no blocker remains on the renamed shell scaffold; next lane should move to runtime bootstrap and packaged desktop delivery
 
 Board intent:
 
@@ -75,6 +75,8 @@ The repository currently has:
   - attach/fallback behavior when the preferred API port is already occupied
   - native toolbar-based action placement instead of in-content action clusters
   - responsive project editor sections with file selectors, lists, and structured pickers
+  - deterministic app icon generation and bundled `.icns` app icon
+  - `T`-based app icon and `Train.app` bundle naming
 - managed project registry with:
   - reference templates
   - user-defined managed projects
@@ -161,6 +163,7 @@ Verified locally:
 - native-shell engine launch path fixed for non-interactive app environments
 - managed-project CRUD verified through the live HTTP API
 - native shell rebuilt after UI recovery with warning-free Swift build
+- repository, package, bundle, and remote rename from `autotrain` to `train`
 
 ## Current Gaps
 

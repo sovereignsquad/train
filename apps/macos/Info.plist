@@ -5,13 +5,15 @@
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleExecutable</key>
-  <string>Autotrain</string>
+  <string>Train</string>
   <key>CFBundleIdentifier</key>
-  <string>ai.sovereignsquad.autotrain</string>
+  <string>ai.sovereignsquad.train</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
+  <key>CFBundleIconFile</key>
+  <string>Train</string>
   <key>CFBundleName</key>
-  <string>Autotrain</string>
+  <string>Train</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>

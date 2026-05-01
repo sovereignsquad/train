@@ -6,9 +6,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from autotrain_core.config import settings
-from autotrain_core.models import ProjectState, RunRecord, RunStatus
-from autotrain_core.time import utc_now
+from train_core.config import settings
+from train_core.models import ProjectState, RunRecord, RunStatus
+from train_core.time import utc_now
 
 
 class OperatorError(ValueError):

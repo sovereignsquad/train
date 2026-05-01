@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the first real `Mistral Vibe`-driven autonomous experiment cycle completed against the `autotrain` mythology benchmark.
+This document records the first real `Mistral Vibe`-driven autonomous experiment cycle completed against the `train` mythology benchmark.
 
 It exists as a durable proof artifact after the temporary clean worktree used by the proof script is removed.
 

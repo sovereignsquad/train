@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_STATE_DIR = ROOT_DIR / "artifacts" / "local"
-DEFAULT_DB_PATH = DEFAULT_STATE_DIR / "autotrain.db"
+DEFAULT_DB_PATH = DEFAULT_STATE_DIR / "train.db"
 
 
 class Settings(BaseSettings):
@@ -16,8 +16,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    autotrain_env: str = Field(default="local", alias="AUTOTRAIN_ENV")
-    app_name: str = "autotrain-api"
+    train_env: str = Field(default="local", alias="TRAIN_ENV")
+    app_name: str = "train-api"
     app_host: str = Field(default="127.0.0.1", alias="APP_HOST")
     app_port: int = Field(default=8000, alias="APP_PORT")
     database_url: str = Field(
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     mistral_api_key: str | None = Field(default=None, alias="MISTRAL_API_KEY")
     mistral_api_base_url: str = Field(default="https://api.mistral.ai", alias="MISTRAL_API_BASE_URL")
     mistral_vibe_executable: str = Field(default="vibe", alias="MISTRAL_VIBE_EXECUTABLE")
-    mistral_vibe_agent_name: str = Field(default="autotrain", alias="MISTRAL_VIBE_AGENT_NAME")
+    mistral_vibe_agent_name: str = Field(default="train", alias="MISTRAL_VIBE_AGENT_NAME")
     mistral_vibe_home: str = Field(
         default=str(DEFAULT_STATE_DIR / "vibe-home"),
         alias="MISTRAL_VIBE_HOME",

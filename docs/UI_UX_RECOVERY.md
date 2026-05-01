@@ -55,7 +55,7 @@ If a UI change fails those checks, it is not ready.
 
 Primary files:
 
-- `apps/macos/Sources/AutotrainApp.swift`
+- `apps/macos/Sources/TrainApp.swift`
 - `apps/macos/Sources/Views/ContentView.swift`
 - `apps/macos/Sources/Views/ProjectManagementView.swift`
 
@@ -76,4 +76,4 @@ Recovery was verified with:
 
 The updated local bundle is:
 
-- `apps/macos/dist/Autotrain.app`
+- `apps/macos/dist/Train.app`

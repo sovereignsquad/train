@@ -6,8 +6,8 @@ import os
 import subprocess
 import sys
 
-from autotrain_core.config import settings
-from autotrain_core.agents import (
+from train_core.config import settings
+from train_core.agents import (
     AgentMode,
     build_agent_launch_plan,
     get_agent_status,
@@ -16,7 +16,7 @@ from autotrain_core.agents import (
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Launch the canonical Mistral Vibe flow for autotrain.")
+    parser = argparse.ArgumentParser(description="Launch the canonical Mistral Vibe flow for train.")
     parser.add_argument("--project-key", default="mythology")
     parser.add_argument("--mode", choices=[mode.value for mode in AgentMode], default=AgentMode.PLAN.value)
     parser.add_argument("--objective")

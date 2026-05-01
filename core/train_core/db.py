@@ -5,7 +5,7 @@ from alembic.config import Config
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from autotrain_core.config import ROOT_DIR, settings
+from train_core.config import ROOT_DIR, settings
 
 
 class Base(DeclarativeBase):
@@ -35,7 +35,7 @@ def get_db() -> Session:
 
 
 def init_db() -> None:
-    from autotrain_core import models  # noqa: F401
+    from train_core import models  # noqa: F401
 
     alembic_config = Config(str(ROOT_DIR / "alembic.ini"))
     alembic_config.set_main_option("script_location", str(ROOT_DIR / "migrations"))

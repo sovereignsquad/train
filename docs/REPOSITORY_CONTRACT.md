@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the intended structure of the `autotrain` repository.
+This document defines the intended structure of the `train` repository.
 
 It is the contract contributors and agents must follow when adding code.
 
@@ -21,7 +21,7 @@ These concerns must not be mixed casually.
 ## Intended Layout
 
 ```text
-autotrain/
+train/
   README.md
   LICENSE
   CONTRIBUTING.md

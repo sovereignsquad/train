@@ -1,6 +1,6 @@
-# Autotrain
+# Train
 
-`autotrain` is a provider-neutral autonomous optimization platform.
+`train` is a provider-neutral autonomous optimization platform.
 
 The system is inspired by the `autoresearch` pattern:
 
@@ -150,8 +150,8 @@ Do not block MVP delivery on:
 The repository now includes:
 
 - Python project metadata in `pyproject.toml`
-- core package in `core/autotrain_core/`
-- local API package in `services/api/autotrain_api/`
+- core package in `core/train_core/`
+- local API package in `services/api/train_api/`
 - native macOS shell scaffold in `apps/macos/`
 - Alembic-backed local `SQLite` migrations
 - run ledger and project-state foundation
@@ -219,7 +219,7 @@ Verified ratchet behavior:
 
 ```bash
 uv sync
-uv run uvicorn autotrain_api.main:app --reload
+uv run uvicorn train_api.main:app --reload
 ```
 
 Default local API URL:
@@ -243,7 +243,7 @@ Local operator UI:
 ```bash
 cd apps/web
 npm install
-AUTOTRAIN_API_URL=http://127.0.0.1:8000 npm run dev
+TRAIN_API_URL=http://127.0.0.1:8000 npm run dev
 ```
 
 Native macOS shell:
@@ -252,13 +252,13 @@ Native macOS shell:
 cd apps/macos
 swift build -c release
 bash Scripts/build-bundle.sh
-open dist/Autotrain.app
+open dist/Train.app
 ```
 
 If the shell cannot find `uv`, set:
 
 ```bash
-export AUTOTRAIN_UV_EXECUTABLE="$(command -v uv)"
+export TRAIN_UV_EXECUTABLE="$(command -v uv)"
 ```
 
 Current native-shell scope:
@@ -298,7 +298,7 @@ Second platform-validation proof artifact:
 ## Planned Repository Layout
 
 ```text
-autotrain/
+train/
   README.md
   docs/
     TECH_STACK.md

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the environment model for `autotrain`.
+This document defines the environment model for `train`.
 
 Use only the environment names defined here.
 
@@ -87,17 +87,17 @@ These are the current local variables:
 - `MISTRAL_VIBE_HOME`
 - `OPERATOR_LEASE_GRACE_SECONDS`
 - `OLLAMA_BASE_URL`
-- `AUTOTRAIN_REPO_ROOT`
-- `AUTOTRAIN_UV_EXECUTABLE`
+- `TRAIN_REPO_ROOT`
+- `TRAIN_UV_EXECUTABLE`
 - `DATABASE_URL`
-- `AUTOTRAIN_ENV`
+- `TRAIN_ENV`
 - `APP_HOST`
 - `APP_PORT`
-- `AUTOTRAIN_API_URL`
+- `TRAIN_API_URL`
 
 ### Variable Reference
 
-`AUTOTRAIN_ENV`
+`TRAIN_ENV`
 
 - environments: `local`, later `staging` and `production`
 - required: no
@@ -150,7 +150,7 @@ These are the current local variables:
 
 - environments: `local`
 - required: no
-- default: `autotrain`
+- default: `train`
 - purpose: selects the repo-local Vibe agent profile under `.vibe/agents/`
 
 `MISTRAL_VIBE_HOME`
@@ -174,21 +174,21 @@ These are the current local variables:
 - default: `30`
 - purpose: extends run lease expiry beyond the declared budget so stalled-run detection and resume semantics remain bounded
 
-`AUTOTRAIN_REPO_ROOT`
+`TRAIN_REPO_ROOT`
 
 - environments: local macOS shell development
 - required: no
 - default: none
 - purpose: overrides repository-root discovery for the native macOS shell when launching the local engine
 
-`AUTOTRAIN_UV_EXECUTABLE`
+`TRAIN_UV_EXECUTABLE`
 
 - environments: local macOS shell development
 - required: no
 - default: resolved from `PATH`, then common Homebrew/system locations
 - purpose: overrides `uv` executable discovery for the native macOS shell when launching the local engine
 
-`AUTOTRAIN_API_URL`
+`TRAIN_API_URL`
 
 - environments: `local`, later `staging` and `production`
 - required: no

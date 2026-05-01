@@ -1,4 +1,4 @@
-system_prompt_id = "autotrain"
+system_prompt_id = "train"
 
 [tools.bash]
 permission = "always"

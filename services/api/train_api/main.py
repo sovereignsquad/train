@@ -4,23 +4,23 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from autotrain_core.agents import (
+from train_core.agents import (
     build_agent_launch_plan,
     get_agent_status,
     list_agent_adapters,
     serialize_agent_status,
     serialize_launch_plan,
 )
-from autotrain_core.config import settings
-from autotrain_core.db import get_db, init_db
-from autotrain_core.models import ProjectState, RunRecord
-from autotrain_core.operator import (
+from train_core.config import settings
+from train_core.db import get_db, init_db
+from train_core.models import ProjectState, RunRecord
+from train_core.operator import (
     OperatorError,
     build_operator_snapshot,
     resume_run_record,
     touch_run_heartbeat,
 )
-from autotrain_core.projects import (
+from train_core.projects import (
     ProjectMutation,
     ProjectMutationError,
     create_managed_project,
@@ -30,20 +30,20 @@ from autotrain_core.projects import (
     list_reference_projects,
     update_managed_project,
 )
-from autotrain_core.providers import (
+from train_core.providers import (
     get_provider_status,
     list_provider_adapters,
     serialize_provider_status,
 )
-from autotrain_core.ratchet import RatchetError, apply_ratchet_decision
-from autotrain_core.runner import (
+from train_core.ratchet import RatchetError, apply_ratchet_decision
+from train_core.runner import (
     RunnerError,
     complete_run_record,
     create_run_record,
     execute_run_record,
     start_run_record,
 )
-from autotrain_core.schemas import (
+from train_core.schemas import (
     AgentAdapterRead,
     AgentLaunchPlanRead,
     AgentStatusRead,
@@ -72,7 +72,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": settings.app_name,
-        "environment": settings.autotrain_env,
+        "environment": settings.train_env,
     }
 
 
