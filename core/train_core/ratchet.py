@@ -123,17 +123,13 @@ def get_git_state() -> tuple[str | None, bool | None]:
 
 
 def _apply_git_mutation(run: RunRecord) -> None:
-    if not run.mutable_artifact:
-        run.git_action = GitAction.NONE
-        return
-
     changed_paths = get_changed_paths()
     project = get_project(run.project_key)
     if project is None:
         raise RatchetError(f"Unknown project '{run.project_key}'")
 
     try:
-        validate_autonomous_workspace(project, changed_paths)
+        report = validate_autonomous_workspace(project, changed_paths)
     except GuardrailError as exc:
         run.git_action = GitAction.BLOCKED
         raise RatchetError(str(exc)) from exc
@@ -142,15 +138,18 @@ def _apply_git_mutation(run: RunRecord) -> None:
         run.git_action = GitAction.NONE
         return
 
-    allowed_path = run.mutable_artifact
+    allowed_paths = report.allowed_paths
+    if not allowed_paths:
+        run.git_action = GitAction.NONE
+        return
 
     if run.ratchet_decision == RatchetDecision.ACCEPTED:
-        commit_mutable_artifact(allowed_path, run)
+        commit_mutable_artifacts(allowed_paths, run)
         run.git_action = GitAction.COMMITTED
         return
 
     if run.ratchet_decision == RatchetDecision.REJECTED:
-        restore_mutable_artifact(allowed_path)
+        restore_mutable_artifacts(allowed_paths)
         run.git_action = GitAction.RESTORED
         return
 
@@ -177,8 +176,8 @@ def get_changed_paths() -> list[str]:
     return paths
 
 
-def commit_mutable_artifact(path: str, run: RunRecord) -> None:
-    subprocess.run(["git", "add", path], cwd=ROOT_DIR, check=True)
+def commit_mutable_artifacts(paths: tuple[str, ...], run: RunRecord) -> None:
+    subprocess.run(["git", "add", "--", *paths], cwd=ROOT_DIR, check=True)
     subprocess.run(
         [
             "git",
@@ -193,8 +192,8 @@ def commit_mutable_artifact(path: str, run: RunRecord) -> None:
     )
 
 
-def restore_mutable_artifact(path: str) -> None:
-    subprocess.run(["git", "restore", "--", path], cwd=ROOT_DIR, check=True)
+def restore_mutable_artifacts(paths: tuple[str, ...]) -> None:
+    subprocess.run(["git", "restore", "--", *paths], cwd=ROOT_DIR, check=True)
 
 
 def _persist_blocked_ratchet_state(

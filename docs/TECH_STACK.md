@@ -235,6 +235,5 @@ Do not require:
 
 ## Current Gaps
 
-- ratchet mutation still assumes a single declared mutable artifact
 - operator recovery is intentionally narrow and currently covers resume-from-checkpoint, not full workflow orchestration
-- native app runtime bootstrap and packaged engine delivery are not implemented yet
+- packaged engine update installation and runtime refresh are not implemented yet

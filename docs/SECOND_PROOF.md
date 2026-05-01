@@ -84,5 +84,4 @@ Project-specific only:
 ## Remaining Limitations
 
 - the second proof does not yet exercise a second agent adapter
-- the ratchet still assumes a single declared mutable artifact
 - the helpdesk benchmark is intentionally small and deterministic, not a production dataset

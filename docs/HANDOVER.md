@@ -34,6 +34,7 @@ Last completed increment:
   - `{train}` improves brains
 - native runtime bootstrap and starter project bootstrap generation
 - first Trinity-powered `{reply}` optimization proof
+- broader git mutation support across declared autonomous mutable artifacts
 
 Implemented:
 
@@ -124,6 +125,7 @@ Implemented:
   - automatic `draft_score` metric
 - third proof runner in `scripts/prove_reply_cycle.py`
 - durable `{reply}` proof notes in `docs/PROOF_REPLY_CYCLE.md`
+- ratchet commit and restore now operate on all changed paths inside `autonomous_mutable_artifacts`
 
 ### What Was Verified
 
@@ -170,6 +172,7 @@ Verified:
 - managed project starter bootstrap unit coverage
 - starter reply benchmark execution coverage
 - real `{reply}` ratchet proof through `uv run python scripts/prove_reply_cycle.py`
+- multi-artifact ratchet coverage through `uv run pytest tests/test_ratchet.py`
 - warning-free Swift rebuild after the UI recovery pass
 - full rename validation for Python, web, macOS bundle, MVP smoke test, and GitHub remote
 
@@ -177,11 +180,11 @@ Verified:
 
 Next expected work:
 
-1. decide whether broader git mutation or packaged runtime refresh moves next
+1. decide whether packaged runtime refresh or unattended heartbeat exercise moves next
 2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
 3. decide whether the Vibe turn-limit exit behavior deserves a dedicated follow-up issue
-4. decide when to exercise heartbeat refresh in a longer unattended agent session
-5. define the next proof after `{reply}` once the real data contract exists
+4. define the next proof after `{reply}` once the real data contract exists
+5. decide whether to add a managed-project example with multiple mutable artifacts
 
 ### Watch Carefully
 
@@ -201,6 +204,7 @@ Next expected work:
 - keep `{trinity}` runtime responsibilities out of `{train}` core while still making runtime components optimizable through project contracts
 - keep starter project generation simple and deterministic; do not hide the project contract behind clever scaffolding
 - keep the starter `reply` benchmark honest about its current limits; the current proof is valid as a seam test, not as evidence of production-quality reply drafting
+- keep multi-artifact mutation bounded to declared autonomous mutable artifacts; do not widen ratchet scope implicitly from git status alone
 
 ### If You Only Have 30 Minutes
 

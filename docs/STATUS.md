@@ -25,10 +25,11 @@ Phase:
   - `{train}` improves brains
 - managed Python runtime bootstrap and starter project bootstrap generation delivered
 - first Trinity-powered `{reply}` optimization proof delivered
+- broader git mutation support delivered for multi-artifact project contracts
 
 Primary active issue:
 
-- no blocker remains on the starter `{reply}` proof; next lane should move to broader git mutation, packaged runtime refresh, or real `{reply}` data integration
+- no blocker remains on the broader git-mutation lane; next lane should move to packaged runtime refresh, unattended heartbeat exercise, or real `{reply}` data integration
 
 Board intent:
 
@@ -140,6 +141,7 @@ The repository currently has:
 - replayable `{reply}` proof artifact:
   - `scripts/prove_reply_cycle.py`
   - `docs/PROOF_REPLY_CYCLE.md`
+- ratchet mutation support across all changed paths inside declared `autonomous_mutable_artifacts`
 
 ## Verified Working
 
@@ -173,8 +175,8 @@ Verified locally:
 - end-to-end bounded subprocess execution through the real mythology benchmark
 - end-to-end bounded subprocess execution through the real helpdesk benchmark
 - best-score updates across multiple runs with accepted and rejected outcomes
-- accepted runs create a git commit when only the mutable artifact is dirty
-- rejected runs restore the mutable artifact cleanly
+- accepted runs create a git commit when only declared mutable artifacts are dirty
+- rejected runs restore changed mutable artifacts cleanly
 - unrelated dirty files block ratchet mutation with a fail-closed response
 - blocked ratchet attempts persist `git_action=blocked` and a recovery message on the run record
 - `vibe --version`
@@ -191,6 +193,7 @@ Verified locally:
 - `npm run lint`
 - `npm run build`
 - `uv run pytest`
+- `uv run pytest tests/test_ratchet.py`
 - `uv run pytest tests/test_projects.py`
 - `uv run ruff check .`
 - the repository can be validated end to end with `uv run python scripts/test_mvp.py`
@@ -209,22 +212,20 @@ Verified locally:
 
 Still missing on the critical path:
 
-- broader git mutation support beyond the single declared mutable artifact
 - longer unattended heartbeat exercise by a real agent session
 - packaged desktop update installation beyond release checks
 - real private-data and runtime integration for the eventual `{reply}` production lane
 
 ## Immediate Next Steps
 
-1. decide whether broader git mutation or packaged runtime refresh is the next engine lane
+1. decide whether packaged runtime refresh or unattended heartbeat exercise is the next engine lane
 2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
 3. decide whether the Vibe turn-limit exit behavior deserves its own follow-up issue
-4. decide when heartbeat integration should be exercised by a longer unattended agent session
-5. define the next honest proof after `{reply}` once the real data contract exists
+4. define the next honest proof after `{reply}` once the real data contract exists
+5. decide whether multi-artifact managed-project bootstrap examples should be added next
 
 ## Current Risks
 
-- git mutation currently supports only the declared mutable artifact path
 - heartbeat and resume semantics are implemented, but unattended lease refresh is not yet exercised by a long-running agent loop
 - `Vibe` currently exits with a non-zero code when the configured turn limit is reached, even if it completed useful work
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
@@ -247,4 +248,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- packaged desktop refinement, broader git mutation, or real `{reply}` data integration, according to board priority
+- packaged desktop refinement, unattended heartbeat exercise, or real `{reply}` data integration, according to board priority
