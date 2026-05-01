@@ -1,0 +1,13 @@
+system_prompt_id = "autotrain"
+
+[tools.bash]
+permission = "always"
+
+[tools.read_file]
+permission = "always"
+
+[tools.search_replace]
+permission = "always"
+
+[tools.write_file]
+permission = "always"

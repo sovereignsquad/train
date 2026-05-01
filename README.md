@@ -11,6 +11,15 @@ The system is inspired by the `autoresearch` pattern:
 
 The first reference benchmark will use mythology / folktales training to prove the loop, but the platform is intended to support other optimization domains later.
 
+The repository now also includes a second reference benchmark:
+
+- `helpdesk`, a deterministic intent-classification project with a `maximize` metric
+
+The repository also now includes a native macOS operator shell:
+
+- `apps/macos`, a SwiftUI desktop shell that supervises the local engine, exposes operator status, and prepares the path toward packaged desktop delivery
+- a managed project registry with reference templates and user-defined project contracts
+
 ## License
 
 This project is licensed under `Apache-2.0`.
@@ -61,16 +70,19 @@ Every project should define:
 
 Agent adapters drive code-editing and execution workflows.
 
-Planned:
+Delivered first adapter:
 
-- `Mistral Vibe` as the first agent adapter
-- later additional agent adapters such as `Cursor`
+- `Mistral Vibe` with a repo-local `.vibe/` contract, API status surface, and canonical launch helper
+
+Planned later:
+
+- additional agent adapters such as `Cursor`
 
 ### Provider Adapters
 
 Provider adapters expose model backends to the platform when needed.
 
-Planned:
+Delivered first adapters:
 
 - `Mistral API` as the first hosted provider path
 - `Ollama` as the first local open-source provider path
@@ -97,6 +109,12 @@ Local open-source models are supported through adapters, but they are not requir
 - `Next.js`
 - `Mantine`
 
+### Native Desktop Shell
+
+- `Swift`
+- `SwiftUI`
+- `SwiftPM`
+
 ### Hosted / Online Leg
 
 - `Vercel` for the web surface
@@ -108,6 +126,7 @@ Local open-source models are supported through adapters, but they are not requir
 - `FastAPI` gives us a clean local API boundary for a control UI and future remote surfaces.
 - `SQLite` is the right local database first: simple, file-based, portable, and sufficient for runs, jobs, adapter config, and metadata.
 - `Next.js` plus `Mantine` is the right operator UI stack for a local admin surface and later hosted control plane.
+- `SwiftUI` is the right native operator shell for local process supervision, status visibility, recovery actions, and future desktop automations.
 - `Vercel` and `MongoDB Atlas` are for the optional online leg, not the local MVP core.
 
 ## Local-First MVP
@@ -133,26 +152,49 @@ The repository now includes:
 - Python project metadata in `pyproject.toml`
 - core package in `core/autotrain_core/`
 - local API package in `services/api/autotrain_api/`
-- local `SQLite` foundation
+- native macOS shell scaffold in `apps/macos/`
+- Alembic-backed local `SQLite` migrations
 - run ledger and project-state foundation
+- two reference benchmarks in `projects/`:
+  - `mythology`
+  - `helpdesk`
+- Vibe adapter contract in `.vibe/` and `scripts/run_vibe.py`
+- autonomous guardrails for setup artifacts, dependency files, and budget bounds
+- minimal `Next.js` + `Mantine` operator UI in `apps/web/`
+- native SwiftUI operator shell in `apps/macos/`
 
 Current endpoints:
 
 - `GET /health`
+- `GET /v1/agents`
+- `GET /v1/agents/{agent_key}`
+- `GET /v1/agents/{agent_key}/launch-plan`
+- `GET /v1/providers`
+- `GET /v1/providers/{provider_key}`
+- `GET /v1/operator/status`
 - `GET /v1/projects`
+- `GET /v1/projects/templates`
+- `GET /v1/projects/{project_key}`
 - `GET /v1/project-states`
 - `GET /v1/runs`
+- `POST /v1/projects`
 - `POST /v1/runs`
+- `PUT /v1/projects/{project_key}`
 - `POST /v1/runs/{run_id}/start`
+- `POST /v1/runs/{run_id}/heartbeat`
 - `POST /v1/runs/{run_id}/complete`
 - `POST /v1/runs/{run_id}/execute`
 - `POST /v1/runs/{run_id}/ratchet`
+- `POST /v1/runs/{run_id}/resume`
+- `DELETE /v1/projects/{project_key}`
 - `GET /v1/runs/{run_id}`
 
 Current engine contract:
 
 - registered project definitions
 - required bounded run budget
+- machine-checkable autonomous guardrails
+- formal DB migration startup on API boot
 - explicit run lifecycle:
   - `pending`
   - `running`
@@ -161,6 +203,11 @@ Current engine contract:
 - project state ledger with best-score tracking
 - ratchet decision model
 - git-state capture at ratchet time
+- repo-local agent bootstrap contract for `Mistral Vibe`
+- fail-closed setup/dependency/unauthorized-artifact enforcement before execution
+- live provider registry and status probing for hosted and local backends
+- durable operator status with heartbeat leases, stalled-run detection, and safe resume semantics
+- managed project registry that overlays user-defined projects on top of built-in reference templates
 
 Verified ratchet behavior:
 
@@ -179,6 +226,56 @@ Default local API URL:
 
 - `http://127.0.0.1:8000`
 
+Canonical Vibe planning launch:
+
+```bash
+uv run python scripts/run_vibe.py --project-key mythology --mode plan --print-only
+```
+
+Provider status check:
+
+```bash
+uv run python scripts/check_providers.py
+```
+
+Local operator UI:
+
+```bash
+cd apps/web
+npm install
+AUTOTRAIN_API_URL=http://127.0.0.1:8000 npm run dev
+```
+
+Native macOS shell:
+
+```bash
+cd apps/macos
+swift build -c release
+bash Scripts/build-bundle.sh
+open dist/Autotrain.app
+```
+
+If the shell cannot find `uv`, set:
+
+```bash
+export AUTOTRAIN_UV_EXECUTABLE="$(command -v uv)"
+```
+
+Current native-shell scope:
+
+- repo-root development shell today
+- local engine supervision through `uv run uvicorn`
+- Application Support state paths for logs, runtime metadata, and local shell DB
+- attach to an already-healthy local engine on the preferred port when one is already running
+- choose the next free local port when the preferred port is occupied by something else
+- GitHub-release update checks
+- dedicated Projects workspace with CRUD for managed projects and template-based bootstrapping from reference benchmarks
+
+Not yet delivered in the native shell:
+
+- managed Python runtime bootstrap for packaged installs
+- in-app update download/install flow
+
 ## MVP Test
 
 Current MVP smoke test:
@@ -189,6 +286,14 @@ uv run python scripts/test_mvp.py
 ```
 
 See [docs/MVP_TEST.md](./docs/MVP_TEST.md).
+
+First autonomous proof artifact:
+
+- [Vibe Proof Cycle](./docs/PROOF_VIBE_CYCLE.md)
+
+Second platform-validation proof artifact:
+
+- [Second Proof](./docs/SECOND_PROOF.md)
 
 ## Planned Repository Layout
 
@@ -207,7 +312,7 @@ autotrain/
     mythology/
 ```
 
-This layout is a target contract, not the current completed state.
+This layout now exists and is the active repository contract.
 
 ## Documentation
 
@@ -220,7 +325,9 @@ This layout is a target contract, not the current completed state.
 - [Setup](./docs/SETUP.md)
 - [Environment](./docs/ENVIRONMENT.md)
 - [MVP Test](./docs/MVP_TEST.md)
+- [Vibe Proof Cycle](./docs/PROOF_VIBE_CYCLE.md)
 - [Recovery](./docs/RECOVERY.md)
+- [UI/UX Recovery](./docs/UI_UX_RECOVERY.md)
 - [Status](./docs/STATUS.md)
 - [Handover](./docs/HANDOVER.md)
 - [Brain](./docs/BRAIN.md)
@@ -229,6 +336,6 @@ This layout is a target contract, not the current completed state.
 ## Current Roadmap Anchors
 
 - GitHub issue `#1`: provider-neutral platform roadmap
-- GitHub issue `#3`: first agent adapter via Mistral Vibe
-- GitHub issue `#5`: ratchet and experiment ledger
+- GitHub issue `#8`: cross-project guardrails and runtime bounds
 - GitHub issue `#9`: hosted and local provider adapters
+- GitHub issue `#10`: operator controls, watchdog recovery, and safe resume

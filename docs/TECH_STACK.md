@@ -10,12 +10,15 @@ The chosen stack is:
 
 - Core engine: `Python 3.12+`
 - API layer: `FastAPI`
+- Native desktop shell: `Swift 6` + `SwiftUI`
 - Validation and settings: `Pydantic`
 - Dependency management: `uv`
+- DB migrations: `Alembic`
 - Local DB: `SQLite`
 - Local artifact storage: filesystem
 - Web UI: `Next.js`
 - UI library: `Mantine`
+- Native desktop packaging: `Swift Package Manager`
 - Hosted web deployment: `Vercel`
 - Hosted shared DB: `MongoDB Atlas`
 - First agent adapter: `Mistral Vibe`
@@ -84,6 +87,23 @@ Hosted leg:
 - Vercel-hosted UI
 - optional shared API surface
 - MongoDB Atlas-backed shared state
+
+### 4. Native Shell vs Engine
+
+The native macOS app owns:
+
+- process supervision
+- native operator UI
+- update UX
+- future automation hooks
+
+The Python engine owns:
+
+- benchmark execution
+- ratchet logic
+- providers
+- agents
+- project state
 
 ## Why Python
 
@@ -181,11 +201,28 @@ The current implementation baseline includes:
 
 - Python packaging via `uv`
 - `FastAPI` local API
+- Alembic-backed startup migrations
 - `SQLite`-backed run ledger
 - project registry for benchmark definitions
-- run lifecycle API for create, start, and complete transitions
+- real mythology benchmark scoring path
+- second helpdesk benchmark scoring path with a maximize-metric classifier
+- `Mistral Vibe` adapter status and launch-plan surfaces
+- provider adapter registry and live status probes for:
+  - `Mistral API`
+  - `Ollama`
+- operator status and recovery layer with:
+  - heartbeat leases
+  - stalled-run detection
+  - safe resume semantics
+- native macOS shell scaffold with:
+  - SwiftPM app target
+  - local engine supervisor
+  - API-backed operator dashboard
+  - release-check scaffold
+- machine-checkable autonomous guardrails for mutable artifacts, setup artifacts, dependency artifacts, and budget bounds
+- `Next.js` + `Mantine` operator UI for health, providers, projects, runs, project states, and recovery actions
 
-This is the first real engine contract layer. It is not yet the full benchmark execution runner or ratchet loop.
+This is now a two-project local baseline with a native shell scaffold. The next lane is runtime bootstrap and packaged desktop delivery, not basic project reuse.
 
 ## Explicit Non-Goals For MVP
 
@@ -196,8 +233,8 @@ Do not require:
 - hosted deployment before the local loop works
 - MongoDB as the local default DB
 
-## Open Questions
+## Current Gaps
 
-- Do we want `SQLAlchemy` or `SQLModel` for persistence?
-- Do we want the local API and web UI in one repo from day one, or scaffold the web app after the engine contract stabilizes?
-- Do we want the provider-adapter API in the MVP even if only one provider path is initially active?
+- ratchet mutation still assumes a single declared mutable artifact
+- operator recovery is intentionally narrow and currently covers resume-from-checkpoint, not full workflow orchestration
+- native app runtime bootstrap and packaged engine delivery are not implemented yet

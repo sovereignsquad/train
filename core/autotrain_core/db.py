@@ -1,9 +1,11 @@
 from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from autotrain_core.config import settings
+from autotrain_core.config import ROOT_DIR, settings
 
 
 class Base(DeclarativeBase):
@@ -35,53 +37,20 @@ def get_db() -> Session:
 def init_db() -> None:
     from autotrain_core import models  # noqa: F401
 
+    alembic_config = Config(str(ROOT_DIR / "alembic.ini"))
+    alembic_config.set_main_option("script_location", str(ROOT_DIR / "migrations"))
+    alembic_config.set_main_option("sqlalchemy.url", settings.database_url)
+
     inspector = inspect(engine)
-    expected_columns = {
-        "id",
-        "project_key",
-        "title",
-        "objective",
-        "metric_name",
-        "metric_direction",
-        "metric_value",
-        "budget_seconds",
-        "status",
-        "mutable_artifact",
-        "runner_key",
-        "ratchet_decision",
-        "git_action",
-        "best_metric_before",
-        "best_metric_after",
-        "git_head_before",
-        "git_head_after",
-        "git_worktree_dirty",
-        "started_at",
-        "finished_at",
-        "result_summary",
-        "error_message",
-        "created_at",
-        "updated_at",
-    }
+    table_names = set(inspector.get_table_names())
+    managed_tables = {"run_records", "project_states"}
 
-    if inspector.has_table("run_records"):
-        existing_columns = {column["name"] for column in inspector.get_columns("run_records")}
-        if existing_columns != expected_columns:
-            Base.metadata.drop_all(bind=engine)
+    if "alembic_version" not in table_names:
+        if managed_tables.issubset(table_names):
+            command.stamp(alembic_config, "head")
+        elif managed_tables & table_names:
+            raise RuntimeError(
+                "Partial legacy database detected. Remove the local SQLite file and rerun startup."
+            )
 
-    if inspector.has_table("project_states"):
-        expected_project_state_columns = {
-            "project_key",
-            "metric_name",
-            "metric_direction",
-            "best_run_id",
-            "best_metric_value",
-            "last_run_id",
-            "git_head",
-            "git_worktree_dirty",
-            "updated_at",
-        }
-        existing_columns = {column["name"] for column in inspector.get_columns("project_states")}
-        if existing_columns != expected_project_state_columns:
-            Base.metadata.drop_all(bind=engine)
-
-    Base.metadata.create_all(bind=engine)
+    command.upgrade(alembic_config, "head")

@@ -1,0 +1,50 @@
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-space-grotesk), sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(247, 214, 116, 0.32), transparent 30%),
+    radial-gradient(circle at top right, rgba(190, 215, 235, 0.36), transparent 28%),
+    linear-gradient(180deg, #fbfaf6 0%, #f1ede1 100%);
+  color: #211c16;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+}
+
+.hero {
+  background:
+    linear-gradient(135deg, rgba(255, 248, 223, 0.92), rgba(234, 240, 244, 0.92)),
+    #ffffff;
+  border: 1px solid rgba(33, 28, 22, 0.08);
+  box-shadow: 0 20px 60px rgba(64, 46, 18, 0.08);
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(33, 28, 22, 0.08);
+  box-shadow: 0 18px 40px rgba(69, 53, 25, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.panel-alt {
+  background: rgba(249, 245, 236, 0.88);
+  border: 1px solid rgba(33, 28, 22, 0.08);
+}

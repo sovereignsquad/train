@@ -5,6 +5,7 @@ from sqlalchemy import DateTime, Enum, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from autotrain_core.db import Base
+from autotrain_core.time import utc_now
 
 
 class MetricDirection(StrEnum):
@@ -69,14 +70,18 @@ class RunRecord(Base):
     git_head_after: Mapped[str | None] = mapped_column(String(120), nullable=True)
     git_worktree_dirty: Mapped[bool | None] = mapped_column(nullable=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resumed_from_run_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    resume_count: Mapped[int] = mapped_column(Integer, default=0)
     result_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=utc_now,
+        onupdate=utc_now,
     )
 
 
@@ -93,6 +98,32 @@ class ProjectState(Base):
     git_worktree_dirty: Mapped[bool | None] = mapped_column(nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class ManagedProject(Base):
+    __tablename__ = "managed_projects"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    mutable_artifact: Mapped[str] = mapped_column(String(260))
+    autonomous_mutable_artifacts_json: Mapped[str] = mapped_column(Text)
+    setup_artifacts_json: Mapped[str] = mapped_column(Text)
+    dependency_artifacts_json: Mapped[str] = mapped_column(Text)
+    metric_name: Mapped[str] = mapped_column(String(120))
+    metric_direction: Mapped[MetricDirection] = mapped_column(Enum(MetricDirection))
+    min_budget_seconds: Mapped[int] = mapped_column(Integer)
+    default_budget_seconds: Mapped[int] = mapped_column(Integer)
+    max_budget_seconds: Mapped[int] = mapped_column(Integer)
+    runner_key: Mapped[str] = mapped_column(String(120))
+    execution_entrypoint: Mapped[str] = mapped_column(String(260))
+    template_key: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
     )

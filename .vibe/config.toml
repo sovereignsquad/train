@@ -1,0 +1,4 @@
+active_model = "devstral-2"
+enable_auto_update = false
+enable_notifications = false
+enable_telemetry = false

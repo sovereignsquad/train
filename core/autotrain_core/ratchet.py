@@ -1,9 +1,9 @@
 import subprocess
-from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from autotrain_core.config import ROOT_DIR
+from autotrain_core.guardrails import GuardrailError, validate_autonomous_workspace
 from autotrain_core.models import (
     GitAction,
     MetricDirection,
@@ -12,7 +12,7 @@ from autotrain_core.models import (
     RunRecord,
     RunStatus,
 )
-
+from autotrain_core.projects import get_project
 
 class RatchetError(ValueError):
     """Raised when a ratchet decision cannot be applied."""
@@ -127,19 +127,22 @@ def _apply_git_mutation(run: RunRecord) -> None:
         run.git_action = GitAction.NONE
         return
 
-    allowed_path = run.mutable_artifact
     changed_paths = get_changed_paths()
+    project = get_project(run.project_key)
+    if project is None:
+        raise RatchetError(f"Unknown project '{run.project_key}'")
+
+    try:
+        validate_autonomous_workspace(project, changed_paths)
+    except GuardrailError as exc:
+        run.git_action = GitAction.BLOCKED
+        raise RatchetError(str(exc)) from exc
+
     if not changed_paths:
         run.git_action = GitAction.NONE
         return
 
-    disallowed_paths = [path for path in changed_paths if path != allowed_path]
-    if disallowed_paths:
-        run.git_action = GitAction.BLOCKED
-        raise RatchetError(
-            "Git mutation blocked because files outside the mutable artifact changed: "
-            + ", ".join(disallowed_paths)
-        )
+    allowed_path = run.mutable_artifact
 
     if run.ratchet_decision == RatchetDecision.ACCEPTED:
         commit_mutable_artifact(allowed_path, run)

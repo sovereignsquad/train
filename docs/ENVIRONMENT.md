@@ -29,6 +29,7 @@ Expected characteristics:
 - local `SQLite`
 - filesystem artifacts
 - optional local web UI
+- optional native macOS shell
 - optional local agent/provider integrations
 
 ## Staging
@@ -80,10 +81,19 @@ When a new variable is introduced, document:
 These are the current local variables:
 
 - `MISTRAL_API_KEY`
+- `MISTRAL_API_BASE_URL`
+- `MISTRAL_VIBE_EXECUTABLE`
+- `MISTRAL_VIBE_AGENT_NAME`
+- `MISTRAL_VIBE_HOME`
+- `OPERATOR_LEASE_GRACE_SECONDS`
+- `OLLAMA_BASE_URL`
+- `AUTOTRAIN_REPO_ROOT`
+- `AUTOTRAIN_UV_EXECUTABLE`
 - `DATABASE_URL`
 - `AUTOTRAIN_ENV`
 - `APP_HOST`
 - `APP_PORT`
+- `AUTOTRAIN_API_URL`
 
 ### Variable Reference
 
@@ -118,9 +128,72 @@ These are the current local variables:
 `MISTRAL_API_KEY`
 
 - environments: local or hosted when using Mistral-backed integrations
-- required: optional for the current scaffold
+- required: required for real Mistral-backed provider checks and Vibe-backed agent runs
 - default: none
-- purpose: provider credential for future Mistral-backed agent or model integrations
+- purpose: provider credential for Mistral-backed agent or model integrations
+
+`MISTRAL_API_BASE_URL`
+
+- environments: `local`, later hosted environments
+- required: no
+- default: `https://api.mistral.ai`
+- purpose: overrides the hosted Mistral API base URL used by the provider adapter
+
+`MISTRAL_VIBE_EXECUTABLE`
+
+- environments: `local`
+- required: no
+- default: `vibe`
+- purpose: overrides the executable path/name used by the first agent adapter
+
+`MISTRAL_VIBE_AGENT_NAME`
+
+- environments: `local`
+- required: no
+- default: `autotrain`
+- purpose: selects the repo-local Vibe agent profile under `.vibe/agents/`
+
+`MISTRAL_VIBE_HOME`
+
+- environments: `local`
+- required: no
+- default: `artifacts/local/vibe-home`
+- purpose: isolates runtime Vibe metadata from the repo-tracked `.vibe/` contract
+
+`OLLAMA_BASE_URL`
+
+- environments: `local`
+- required: no
+- default: `http://127.0.0.1:11434`
+- purpose: overrides the local Ollama API base URL used by the provider adapter
+
+`OPERATOR_LEASE_GRACE_SECONDS`
+
+- environments: `local`, later `staging` and `production`
+- required: no
+- default: `30`
+- purpose: extends run lease expiry beyond the declared budget so stalled-run detection and resume semantics remain bounded
+
+`AUTOTRAIN_REPO_ROOT`
+
+- environments: local macOS shell development
+- required: no
+- default: none
+- purpose: overrides repository-root discovery for the native macOS shell when launching the local engine
+
+`AUTOTRAIN_UV_EXECUTABLE`
+
+- environments: local macOS shell development
+- required: no
+- default: resolved from `PATH`, then common Homebrew/system locations
+- purpose: overrides `uv` executable discovery for the native macOS shell when launching the local engine
+
+`AUTOTRAIN_API_URL`
+
+- environments: `local`, later `staging` and `production`
+- required: no
+- default: `http://127.0.0.1:8000`
+- purpose: points the Next.js operator UI at the API base URL
 
 ## Environment Ownership
 

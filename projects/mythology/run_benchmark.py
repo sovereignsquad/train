@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 
 from prepare import TRAIN_PATH, VAL_PATH, ensure_prepared
 from train import bits_per_byte, train_model

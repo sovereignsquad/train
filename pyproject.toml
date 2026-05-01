@@ -9,6 +9,7 @@ authors = [
   { name = "Sovereign Squad" }
 ]
 dependencies = [
+  "alembic>=1.16.0",
   "fastapi>=0.116.0",
   "pydantic-settings>=2.11.0",
   "sqlalchemy>=2.0.40",

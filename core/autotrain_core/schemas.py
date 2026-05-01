@@ -2,7 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
+from autotrain_core.agents import AgentMode
 from autotrain_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
+from autotrain_core.providers import ProviderKind
 
 
 class RunCreate(BaseModel):
@@ -16,6 +18,10 @@ class RunCreate(BaseModel):
 
 class RunStart(BaseModel):
     pass
+
+
+class RunHeartbeat(BaseModel):
+    lease_seconds: int | None = Field(default=None, ge=5, le=86_400)
 
 
 class RunComplete(BaseModel):
@@ -40,11 +46,46 @@ class ProjectRead(BaseModel):
     name: str
     description: str
     mutable_artifact: str
+    autonomous_mutable_artifacts: tuple[str, ...]
+    setup_artifacts: tuple[str, ...]
+    dependency_artifacts: tuple[str, ...]
     metric_name: str
     metric_direction: MetricDirection
+    min_budget_seconds: int
     default_budget_seconds: int
+    max_budget_seconds: int
     runner_key: str
     execution_entrypoint: str
+    source_kind: str
+    editable: bool
+    deletable: bool
+    template_key: str | None
+
+
+class ProjectWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    mutable_artifact: str = Field(min_length=1, max_length=260)
+    autonomous_mutable_artifacts: tuple[str, ...] = Field(min_length=1)
+    setup_artifacts: tuple[str, ...] = Field(min_length=1)
+    dependency_artifacts: tuple[str, ...] = Field(min_length=1)
+    metric_name: str = Field(min_length=1, max_length=120)
+    metric_direction: MetricDirection
+    min_budget_seconds: int = Field(ge=1, le=86_400)
+    default_budget_seconds: int = Field(ge=1, le=86_400)
+    max_budget_seconds: int = Field(ge=1, le=86_400)
+    runner_key: str = Field(min_length=1, max_length=120)
+    execution_entrypoint: str = Field(min_length=1, max_length=260)
+    template_key: str | None = Field(default=None, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_project_budgets(self) -> "ProjectWrite":
+        if self.min_budget_seconds > self.default_budget_seconds:
+            raise ValueError("Default budget must be greater than or equal to min budget")
+        if self.default_budget_seconds > self.max_budget_seconds:
+            raise ValueError("Default budget must be less than or equal to max budget")
+        return self
 
 
 class ExecutionResult(BaseModel):
@@ -74,11 +115,45 @@ class RunRead(BaseModel):
     git_head_after: str | None
     git_worktree_dirty: bool | None
     started_at: datetime | None
+    heartbeat_at: datetime | None
+    lease_expires_at: datetime | None
     finished_at: datetime | None
+    resumed_from_run_id: int | None
+    resume_count: int
     result_summary: str | None
     error_message: str | None
     created_at: datetime
     updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class RecoverableRunRead(BaseModel):
+    id: int
+    project_key: str
+    title: str
+    status: RunStatus
+    stalled: bool
+    resumable: bool
+    resume_count: int
+    resumed_from_run_id: int | None
+    heartbeat_at: datetime | None
+    lease_expires_at: datetime | None
+    best_run_id: int | None
+    checkpoint_git_head: str | None
+    error_message: str | None
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class OperatorStatusRead(BaseModel):
+    generated_at: datetime
+    total_runs: int
+    running_runs: int
+    healthy_running_runs: int
+    stalled_runs: int
+    recoverable_runs: list[RecoverableRunRead]
 
     model_config = {"from_attributes": True}
 
@@ -95,3 +170,59 @@ class ProjectStateRead(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class AgentAdapterRead(BaseModel):
+    key: str
+    name: str
+    description: str
+    executable: str
+    first_class: bool
+
+
+class AgentStatusRead(BaseModel):
+    key: str
+    name: str
+    available: bool
+    executable: str
+    resolved_executable: str | None
+    version: str | None
+    mistral_api_key_configured: bool
+    contract_home: str
+    runtime_home: str
+    config_path: str
+    agent_config_path: str
+    prompt_path: str
+    issues: list[str]
+
+
+class AgentLaunchPlanRead(BaseModel):
+    adapter_key: str
+    project_key: str
+    mode: AgentMode
+    command: list[str]
+    prompt: str
+    workdir: str
+    environment: dict[str, str]
+    summary: str
+
+
+class ProviderAdapterRead(BaseModel):
+    key: str
+    name: str
+    kind: ProviderKind
+    description: str
+    base_url: str
+    requires_api_key: bool
+
+
+class ProviderStatusRead(BaseModel):
+    key: str
+    name: str
+    kind: ProviderKind
+    base_url: str
+    configured: bool
+    reachable: bool
+    model_count: int | None
+    models: tuple[str, ...]
+    issues: list[str]

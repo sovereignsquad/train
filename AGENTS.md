@@ -47,7 +47,7 @@ Before changing code, read:
 
 Current active implementation lane:
 
-- `ISSUE-4` runner and metric contract, unless `docs/STATUS.md` says otherwise
+- `docs/STATUS.md` is authoritative; current next lane is native runtime bootstrap and packaged desktop delivery unless it says otherwise
 
 Always check `docs/STATUS.md` before starting.
 
@@ -97,7 +97,10 @@ Avoid:
 - `FastAPI`
 - `SQLite`
 - `uv`
-- future `Next.js` + `Mantine`
+- `Next.js`
+- `Mantine`
+- `Swift`
+- `SwiftUI`
 
 ## Current State Summary
 
@@ -109,13 +112,12 @@ The repo already has:
 - local run ledger
 - registered benchmark project definition
 - explicit run lifecycle endpoints
-
-The repo does not yet have:
-
-- actual benchmark execution runner
+- real benchmark execution runner
 - ratchet logic
-- provider adapters
-- agent integration code
+- `Mistral Vibe` agent integration
+- provider adapters for `Mistral API` and `Ollama`
+- minimal operator UI
+- native macOS shell scaffold
 
 ## Final Rule
 

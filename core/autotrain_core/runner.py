@@ -1,13 +1,15 @@
 import json
 import subprocess
-from datetime import datetime
+from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
-from autotrain_core.config import ROOT_DIR
+from autotrain_core.config import ROOT_DIR, settings
+from autotrain_core.guardrails import GuardrailError, validate_autonomous_workspace, validate_run_budget
 from autotrain_core.models import RunRecord, RunStatus
 from autotrain_core.projects import ProjectDefinition, build_run_command, get_project
 from autotrain_core.schemas import ExecutionResult, RunComplete, RunCreate
+from autotrain_core.time import utc_now
 
 
 class RunnerError(ValueError):
@@ -20,6 +22,11 @@ def create_run_record(db: Session, payload: RunCreate) -> RunRecord:
         raise RunnerError(f"Unknown project '{payload.project_key}'")
 
     budget_seconds = payload.budget_seconds or project.default_budget_seconds
+    try:
+        validate_run_budget(project, budget_seconds)
+    except GuardrailError as exc:
+        raise RunnerError(str(exc)) from exc
+
     run = RunRecord(
         project_key=project.key,
         title=payload.title,
@@ -41,8 +48,13 @@ def start_run_record(db: Session, run: RunRecord) -> RunRecord:
     if run.status != RunStatus.PENDING:
         raise RunnerError("Only pending runs can be started")
 
+    started_at = utc_now()
     run.status = RunStatus.RUNNING
-    run.started_at = datetime.utcnow()
+    run.started_at = started_at
+    run.heartbeat_at = started_at
+    run.lease_expires_at = started_at + timedelta(
+        seconds=run.budget_seconds + settings.operator_lease_grace_seconds
+    )
     run.error_message = None
     db.add(run)
     db.commit()
@@ -57,7 +69,9 @@ def complete_run_record(db: Session, run: RunRecord, payload: RunComplete) -> Ru
     run.metric_value = payload.metric_value
     run.result_summary = payload.result_summary
     run.error_message = payload.error_message
-    run.finished_at = datetime.utcnow()
+    run.finished_at = utc_now()
+    run.heartbeat_at = run.finished_at
+    run.lease_expires_at = run.finished_at
     run.status = payload.status
     db.add(run)
     db.commit()
@@ -75,6 +89,18 @@ def get_project_definition(project_key: str) -> ProjectDefinition:
 def execute_run_record(db: Session, run: RunRecord) -> RunRecord:
     project = get_project_definition(run.project_key)
     start_run_record(db, run)
+    try:
+        validate_autonomous_workspace(project, _get_changed_paths())
+    except GuardrailError as exc:
+        return complete_run_record(
+            db,
+            run,
+            RunComplete(
+                status=RunStatus.FAILED,
+                error_message=str(exc),
+                result_summary="Autonomous workspace guardrail violation before execution",
+            ),
+        )
 
     command = build_run_command(project, budget_seconds=run.budget_seconds, run_id=run.id)
 
@@ -87,7 +113,7 @@ def execute_run_record(db: Session, run: RunRecord) -> RunRecord:
             timeout=run.budget_seconds + 5,
             check=False,
         )
-    except subprocess.TimeoutExpired as exc:
+    except subprocess.TimeoutExpired:
         return complete_run_record(
             db,
             run,
@@ -138,3 +164,23 @@ def _parse_execution_result(stdout: str) -> ExecutionResult:
         return ExecutionResult.model_validate(payload)
     except Exception as exc:
         raise RunnerError("Runner process returned an invalid execution payload") from exc
+
+
+def _get_changed_paths() -> list[str]:
+    completed = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=ROOT_DIR,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    paths: list[str] = []
+    for raw_line in completed.stdout.splitlines():
+        line = raw_line.rstrip()
+        if not line:
+            continue
+        path = line[3:]
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        paths.append(path)
+    return paths
