@@ -28,6 +28,7 @@ Keep this document concise and current.
 Last completed increment:
 
 - repository-wide rename to `{train}`
+- native shell overview scoping and startup update-check fix
 
 Implemented:
 
@@ -78,6 +79,8 @@ Implemented:
 - renamed the core package, API package, repo-local Vibe contract, native app target, bundle, and GitHub remote from `autotrain` to `{train}`
 - refreshed the generated app icon from the old `AT` monogram to a `{t}` mark aligned with the new app name
 - recorded the UI failure and recovery standard in `docs/UI_UX_RECOVERY.md`
+- scoped the `{train}` brand header and engine supervisor card back to the Overview page instead of every page
+- changed the startup GitHub release check to run silently so a missing release does not show a false orange API error
 - project contract metadata for:
   - autonomous mutable artifacts
   - setup artifacts

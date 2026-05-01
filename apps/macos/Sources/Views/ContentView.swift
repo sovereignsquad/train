@@ -42,18 +42,8 @@ struct ContentView: View {
             }
             .navigationSplitViewColumnWidth(min: 160, ideal: 200)
         } detail: {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    header
-                    engineCard
-                    if !viewModel.lastRefreshError.isEmpty {
-                        errorBanner(viewModel.lastRefreshError)
-                    }
-                    detailContent
-                }
-                .padding(24)
-            }
-            .frame(minWidth: 760, minHeight: 620)
+            detailContent
+                .frame(minWidth: 760, minHeight: 620)
         }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
@@ -80,15 +70,56 @@ struct ContentView: View {
     private var detailContent: some View {
         switch selectedPage ?? .overview {
         case .overview:
-            overviewGrid
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    header
+                    engineCard
+                    if !viewModel.lastRefreshError.isEmpty {
+                        errorBanner(viewModel.lastRefreshError)
+                    }
+                    overviewGrid
+                }
+                .padding(24)
+            }
         case .runs:
-            runsSection
+            pageScaffold(title: "Runs", subtitle: "Recent execution history and ratchet outcomes.") {
+                runsSection
+            }
         case .recovery:
-            recoverySection
+            pageScaffold(title: "Recovery", subtitle: "Resume stalled work from durable operator state.") {
+                recoverySection
+            }
         case .projects:
-            ProjectManagementView()
+            pageScaffold(title: "Projects", subtitle: "Manage reusable project contracts and templates.") {
+                ProjectManagementView()
+            }
         case .logs:
-            logsSection
+            pageScaffold(title: "Logs", subtitle: "Inspect local shell and engine output.") {
+                logsSection
+            }
+        }
+    }
+
+    private func pageScaffold<Content: View>(
+        title: String,
+        subtitle: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Text(subtitle)
+                        .foregroundStyle(.secondary)
+                }
+                if !viewModel.lastRefreshError.isEmpty {
+                    errorBanner(viewModel.lastRefreshError)
+                }
+                content()
+            }
+            .padding(24)
         }
     }
 

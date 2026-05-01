@@ -13,7 +13,7 @@ struct TrainApp: App {
                 .onAppear {
                     appDelegate.viewModel = viewModel
                     viewModel.start()
-                    viewModel.updateService.checkForUpdates()
+                    viewModel.updateService.checkForUpdates(silent: true)
                 }
                 .frame(minWidth: 880, minHeight: 640)
         }
@@ -27,7 +27,7 @@ struct TrainApp: App {
             }
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates...") {
-                    viewModel.updateService.checkForUpdates()
+                    viewModel.updateService.checkForUpdates(silent: false)
                 }
                 .keyboardShortcut("u", modifiers: [.command, .shift])
 

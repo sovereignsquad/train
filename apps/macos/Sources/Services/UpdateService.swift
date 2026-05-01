@@ -1,6 +1,20 @@
 import AppKit
 import Foundation
 
+enum UpdateCheckError: LocalizedError {
+    case noPublishedRelease
+    case requestFailed(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .noPublishedRelease:
+            return "No published release is available yet."
+        case .requestFailed(let status):
+            return "Update check failed with status \(status)."
+        }
+    }
+}
+
 @MainActor
 final class UpdateService: ObservableObject {
     @Published var isChecking = false
@@ -10,10 +24,15 @@ final class UpdateService: ObservableObject {
 
     private let releaseEndpoint = URL(string: "https://api.github.com/repos/sovereignsquad/train/releases/latest")!
 
-    func checkForUpdates() {
+    func checkForUpdates(silent: Bool = false) {
         guard !isChecking else { return }
+        if silent, latestVersion != nil || !errorMessage.isEmpty {
+            return
+        }
         isChecking = true
-        errorMessage = ""
+        if !silent {
+            errorMessage = ""
+        }
 
         Task {
             defer { isChecking = false }
@@ -22,14 +41,28 @@ final class UpdateService: ObservableObject {
                 request.timeoutInterval = 10
                 request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
                 let (data, response) = try await URLSession.shared.data(for: request)
-                guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+                guard let http = response as? HTTPURLResponse else {
                     throw APIClientError.invalidResponse
+                }
+                if http.statusCode == 404 {
+                    latestVersion = nil
+                    releaseURL = nil
+                    if !silent {
+                        errorMessage = UpdateCheckError.noPublishedRelease.localizedDescription
+                    }
+                    return
+                }
+                guard (200...299).contains(http.statusCode) else {
+                    throw UpdateCheckError.requestFailed(http.statusCode)
                 }
                 let release = try JSONDecoder().decode(GitHubRelease.self, from: data)
                 latestVersion = release.tagName.replacingOccurrences(of: "v", with: "")
                 releaseURL = URL(string: release.htmlURL)
+                errorMessage = ""
             } catch {
-                errorMessage = error.localizedDescription
+                if !silent {
+                    errorMessage = error.localizedDescription
+                }
             }
         }
     }

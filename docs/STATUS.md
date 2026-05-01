@@ -19,6 +19,7 @@ Update this document whenever the active implementation state changes materially
 Phase:
 
 - repository-wide rename to `{train}` completed
+- native shell overview scoping and release-check error handling corrected
 
 Primary active issue:
 
@@ -77,6 +78,8 @@ The repository currently has:
   - responsive project editor sections with file selectors, lists, and structured pickers
   - deterministic app icon generation and bundled `.icns` app icon
   - `{t}`-based app icon and `train.app` bundle naming
+  - overview-only shell framing instead of repeating the brand and engine card on every page
+  - silent startup update checks that no longer surface a false engine/API error when no release is published
 - managed project registry with:
   - reference templates
   - user-defined managed projects
@@ -164,6 +167,7 @@ Verified locally:
 - managed-project CRUD verified through the live HTTP API
 - native shell rebuilt after UI recovery with warning-free Swift build
 - repository, package, bundle, and remote rename from `autotrain` to `train`
+- native shell rebuilt after overview scoping and update-check error handling fixes
 
 ## Current Gaps
 
