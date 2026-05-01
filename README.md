@@ -235,6 +235,12 @@ Verified ratchet behavior:
 - better runs are accepted and replace best-so-far
 - worse runs are rejected and preserve the existing best score
 
+Proof artifacts:
+
+- `docs/PROOF_VIBE_CYCLE.md`
+- `docs/SECOND_PROOF.md`
+- `docs/PROOF_REPLY_CYCLE.md`
+
 ## Local Quickstart
 
 ```bash

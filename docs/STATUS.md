@@ -24,10 +24,11 @@ Phase:
   - `{trinity}` runs brains
   - `{train}` improves brains
 - managed Python runtime bootstrap and starter project bootstrap generation delivered
+- first Trinity-powered `{reply}` optimization proof delivered
 
 Primary active issue:
 
-- no blocker remains on the renamed shell scaffold; next lane should move to runtime bootstrap and packaged desktop delivery
+- no blocker remains on the starter `{reply}` proof; next lane should move to broader git mutation, packaged runtime refresh, or real `{reply}` data integration
 
 Board intent:
 
@@ -41,13 +42,17 @@ Board intent:
 - `ISSUE-9` completed
 - `ISSUE-10` completed
 - `ISSUE-11` completed
+- `ISSUE-12` completed
+- `ISSUE-13` completed
+- `ISSUE-14` completed
+- `ISSUE-15` completed
+- `ISSUE-16` completed
+- `ISSUE-17` completed
 - follow-on roadmap work should cover:
-  - `ISSUE-12` idea-to-project onboarding
-  - `ISSUE-13` managed-project bootstrap generation
-  - `ISSUE-14` external runtime optimization seams
-  - `ISSUE-15` the first `{reply}` template path
-  - `ISSUE-16` the first local `{reply}` benchmark contract
-  - `ISSUE-17` the first Trinity-powered optimization proof
+  - broader git mutation support
+  - packaged runtime refresh and update installation
+  - real private-data and runtime integration for `{reply}`
+  - the next proof after the starter `{reply}` harness
 
 ## Current Reality
 
@@ -132,6 +137,9 @@ The repository currently has:
   - `program.md`
   - `run_benchmark.py`
   - `eval_fixture.json`
+- replayable `{reply}` proof artifact:
+  - `scripts/prove_reply_cycle.py`
+  - `docs/PROOF_REPLY_CYCLE.md`
 
 ## Verified Working
 
@@ -178,6 +186,7 @@ Verified locally:
 - recoverable-run summaries through `GET /v1/operator/status`
 - safe resume lineages through `POST /v1/runs/{id}/resume`
 - second-project proof through `uv run python scripts/prove_second_project.py`
+- Trinity-style reply proof through `uv run python scripts/prove_reply_cycle.py`
 - `npm audit --omit=dev` with zero vulnerabilities in `apps/web`
 - `npm run lint`
 - `npm run build`
@@ -203,16 +212,15 @@ Still missing on the critical path:
 - broader git mutation support beyond the single declared mutable artifact
 - longer unattended heartbeat exercise by a real agent session
 - packaged desktop update installation beyond release checks
-- one honest optimization proof against the starter reply benchmark
 - real private-data and runtime integration for the eventual `{reply}` production lane
 
 ## Immediate Next Steps
 
-1. decide whether the broader git mutation issue or the first reply proof lane has priority next
-2. decide whether packaged runtime refresh and update installation should happen before the first reply proof
+1. decide whether broader git mutation or packaged runtime refresh is the next engine lane
+2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
 3. decide whether the Vibe turn-limit exit behavior deserves its own follow-up issue
 4. decide when heartbeat integration should be exercised by a longer unattended agent session
-5. begin `ISSUE-12` through `ISSUE-17` when roadmap priority shifts from packaging
+5. define the next honest proof after `{reply}` once the real data contract exists
 
 ## Current Risks
 
@@ -220,7 +228,7 @@ Still missing on the critical path:
 - heartbeat and resume semantics are implemented, but unattended lease refresh is not yet exercised by a long-running agent loop
 - `Vibe` currently exits with a non-zero code when the configured turn limit is reached, even if it completed useful work
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
-- the starter `reply` benchmark is local and deterministic, but it is not yet wired to real private `{reply}` data or a `{trinity}` runtime component
+- the starter `reply` benchmark is local and deterministic, and the proof mutation is intentionally fixture-aware until real private `{reply}` data and runtime integration exist
 
 ## Blockers
 
@@ -239,4 +247,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- packaged desktop refinement and the Trinity-aware project-template lane, according to board priority
+- packaged desktop refinement, broader git mutation, or real `{reply}` data integration, according to board priority

@@ -33,6 +33,7 @@ Last completed increment:
   - `{trinity}` runs brains
   - `{train}` improves brains
 - native runtime bootstrap and starter project bootstrap generation
+- first Trinity-powered `{reply}` optimization proof
 
 Implemented:
 
@@ -93,7 +94,7 @@ Implemented:
 - strategic repo split:
   - `{trinity}` is the runtime workflow repository
   - `{train}` remains the bounded optimizer for project artifacts and runtime components
-- new roadmap issues opened for the next lane:
+- completed roadmap lane:
   - `ISSUE-12` Trinity-aware idea-to-project onboarding
   - `ISSUE-13` managed-project bootstrap generation
   - `ISSUE-14` runtime-to-optimizer contract for systems such as `{trinity}`
@@ -121,6 +122,8 @@ Implemented:
   - committed sample fixture
   - local-only override path under `artifacts/local/reply/eval.json`
   - automatic `draft_score` metric
+- third proof runner in `scripts/prove_reply_cycle.py`
+- durable `{reply}` proof notes in `docs/PROOF_REPLY_CYCLE.md`
 
 ### What Was Verified
 
@@ -166,6 +169,7 @@ Verified:
 - live HTTP CRUD verification for managed projects
 - managed project starter bootstrap unit coverage
 - starter reply benchmark execution coverage
+- real `{reply}` ratchet proof through `uv run python scripts/prove_reply_cycle.py`
 - warning-free Swift rebuild after the UI recovery pass
 - full rename validation for Python, web, macOS bundle, MVP smoke test, and GitHub remote
 
@@ -173,11 +177,11 @@ Verified:
 
 Next expected work:
 
-1. decide whether the broader git-mutation issue or the first reply proof lane moves next
-2. decide whether packaged runtime refresh and update installation should happen before the first reply proof
+1. decide whether broader git mutation or packaged runtime refresh moves next
+2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
 3. decide whether the Vibe turn-limit exit behavior deserves a dedicated follow-up issue
 4. decide when to exercise heartbeat refresh in a longer unattended agent session
-5. start `ISSUE-12` through `ISSUE-17` when roadmap priority shifts from packaging refinement
+5. define the next proof after `{reply}` once the real data contract exists
 
 ### Watch Carefully
 
@@ -196,7 +200,7 @@ Next expected work:
 - keep desktop actions in the toolbar unless there is a strong native UX reason not to
 - keep `{trinity}` runtime responsibilities out of `{train}` core while still making runtime components optimizable through project contracts
 - keep starter project generation simple and deterministic; do not hide the project contract behind clever scaffolding
-- keep the starter `reply` benchmark honest about its current limits until real private data and runtime integration are available
+- keep the starter `reply` benchmark honest about its current limits; the current proof is valid as a seam test, not as evidence of production-quality reply drafting
 
 ### If You Only Have 30 Minutes
 
@@ -215,5 +219,5 @@ Do this:
 Do this:
 
 - run the full verification stack
-- close the second-proof issue
-- choose the next post-shell lane
+- choose the next post-proof lane
+- define the next issue after the starter `{reply}` seam proof
