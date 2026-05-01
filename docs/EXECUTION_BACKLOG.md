@@ -37,6 +37,11 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 - `TRAIN-003` Missing promotion contract for `{train}` to `{trinity}`
   The benchmark existed after implementation, but the repo still needed an explicit promotion rule for how optimized ranking artifacts map back into Trinity-owned code. Fixed by adding `docs/TRINITY_FRONTIER_PROMOTION.md`.
 
+### Open
+
+- `TRAIN-004` Web toolchain major-version upgrade lane
+  `apps/web` is clean on lint, production build, and audit after safe updates, but major upgrades remain for `eslint` and `typescript`. Those should be handled as a dedicated compatibility lane against the Next 16 toolchain.
+
 ## Dependencies
 
 - Depends on `{trinity}` to define stable bounded artifacts for runtime components.
