@@ -1,12 +1,24 @@
 import Foundation
 
 enum ProjectLocator {
+    static func bundledAppModeEnabled() -> Bool {
+        let env = ProcessInfo.processInfo.environment
+        if let raw = env["TRAIN_BUNDLED_APP"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+            return ["1", "true", "yes"].contains(raw)
+        }
+        return Bundle.main.bundleURL.pathExtension == "app"
+    }
+
     static func applicationSupportRoot() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return base.appendingPathComponent("train", isDirectory: true)
     }
 
     static func resolveRepositoryRoot() -> URL? {
+        if bundledAppModeEnabled(), let bundled = bootstrapBundledRuntime() {
+            return bundled
+        }
+
         let env = ProcessInfo.processInfo.environment
         if let override = env["TRAIN_REPO_ROOT"] {
             let url = URL(fileURLWithPath: override)
@@ -29,7 +41,6 @@ enum ProjectLocator {
         if isRepositoryRoot(sharedProjects) {
             return sharedProjects
         }
-
         return bootstrapBundledRuntime()
     }
 
@@ -72,6 +83,10 @@ enum ProjectLocator {
             }
         }
 
+        if let bundled = bundledExecutable(named: name) {
+            return bundled
+        }
+
         if let pathValue = env["PATH"] {
             for pathEntry in pathValue.split(separator: ":") {
                 let candidate = URL(fileURLWithPath: String(pathEntry)).appendingPathComponent(name)
@@ -94,6 +109,15 @@ enum ProjectLocator {
             }
         }
 
+        return nil
+    }
+
+    private static func bundledExecutable(named name: String) -> URL? {
+        guard let resourceURL = Bundle.main.resourceURL else { return nil }
+        let candidate = resourceURL.appendingPathComponent(name)
+        if FileManager.default.isExecutableFile(atPath: candidate.path) {
+            return candidate
+        }
         return nil
     }
 

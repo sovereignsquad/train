@@ -131,6 +131,7 @@ final class ProcessSupervisorService: ObservableObject {
             String(selectedPort),
         ]
         var env = ProcessInfo.processInfo.environment
+        env["TRAIN_BUNDLED_APP"] = ProjectLocator.bundledAppModeEnabled() ? "1" : "0"
         env["TRAIN_ENV"] = "local"
         env["APP_HOST"] = host
         env["APP_PORT"] = String(selectedPort)
