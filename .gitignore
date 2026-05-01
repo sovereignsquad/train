@@ -9,6 +9,8 @@ __pycache__/
 node_modules/
 .next/
 dist/
+apps/macos/.build/
+apps/macos/dist/
 coverage/
 artifacts/
 logs/
