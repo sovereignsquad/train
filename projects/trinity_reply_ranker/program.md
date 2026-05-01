@@ -7,6 +7,7 @@ Purpose:
 - validate that Train can load Trinity reply traces safely
 - replay one bounded ranking policy against deterministic fixtures
 - prepare the future optimization lane without pretending live optimization is ready
+- accept fixtures generated from real Trinity trace exports plus optional Reply shadow comparisons
 
 Rules:
 

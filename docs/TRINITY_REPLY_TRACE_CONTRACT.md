@@ -11,6 +11,7 @@
 3. inspect `frontier_candidate_ids`
 4. inspect `feedback_events`
 5. replay bounded ranker logic against committed fixtures
+6. optionally merge Reply shadow-comparison logs into generated fixtures
 
 ## Non-Goals
 
@@ -24,3 +25,4 @@
 2. add `trinity_reply_ranker` scaffold project
 3. keep benchmark deterministic and fixture-bound
 4. refuse malformed or incompatible trace exports
+5. add a fixture-builder path from real Trinity exports and Reply shadow logs
