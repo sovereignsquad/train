@@ -1,4 +1,4 @@
-# Reply Proof Cycle
+# {reply} Proof Cycle
 
 ## Purpose
 
@@ -41,7 +41,7 @@ Ratchet result:
 
 This proof demonstrates that the delivered local platform can:
 
-- execute a Trinity-style runtime component project through the standard run lifecycle
+- execute a `{trinity}`-style runtime component project through the standard run lifecycle
 - mutate only the declared controlled artifact for that component
 - score the changed component through the documented local `{reply}` benchmark
 - keep the better result through the standard ratchet path

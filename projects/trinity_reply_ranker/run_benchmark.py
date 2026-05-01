@@ -14,7 +14,7 @@ def run_benchmark() -> dict[str, object]:
     return {
         "status": "succeeded",
         "metric_value": metric_value,
-        "result_summary": "Trinity reply trace replay scaffold completed against one bounded export fixture.",
+        "result_summary": "{trinity} {reply} trace replay scaffold completed against one bounded export fixture.",
         "error_message": None,
     }
 

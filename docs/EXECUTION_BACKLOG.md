@@ -1,4 +1,4 @@
-# Train Execution Backlog
+# {train} Execution Backlog
 
 ## Objective
 
@@ -14,7 +14,7 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 - [x] Record the execution backlog and issue queue in-repo.
 - [ ] Verify clean local test, lint, and app-build baseline after changes.
 
-### M2. Trinity Component Optimization Path
+### M2. {trinity} Component Optimization Path
 
 - [x] Add a bounded reference benchmark for the `{trinity}` frontier-ranking component.
 - [ ] Add more runtime-component templates once `{trinity}` exports additional bounded artifacts.
@@ -22,7 +22,7 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 ### M3. Promotion Readiness
 
 - [x] Add artifact-promotion notes for importing optimized ranking policies back into `{trinity}`.
-- [ ] Add stronger regression fixtures once `{reply}` starts consuming Trinity frontier outputs.
+- [ ] Add stronger regression fixtures once `{reply}` starts consuming `{trinity}` frontier outputs.
 
 ## Active Issue Queue
 
@@ -31,11 +31,11 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 - `TRAIN-001` Repo-local Vibe runtime-home regression
   The status surface resolved `runtime_home` to `~/Library/Application Support/train/vibe-home` instead of the repo-local contract path expected by tests and by local operator workflows. Fixed by restoring the default to `artifacts/local/vibe-home`.
 
-- `TRAIN-002` Missing first-class Trinity runtime benchmark
+- `TRAIN-002` Missing first-class `{trinity}` runtime benchmark
   The repository described bounded external runtime optimization but did not ship a concrete `{trinity}` reference benchmark. Fixed by adding `projects/trinity_frontier`.
 
 - `TRAIN-003` Missing promotion contract for `{train}` to `{trinity}`
-  The benchmark existed after implementation, but the repo still needed an explicit promotion rule for how optimized ranking artifacts map back into Trinity-owned code. Fixed by adding `docs/TRINITY_FRONTIER_PROMOTION.md`.
+  The benchmark existed after implementation, but the repo still needed an explicit promotion rule for how optimized ranking artifacts map back into `{trinity}`-owned code. Fixed by adding `docs/TRINITY_FRONTIER_PROMOTION.md`.
 
 ### Open
 

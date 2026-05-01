@@ -29,7 +29,7 @@ The repository now also includes a second reference benchmark:
 
 - `helpdesk`, a deterministic intent-classification project with a `maximize` metric
 
-The repository now also includes a starter Trinity-style reply benchmark:
+The repository now also includes a starter `{trinity}`-style `{reply}` benchmark:
 
 - `reply`, a deterministic local reply-drafting project with a `maximize` metric and local-only data override support
 

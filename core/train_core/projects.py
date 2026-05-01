@@ -69,10 +69,10 @@ class ProjectBootstrapResult:
 REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
     "trinity_frontier": ProjectDefinition(
         key="trinity_frontier",
-        name="Trinity Frontier Benchmark",
+        name="{trinity} frontier benchmark",
         description=(
-            "Bounded Trinity runtime component benchmark for train. It optimizes the frontier "
-            "ranking heuristic without absorbing Trinity runtime ownership."
+            "Bounded {trinity} runtime component benchmark for {train}. It optimizes the frontier "
+            "ranking heuristic without absorbing {trinity} runtime ownership."
         ),
         mutable_artifact="projects/trinity_frontier/train.py",
         autonomous_mutable_artifacts=("projects/trinity_frontier/train.py",),
@@ -97,9 +97,9 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
     ),
     "reply": ProjectDefinition(
         key="reply",
-        name="Reply Draft Benchmark",
+        name="{reply} draft benchmark",
         description=(
-            "Starter Trinity-style reference project for train using local reply-drafting "
+            "Starter {trinity}-style reference project for {train} using local {reply}-drafting "
             "fixtures and a deterministic maximize metric."
         ),
         mutable_artifact="projects/reply/train.py",
@@ -125,9 +125,9 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
     ),
     "trinity_reply_ranker": ProjectDefinition(
         key="trinity_reply_ranker",
-        name="Trinity Reply Ranker Trace Replay",
+        name="{trinity} {reply} ranker trace replay",
         description=(
-            "Trace-ingestion scaffold for train that replays Trinity reply runtime exports without "
+            "Trace-ingestion scaffold for {train} that replays {trinity} {reply} runtime exports without "
             "claiming live optimization readiness before enough real traces exist."
         ),
         mutable_artifact="projects/trinity_reply_ranker/train.py",

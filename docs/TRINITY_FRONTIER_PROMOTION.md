@@ -1,8 +1,8 @@
-# Trinity Frontier Promotion Contract
+# {trinity} Frontier Promotion Contract
 
 ## Purpose
 
-This document defines how a bounded `{train}` result for the Trinity frontier benchmark maps back into `{trinity}` without mixing repository ownership.
+This document defines how a bounded `{train}` result for the `{trinity}` frontier benchmark maps back into `{trinity}` without mixing repository ownership.
 
 ## Promotion Rules
 

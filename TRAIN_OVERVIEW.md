@@ -230,7 +230,7 @@ Shape:
 
 Purpose:
 
-- starter Trinity-style reply benchmark
+- starter `{trinity}`-style `{reply}` benchmark
 
 Shape:
 
@@ -367,7 +367,7 @@ The repository has already proven:
 - support for both `minimize` and `maximize` metrics
 - safe ratchet semantics with keep/reject behavior
 - protected-path guardrails
-- Trinity-style bounded runtime component optimization through the starter `{reply}` proof
+- `{trinity}`-style bounded runtime component optimization through the starter `{reply}` proof
 - multi-artifact git mutation support inside declared mutable artifact sets
 
 This means `{train}` is already beyond a conceptual prototype.

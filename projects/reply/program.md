@@ -1,6 +1,6 @@
-# Reply Draft Benchmark
+# {reply} Draft Benchmark
 
-This is the first Trinity-style reference project for `train`.
+This is the first `{trinity}`-style reference project for `{train}`.
 
 Purpose:
 

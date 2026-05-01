@@ -10,7 +10,7 @@ FIXTURE_PATH = PROJECT_ROOT / "eval_fixture.json"
 
 def ensure_prepared() -> None:
     if not FIXTURE_PATH.exists():
-        raise FileNotFoundError(f"Missing Trinity reply trace fixture: {FIXTURE_PATH}")
+        raise FileNotFoundError(f"Missing {{trinity}} {{reply}} trace fixture: {FIXTURE_PATH}")
 
 
 def load_fixture() -> dict[str, object]:

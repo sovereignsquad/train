@@ -1,4 +1,4 @@
-# Trinity Frontier Benchmark
+# {trinity} Frontier Benchmark
 
 This project lets `{train}` optimize a bounded `{trinity}` component without taking over runtime ownership.
 
