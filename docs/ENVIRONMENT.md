@@ -88,6 +88,8 @@ These are the current local variables:
 - `OPERATOR_LEASE_GRACE_SECONDS`
 - `OLLAMA_BASE_URL`
 - `TRAIN_REPO_ROOT`
+- `TRAIN_ROOT_DIR`
+- `TRAIN_STATE_DIR`
 - `TRAIN_UV_EXECUTABLE`
 - `DATABASE_URL`
 - `TRAIN_ENV`
@@ -180,6 +182,20 @@ These are the current local variables:
 - required: no
 - default: none
 - purpose: overrides repository-root discovery for the native macOS shell when launching the local engine
+
+`TRAIN_ROOT_DIR`
+
+- environments: local engine execution, especially native macOS shell launches
+- required: no
+- default: resolved source checkout root
+- purpose: overrides the runtime root used by Python services, migrations, scripts, projects, and bundled runtime launches
+
+`TRAIN_STATE_DIR`
+
+- environments: local engine execution, especially native macOS shell launches
+- required: no
+- default: `<TRAIN_ROOT_DIR>/artifacts/local`
+- purpose: overrides the writable state directory used for SQLite and other local runtime state
 
 `TRAIN_UV_EXECUTABLE`
 

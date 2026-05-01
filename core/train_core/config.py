@@ -1,17 +1,21 @@
+import os
 from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-DEFAULT_STATE_DIR = ROOT_DIR / "artifacts" / "local"
+SOURCE_ROOT_DIR = Path(__file__).resolve().parents[2]
+ROOT_DIR = Path(os.environ.get("TRAIN_ROOT_DIR", str(SOURCE_ROOT_DIR))).resolve()
+DEFAULT_STATE_DIR = Path(
+    os.environ.get("TRAIN_STATE_DIR", str(ROOT_DIR / "artifacts" / "local"))
+).resolve()
 DEFAULT_DB_PATH = DEFAULT_STATE_DIR / "train.db"
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ROOT_DIR / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )

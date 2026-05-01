@@ -165,6 +165,9 @@ struct ProjectManagementView: View {
                         isPresentingEditor = true
                     }
                 } else {
+                    Button("Bootstrap Files") {
+                        viewModel.bootstrapProject(project.key)
+                    }
                     Button("Edit") {
                         editingProjectKey = project.key
                         editorState = .fromProject(project)

@@ -32,6 +32,7 @@ Last completed increment:
 - strategic architecture clarification:
   - `{trinity}` runs brains
   - `{train}` improves brains
+- native runtime bootstrap and starter project bootstrap generation
 
 Implemented:
 
@@ -99,6 +100,27 @@ Implemented:
   - `ISSUE-15` the first `{reply}` template
   - `ISSUE-16` the first local `{reply}` benchmark contract
   - `ISSUE-17` the first Trinity-powered optimization proof
+- configurable runtime root and state paths in `core/train_core/config.py`
+- native shell launch env now sets:
+  - `TRAIN_ROOT_DIR`
+  - `TRAIN_STATE_DIR`
+  - `DATABASE_URL`
+  - `MISTRAL_VIBE_HOME`
+- bundled runtime template copied into `train.app` resources during `build-bundle.sh`
+- first-launch managed runtime bootstrap via `uv sync --frozen --no-dev`
+- managed project workspace bootstrap API:
+  - `POST /v1/projects/{project_key}/bootstrap`
+- starter project generation for:
+  - mutable artifact
+  - `prepare.py`
+  - `program.md`
+  - `run_benchmark.py`
+- native Projects view action to bootstrap starter files for managed projects
+- starter Trinity-style `reply` reference project in `projects/reply/`
+- local reply benchmark contract with:
+  - committed sample fixture
+  - local-only override path under `artifacts/local/reply/eval.json`
+  - automatic `draft_score` metric
 
 ### What Was Verified
 
@@ -106,6 +128,7 @@ Verified:
 
 - `uv run ruff check .`
 - `uv run pytest`
+- `uv run pytest tests/test_projects.py`
 - `npm run lint`
 - `npm run build`
 - `npm audit --omit=dev`
@@ -139,7 +162,10 @@ Verified:
   - app bundle creation
   - bundle signature validation
   - engine launch path in non-interactive app context
+- packaged runtime template included in `train.app`
 - live HTTP CRUD verification for managed projects
+- managed project starter bootstrap unit coverage
+- starter reply benchmark execution coverage
 - warning-free Swift rebuild after the UI recovery pass
 - full rename validation for Python, web, macOS bundle, MVP smoke test, and GitHub remote
 
@@ -147,11 +173,11 @@ Verified:
 
 Next expected work:
 
-1. implement runtime bootstrap inside the native shell
-2. remove remaining repo-root assumptions for packaged use
-3. decide whether managed-project folder bootstrapping belongs before or after packaged desktop delivery
+1. decide whether the broader git-mutation issue or the first reply proof lane moves next
+2. decide whether packaged runtime refresh and update installation should happen before the first reply proof
+3. decide whether the Vibe turn-limit exit behavior deserves a dedicated follow-up issue
 4. decide when to exercise heartbeat refresh in a longer unattended agent session
-5. add the Trinity-aware idea-to-project and `{reply}` template roadmap once runtime bootstrap priority is settled
+5. start `ISSUE-12` through `ISSUE-17` when roadmap priority shifts from packaging refinement
 
 ### Watch Carefully
 
@@ -169,6 +195,8 @@ Next expected work:
 - keep reference templates distinct from managed user projects in both API and UI
 - keep desktop actions in the toolbar unless there is a strong native UX reason not to
 - keep `{trinity}` runtime responsibilities out of `{train}` core while still making runtime components optimizable through project contracts
+- keep starter project generation simple and deterministic; do not hide the project contract behind clever scaffolding
+- keep the starter `reply` benchmark honest about its current limits until real private data and runtime integration are available
 
 ### If You Only Have 30 Minutes
 

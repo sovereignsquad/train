@@ -23,6 +23,7 @@ Phase:
 - strategic separation clarified:
   - `{trinity}` runs brains
   - `{train}` improves brains
+- managed Python runtime bootstrap and starter project bootstrap generation delivered
 
 Primary active issue:
 
@@ -61,6 +62,7 @@ The repository currently has:
 - Alembic-backed `SQLite` local state
 - project registry with `project.mythology`
 - second benchmark project with `project.helpdesk`
+- starter reply benchmark project with `project.reply`
 - `Mistral Vibe` as the first delivered agent adapter
 - provider adapter registry with:
   - `Mistral API`
@@ -84,6 +86,9 @@ The repository currently has:
   - release-check scaffold
   - deterministic `uv` executable resolution with override support
   - attach/fallback behavior when the preferred API port is already occupied
+  - app-support runtime and state paths for packaged launches
+  - bundled runtime template copied into `train.app`
+  - first-launch managed runtime bootstrap through `uv sync --frozen --no-dev`
   - native toolbar-based action placement instead of in-content action clusters
   - responsive project editor sections with file selectors, lists, and structured pickers
   - deterministic app icon generation and bundled `.icns` app icon
@@ -94,6 +99,7 @@ The repository currently has:
   - reference templates
   - user-defined managed projects
   - CRUD API surface
+  - starter workspace bootstrap generation
   - dedicated native Projects workspace
 - run lifecycle endpoints:
   - create
@@ -120,6 +126,12 @@ The repository currently has:
   - `train.py`
   - `program.md`
   - `run_benchmark.py`
+- starter reply benchmark files:
+  - `prepare.py`
+  - `train.py`
+  - `program.md`
+  - `run_benchmark.py`
+  - `eval_fixture.json`
 
 ## Verified Working
 
@@ -138,6 +150,7 @@ Verified locally:
 - `GET /v1/projects/templates`
 - `GET /v1/projects/{project_key}`
 - `POST /v1/projects`
+- `POST /v1/projects/{project_key}/bootstrap`
 - `PUT /v1/projects/{project_key}`
 - `DELETE /v1/projects/{project_key}`
 - `POST /v1/runs`
@@ -169,12 +182,16 @@ Verified locally:
 - `npm run lint`
 - `npm run build`
 - `uv run pytest`
+- `uv run pytest tests/test_projects.py`
 - `uv run ruff check .`
 - the repository can be validated end to end with `uv run python scripts/test_mvp.py`
+- `uv run python projects/reply/run_benchmark.py --budget-seconds 60 --run-id 1`
 - `swift build -c release` in `apps/macos`
 - app bundle creation through `apps/macos/Scripts/build-bundle.sh`
+- packaged runtime template included in `train.app`
 - native-shell engine launch path fixed for non-interactive app environments
 - managed-project CRUD verified through the live HTTP API
+- managed-project starter bootstrap verified through unit coverage
 - native shell rebuilt after UI recovery with warning-free Swift build
 - repository, package, bundle, and remote rename from `autotrain` to `train`
 - native shell rebuilt after overview scoping and update-check error handling fixes
@@ -185,29 +202,25 @@ Still missing on the critical path:
 
 - broader git mutation support beyond the single declared mutable artifact
 - longer unattended heartbeat exercise by a real agent session
-- managed Python runtime bootstrap inside the native shell
-- packaged desktop state bootstrap independent of repo-root assumptions
 - packaged desktop update installation beyond release checks
-- turnkey project-folder bootstrap generation for new project templates
-- a formal contract for optimizing bounded runtime components from systems such as `{trinity}`
+- one honest optimization proof against the starter reply benchmark
+- real private-data and runtime integration for the eventual `{reply}` production lane
 
 ## Immediate Next Steps
 
-1. implement native runtime bootstrap and packaged app-support state paths
-2. decide whether the broader git mutation issue or runtime packaging has priority after that
+1. decide whether the broader git mutation issue or the first reply proof lane has priority next
+2. decide whether packaged runtime refresh and update installation should happen before the first reply proof
 3. decide whether the Vibe turn-limit exit behavior deserves its own follow-up issue
 4. decide when heartbeat integration should be exercised by a longer unattended agent session
-5. define the Trinity-aware idea-to-project and `{reply}` template follow-up lane
+5. begin `ISSUE-12` through `ISSUE-17` when roadmap priority shifts from packaging
 
 ## Current Risks
 
 - git mutation currently supports only the declared mutable artifact path
 - heartbeat and resume semantics are implemented, but unattended lease refresh is not yet exercised by a long-running agent loop
 - `Vibe` currently exits with a non-zero code when the configured turn limit is reached, even if it completed useful work
-- the native shell currently assumes a repo-root development workflow and does not yet ship a managed Python runtime
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
-- managed projects store contract metadata, but they do not yet ship a turnkey project-folder bootstrap generator
-- the project contract is broad enough for Trinity-style components, but the onboarding path for those projects is not yet formalized
+- the starter `reply` benchmark is local and deterministic, but it is not yet wired to real private `{reply}` data or a `{trinity}` runtime component
 
 ## Blockers
 
@@ -226,4 +239,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- native runtime bootstrap and packaged desktop delivery, unless the board explicitly reprioritizes the Trinity-aware project-template lane
+- packaged desktop refinement and the Trinity-aware project-template lane, according to board priority

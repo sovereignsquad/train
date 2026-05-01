@@ -1,6 +1,11 @@
 import Foundation
 
 enum ProjectLocator {
+    static func applicationSupportRoot() -> URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return base.appendingPathComponent("train", isDirectory: true)
+    }
+
     static func resolveRepositoryRoot() -> URL? {
         let env = ProcessInfo.processInfo.environment
         if let override = env["TRAIN_REPO_ROOT"] {
@@ -25,7 +30,7 @@ enum ProjectLocator {
             return sharedProjects
         }
 
-        return nil
+        return bootstrapBundledRuntime()
     }
 
     private static func ancestorRepositoryRoot(from start: URL) -> URL? {
@@ -90,5 +95,36 @@ enum ProjectLocator {
         }
 
         return nil
+    }
+
+    private static func bootstrapBundledRuntime() -> URL? {
+        guard let resourceRoot = Bundle.main.resourceURL else {
+            return nil
+        }
+
+        let bundledRuntime = resourceRoot.appendingPathComponent("runtime-template", isDirectory: true)
+        guard isRepositoryRoot(bundledRuntime) else {
+            return nil
+        }
+
+        let runtimeRoot = applicationSupportRoot()
+            .appendingPathComponent("runtime", isDirectory: true)
+            .appendingPathComponent("current", isDirectory: true)
+
+        if isRepositoryRoot(runtimeRoot) {
+            return runtimeRoot
+        }
+
+        do {
+            let parent = runtimeRoot.deletingLastPathComponent()
+            try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+            if FileManager.default.fileExists(atPath: runtimeRoot.path) {
+                try FileManager.default.removeItem(at: runtimeRoot)
+            }
+            try FileManager.default.copyItem(at: bundledRuntime, to: runtimeRoot)
+            return runtimeRoot
+        } catch {
+            return nil
+        }
     }
 }

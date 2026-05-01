@@ -1,0 +1,39 @@
+[
+  {
+    "language": "en",
+    "intent": "business_decision",
+    "incoming": "Should we delay the launch by one week to tighten onboarding?",
+    "gold_reply": "I would delay by one week if onboarding is still shaky. A clean first experience matters more than an arbitrary date."
+  },
+  {
+    "language": "en",
+    "intent": "neutral",
+    "incoming": "Thanks for the update. I will review it tonight.",
+    "gold_reply": "Perfect, thank you. Review it when you have time and send me your notes after."
+  },
+  {
+    "language": "en",
+    "intent": "personal",
+    "incoming": "I am overthinking the conversation from yesterday.",
+    "gold_reply": "That is normal. Give it a little distance, then focus on what was actually said instead of replaying every possibility."
+  },
+  {
+    "language": "hu",
+    "intent": "business_decision",
+    "incoming": "Szerinted most felvegyünk még egy embert, vagy várjunk egy hónapot?",
+    "gold_reply": "Én várnék egy hónapot, ha a feladatok még kezelhetők. Előbb legyen tiszta a prioritás és a terhelés."
+  },
+  {
+    "language": "hu",
+    "intent": "neutral",
+    "incoming": "Megkaptam a fájlt, este megnézem.",
+    "gold_reply": "Szuper, köszönöm. Nézd meg nyugodtan este, és utána egyeztessünk róla."
+  },
+  {
+    "language": "hu",
+    "intent": "personal",
+    "incoming": "Túl sokat gondolkodom ezen az egészen.",
+    "gold_reply": "Ez teljesen rendben van. Adj neki egy kis időt, és inkább a tényekre figyelj, ne az összes lehetséges forgatókönyvre."
+  }
+]
+

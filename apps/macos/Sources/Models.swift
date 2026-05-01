@@ -86,6 +86,26 @@ struct ProjectWritePayload: Codable {
     }
 }
 
+struct ProjectBootstrapRequestPayload: Codable {
+    let overwrite: Bool
+}
+
+struct ProjectBootstrapPayload: Codable {
+    let projectKey: String
+    let projectRoot: String
+    let createdFiles: [String]
+    let overwrittenFiles: [String]
+    let skippedFiles: [String]
+
+    private enum CodingKeys: String, CodingKey {
+        case projectKey = "project_key"
+        case projectRoot = "project_root"
+        case createdFiles = "created_files"
+        case overwrittenFiles = "overwritten_files"
+        case skippedFiles = "skipped_files"
+    }
+}
+
 struct RunPayload: Codable, Identifiable {
     let id: Int
     let projectKey: String

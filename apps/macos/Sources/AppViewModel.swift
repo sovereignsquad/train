@@ -79,6 +79,23 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func bootstrapProject(_ key: String, overwrite: Bool = false) {
+        Task {
+            guard let client = apiClient() else { return }
+            do {
+                let payload = ProjectBootstrapRequestPayload(overwrite: overwrite)
+                _ = try await client.post(
+                    "v1/projects/\(key)/bootstrap",
+                    body: payload,
+                    as: ProjectBootstrapPayload.self
+                )
+                await refreshSnapshot()
+            } catch {
+                lastRefreshError = error.localizedDescription
+            }
+        }
+    }
+
     private func beginRefreshing() {
         refreshTask?.cancel()
         refreshTask = Task { [weak self] in

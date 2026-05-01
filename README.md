@@ -22,6 +22,10 @@ The repository now also includes a second reference benchmark:
 
 - `helpdesk`, a deterministic intent-classification project with a `maximize` metric
 
+The repository now also includes a starter Trinity-style reply benchmark:
+
+- `reply`, a deterministic local reply-drafting project with a `maximize` metric and local-only data override support
+
 The repository also now includes a native macOS operator shell:
 
 - `apps/macos`, a SwiftUI desktop shell that supervises the local engine, exposes operator status, and prepares the path toward packaged desktop delivery
@@ -170,8 +174,10 @@ The repository now includes:
 - Alembic-backed local `SQLite` migrations
 - run ledger and project-state foundation
 - two reference benchmarks in `projects/`:
+- three reference benchmarks in `projects/`:
   - `mythology`
   - `helpdesk`
+  - `reply`
 - Vibe adapter contract in `.vibe/` and `scripts/run_vibe.py`
 - autonomous guardrails for setup artifacts, dependency files, and budget bounds
 - minimal `Next.js` + `Mantine` operator UI in `apps/web/`

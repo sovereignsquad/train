@@ -47,8 +47,8 @@ final class ProcessSupervisorService: ObservableObject {
     private func startEngineWorkflow() async {
         guard let repositoryRoot else {
             status = .failed
-            statusMessage = "Repository root could not be resolved."
-            appendLog("Repository root missing. Set TRAIN_REPO_ROOT or run from the train repository.")
+            statusMessage = "Runtime root could not be resolved."
+            appendLog("Runtime root missing. Set TRAIN_REPO_ROOT for development or ensure the app bundle includes a runtime template.")
             return
         }
         guard let uvExecutable = ProjectLocator.resolveExecutable(
@@ -65,13 +65,15 @@ final class ProcessSupervisorService: ObservableObject {
         let stateDirectory = appSupportDirectory()
         let logsDirectory = stateDirectory.appendingPathComponent("logs", isDirectory: true)
         let runtimeDirectory = stateDirectory.appendingPathComponent("runtime", isDirectory: true)
+        let stateFilesDirectory = stateDirectory.appendingPathComponent("state", isDirectory: true)
         let logFileURL = logsDirectory.appendingPathComponent("engine.log")
-        databaseURL = "sqlite:///\(stateDirectory.appendingPathComponent("state/train.db").path)"
+        databaseURL = "sqlite:///\(stateFilesDirectory.appendingPathComponent("train.db").path)"
 
         do {
             try FileManager.default.createDirectory(at: stateDirectory, withIntermediateDirectories: true)
             try FileManager.default.createDirectory(at: logsDirectory, withIntermediateDirectories: true)
             try FileManager.default.createDirectory(at: runtimeDirectory, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: stateFilesDirectory, withIntermediateDirectories: true)
             FileManager.default.createFile(atPath: logFileURL.path, contents: nil)
             logFileHandle = try FileHandle(forWritingTo: logFileURL)
             try logFileHandle?.seekToEnd()
@@ -79,6 +81,17 @@ final class ProcessSupervisorService: ObservableObject {
             status = .failed
             statusMessage = "Failed to prepare app support directories."
             appendLog("Directory preparation failed: \(error.localizedDescription)")
+            return
+        }
+
+        do {
+            try ensureManagedRuntime(at: repositoryRoot, using: uvExecutable)
+        } catch {
+            status = .failed
+            statusMessage = "Failed to prepare the managed runtime."
+            appendLog("Managed runtime bootstrap failed: \(error.localizedDescription)")
+            try? logFileHandle?.close()
+            logFileHandle = nil
             return
         }
 
@@ -122,6 +135,8 @@ final class ProcessSupervisorService: ObservableObject {
         env["APP_HOST"] = host
         env["APP_PORT"] = String(selectedPort)
         env["DATABASE_URL"] = databaseURL
+        env["TRAIN_ROOT_DIR"] = repositoryRoot.path
+        env["TRAIN_STATE_DIR"] = stateFilesDirectory.path
         env["MISTRAL_VIBE_HOME"] = runtimeDirectory.appendingPathComponent("vibe-home").path
         env["PYTHONUNBUFFERED"] = "1"
         process.environment = env
@@ -224,8 +239,7 @@ final class ProcessSupervisorService: ObservableObject {
     }
 
     private func appSupportDirectory() -> URL {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return base.appendingPathComponent("train", isDirectory: true)
+        ProjectLocator.applicationSupportRoot()
     }
 
     private func appendLog(_ line: String) {
@@ -242,6 +256,44 @@ final class ProcessSupervisorService: ObservableObject {
 
     private func baseURL(for port: Int) -> URL {
         URL(string: "http://\(host):\(port)")!
+    }
+
+    private func ensureManagedRuntime(at repositoryRoot: URL, using uvExecutable: URL) throws {
+        let venvPath = repositoryRoot.appendingPathComponent(".venv").path
+        let lockPath = repositoryRoot.appendingPathComponent("uv.lock").path
+
+        if FileManager.default.fileExists(atPath: venvPath),
+           FileManager.default.fileExists(atPath: lockPath) {
+            return
+        }
+
+        appendLog("Bootstrapping managed runtime in \(repositoryRoot.path)")
+
+        let syncProcess = Process()
+        let pipe = Pipe()
+        syncProcess.currentDirectoryURL = repositoryRoot
+        syncProcess.executableURL = uvExecutable
+        syncProcess.arguments = ["sync", "--frozen", "--no-dev"]
+        syncProcess.standardOutput = pipe
+        syncProcess.standardError = pipe
+
+        try syncProcess.run()
+        syncProcess.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        if let output = String(data: data, encoding: .utf8), output.isEmpty == false {
+            for line in output.split(separator: "\n", omittingEmptySubsequences: true) {
+                appendLog(String(line))
+            }
+        }
+
+        if syncProcess.terminationStatus != 0 {
+            throw NSError(
+                domain: "ProcessSupervisorService",
+                code: Int(syncProcess.terminationStatus),
+                userInfo: [NSLocalizedDescriptionKey: "uv sync failed with exit code \(syncProcess.terminationStatus)"]
+            )
+        }
     }
 
     private func isHealthyEngine(at baseURL: URL) async -> Bool {

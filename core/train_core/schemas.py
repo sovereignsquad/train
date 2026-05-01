@@ -88,6 +88,18 @@ class ProjectWrite(BaseModel):
         return self
 
 
+class ProjectBootstrapRequest(BaseModel):
+    overwrite: bool = False
+
+
+class ProjectBootstrapRead(BaseModel):
+    project_key: str
+    project_root: str
+    created_files: tuple[str, ...]
+    overwritten_files: tuple[str, ...]
+    skipped_files: tuple[str, ...]
+
+
 class ExecutionResult(BaseModel):
     status: RunStatus
     metric_value: float | None = None

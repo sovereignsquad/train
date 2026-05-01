@@ -21,8 +21,10 @@ from train_core.operator import (
     touch_run_heartbeat,
 )
 from train_core.projects import (
+    ProjectBootstrapResult,
     ProjectMutation,
     ProjectMutationError,
+    bootstrap_project_workspace,
     create_managed_project,
     delete_managed_project,
     get_project,
@@ -50,6 +52,8 @@ from train_core.schemas import (
     OperatorStatusRead,
     ProviderAdapterRead,
     ProviderStatusRead,
+    ProjectBootstrapRead,
+    ProjectBootstrapRequest,
     ProjectRead,
     ProjectWrite,
     ProjectStateRead,
@@ -120,6 +124,24 @@ def delete_project(project_key: str, db: Session = Depends(get_db)) -> None:
     except ProjectMutationError as exc:
         status_code = 404 if "was not found" in str(exc) else 400
         raise HTTPException(status_code=status_code, detail=str(exc)) from exc
+
+
+@app.post("/v1/projects/{project_key}/bootstrap", response_model=ProjectBootstrapRead)
+def bootstrap_project(
+    project_key: str,
+    payload: ProjectBootstrapRequest,
+    db: Session = Depends(get_db),
+) -> ProjectBootstrapRead:
+    project = get_project(project_key, db=db)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if project.source_kind != "managed":
+        raise HTTPException(status_code=400, detail="Only managed projects can be bootstrapped.")
+    try:
+        result = bootstrap_project_workspace(project, overwrite=payload.overwrite)
+    except ProjectMutationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _serialize_project_bootstrap(result)
 
 
 @app.get("/v1/agents", response_model=list[AgentAdapterRead])
@@ -295,4 +317,14 @@ def _project_mutation_from_payload(payload: ProjectWrite) -> ProjectMutation:
         runner_key=payload.runner_key,
         execution_entrypoint=payload.execution_entrypoint,
         template_key=payload.template_key,
+    )
+
+
+def _serialize_project_bootstrap(result: ProjectBootstrapResult) -> ProjectBootstrapRead:
+    return ProjectBootstrapRead(
+        project_key=result.project_key,
+        project_root=result.project_root,
+        created_files=result.created_files,
+        overwritten_files=result.overwritten_files,
+        skipped_files=result.skipped_files,
     )
