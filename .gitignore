@@ -8,6 +8,7 @@ __pycache__/
 *.egg-info/
 node_modules/
 .next/
+apps/web/next-env.d.ts
 dist/
 apps/macos/.build/
 apps/macos/dist/

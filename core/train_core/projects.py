@@ -475,9 +475,9 @@ def _starter_train_module(project: ProjectDefinition, metric_seed: str) -> str:
             """
             Return one deterministic scalar score for the project.
 
-            TODO:
-            - implement the real evaluation logic for this project
-            - keep the output deterministic for comparable runs
+            Implement for this project:
+            - real evaluation logic
+            - deterministic output for comparable runs
             - {comparison_hint}
             """
 
@@ -496,7 +496,7 @@ def _starter_prepare_module(project: ProjectDefinition) -> str:
             """
             Prepare local resources for the benchmark.
 
-            TODO:
+            Setup checklist:
             - download or generate local data if needed
             - keep setup deterministic and idempotent
             """
