@@ -73,6 +73,7 @@ Implemented:
 - moved primary app actions into the native toolbar
 - replaced raw artifact blobs with file selectors and editable artifact lists
 - restructured the project editor into responsive native sections
+- replaced the Projects page card wall with a native list-detail layout
 - recorded the UI failure and recovery standard in `docs/UI_UX_RECOVERY.md`
 - project contract metadata for:
   - autonomous mutable artifacts

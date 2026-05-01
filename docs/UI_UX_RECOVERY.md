@@ -35,6 +35,7 @@ The corrective changes in `apps/macos` were:
   - native file browse controls for single-path fields
   - editable list controls for multi-path artifact groups
   - native pickers for metric direction, runner key, and template selection
+- replaced the long Projects card wall with a native list-detail selection layout
 - enabled text selection on key read-only values and project metadata surfaces
 - made the shell warning-free again by fixing Swift actor-isolation issues around `NSOpenPanel`
 

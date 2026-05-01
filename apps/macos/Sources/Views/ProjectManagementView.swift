@@ -8,6 +8,7 @@ struct ProjectManagementView: View {
     @State private var isPresentingEditor = false
     @State private var editingProjectKey: String?
     @State private var deleteCandidate: ProjectPayload?
+    @State private var selectedProjectKey: String?
 
     private var managedProjects: [ProjectPayload] {
         viewModel.projects.filter { $0.sourceKind == "managed" }
@@ -17,6 +18,10 @@ struct ProjectManagementView: View {
         viewModel.projects.filter { $0.sourceKind == "reference" }
     }
 
+    private var selectedProject: ProjectPayload? {
+        viewModel.projects.first(where: { $0.key == selectedProjectKey })
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .top) {
@@ -24,7 +29,7 @@ struct ProjectManagementView: View {
                     Text("Projects")
                         .font(.title2)
                         .fontWeight(.bold)
-                    Text("Create and manage project contracts here. Reference templates are separated from your own managed projects.")
+                    Text("Use the list to select a project. Managed projects and reference templates are separated.")
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -35,8 +40,17 @@ struct ProjectManagementView: View {
                 }
             }
 
-            managedProjectsSection
-            referenceProjectsSection
+            HSplitView {
+                projectListPane
+                    .frame(minWidth: 280, idealWidth: 340, maxWidth: 380)
+                projectDetailPane
+                    .frame(minWidth: 440, maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .onAppear {
+            if selectedProjectKey == nil {
+                selectedProjectKey = managedProjects.first?.key ?? referenceProjects.first?.key
+            }
         }
         .sheet(isPresented: $isPresentingEditor) {
             ProjectEditorSheet(
@@ -55,107 +69,173 @@ struct ProjectManagementView: View {
                 message: Text("This removes the managed project definition from autotrain."),
                 primaryButton: .destructive(Text("Delete")) {
                     viewModel.deleteProject(project.key)
+                    if selectedProjectKey == project.key {
+                        selectedProjectKey = managedProjects.first(where: { $0.key != project.key })?.key
+                    }
                 },
                 secondaryButton: .cancel()
             )
         }
     }
 
-    private var managedProjectsSection: some View {
-        GroupBox {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Managed Projects")
-                    .font(.headline)
-                if managedProjects.isEmpty {
-                    Text("No managed projects yet. Create your first project contract here.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(managedProjects) { project in
-                        projectCard(project, isTemplate: false)
-                        if project.id != managedProjects.last?.id {
-                            Divider()
+    private var projectListPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Project List")
+                .font(.headline)
+            Text("Choose from a native list instead of scrolling through long cards.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            List(selection: $selectedProjectKey) {
+                Section("Managed Projects") {
+                    if managedProjects.isEmpty {
+                        Text("No managed projects yet")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(managedProjects) { project in
+                            projectRow(project)
+                                .tag(project.key)
                         }
                     }
                 }
+
+                Section("Reference Templates") {
+                    ForEach(referenceProjects) { project in
+                        projectRow(project)
+                            .tag(project.key)
+                    }
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    private var referenceProjectsSection: some View {
+    private var projectDetailPane: some View {
         GroupBox {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Reference Templates")
-                    .font(.headline)
-                Text("These built-in examples help you bootstrap a project, but they are not your project workspace.")
+            if let selectedProject {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        detailHeader(for: selectedProject)
+                        executionSection(for: selectedProject)
+                        artifactSection(for: selectedProject)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("No Project Selected")
+                        .font(.headline)
+                    Text("Select a managed project or template from the list.")
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+        }
+    }
+
+    private func projectRow(_ project: ProjectPayload) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(project.name)
+                .fontWeight(.semibold)
+            Text(project.key)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func detailHeader(for project: ProjectPayload) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(project.name)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                Text(project.sourceKind == "reference" ? "Reference Template" : "Managed Project")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                ForEach(referenceProjects) { project in
-                    projectCard(project, isTemplate: true)
-                    if project.id != referenceProjects.last?.id {
-                        Divider()
+                Text(project.description)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+            Spacer()
+            HStack {
+                if project.sourceKind == "reference" {
+                    Button("Use Template") {
+                        editingProjectKey = nil
+                        editorState = .fromTemplate(project)
+                        isPresentingEditor = true
+                    }
+                } else {
+                    Button("Edit") {
+                        editingProjectKey = project.key
+                        editorState = .fromProject(project)
+                        isPresentingEditor = true
+                    }
+                    Button("Delete", role: .destructive) {
+                        deleteCandidate = project
                     }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    @ViewBuilder
-    private func projectCard(_ project: ProjectPayload, isTemplate: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(project.name)
-                        .font(.headline)
-                    Text(project.key)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(project.description)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
-                }
-                Spacer()
-                HStack {
-                    if isTemplate {
-                        Button("Use Template") {
-                            editingProjectKey = nil
-                            editorState = .fromTemplate(project)
-                            isPresentingEditor = true
-                        }
-                    } else {
-                        Button("Edit") {
-                            editingProjectKey = project.key
-                            editorState = .fromProject(project)
-                            isPresentingEditor = true
-                        }
-                        Button("Delete", role: .destructive) {
-                            deleteCandidate = project
-                        }
-                    }
-                }
+    private func executionSection(for project: ProjectPayload) -> some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                infoRow("Metric", "\(project.metricName) / \(project.metricDirection)")
+                infoRow(
+                    "Budget",
+                    "\(project.minBudgetSeconds)s - \(project.defaultBudgetSeconds)s - \(project.maxBudgetSeconds)s"
+                )
+                infoRow("Runner", project.runnerKey)
+                infoRow("Mutable Artifact", project.mutableArtifact)
+                infoRow("Entrypoint", project.executionEntrypoint)
             }
-
-            Divider()
-
-            infoRow("Metric", "\(project.metricName) / \(project.metricDirection)")
-            infoRow(
-                "Budget",
-                "\(project.minBudgetSeconds)s - \(project.defaultBudgetSeconds)s - \(project.maxBudgetSeconds)s"
-            )
-            infoRow("Mutable Artifact", project.mutableArtifact)
-            infoRow("Entrypoint", project.executionEntrypoint)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Text("Execution Contract")
+                .font(.headline)
         }
-        .textSelection(.enabled)
+    }
+
+    private func artifactSection(for project: ProjectPayload) -> some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 12) {
+                artifactReadList("Autonomous Mutable Artifacts", items: project.autonomousMutableArtifacts)
+                artifactReadList("Setup Artifacts", items: project.setupArtifacts)
+                artifactReadList("Dependency Artifacts", items: project.dependencyArtifacts)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Text("Artifacts")
+                .font(.headline)
+        }
+    }
+
+    private func artifactReadList(_ title: String, items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .fontWeight(.semibold)
+            ForEach(items, id: \.self) { item in
+                Text(item)
+                    .font(.caption)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.secondary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .textSelection(.enabled)
+            }
+        }
     }
 
     private func submitEditor() {
         let payload = editorState.toPayload()
         if let editingProjectKey {
             viewModel.updateProject(editingProjectKey, payload: payload)
+            selectedProjectKey = editingProjectKey
         } else {
             viewModel.createProject(payload)
+            selectedProjectKey = payload.key
         }
         isPresentingEditor = false
     }
@@ -168,6 +248,7 @@ struct ProjectManagementView: View {
                 .frame(width: 120, alignment: .leading)
             Text(value)
                 .font(.caption)
+                .textSelection(.enabled)
             Spacer()
         }
     }
@@ -256,8 +337,7 @@ private struct ProjectEditorSheet: View {
                             FileFieldRow(
                                 value: $state.executionEntrypoint,
                                 placeholder: "projects/my-project/run_benchmark.py",
-                                repositoryRoot: repositoryRoot,
-                                allowsMultipleSelection: false
+                                repositoryRoot: repositoryRoot
                             )
                         }
                         ResponsiveFormRow(
@@ -291,8 +371,7 @@ private struct ProjectEditorSheet: View {
                             FileFieldRow(
                                 value: $state.mutableArtifact,
                                 placeholder: "projects/my-project/train.py",
-                                repositoryRoot: repositoryRoot,
-                                allowsMultipleSelection: false
+                                repositoryRoot: repositoryRoot
                             )
                         }
                         ArtifactListEditor(
@@ -383,17 +462,13 @@ private struct FileFieldRow: View {
     @Binding var value: String
     let placeholder: String
     let repositoryRoot: URL?
-    let allowsMultipleSelection: Bool
 
     var body: some View {
         HStack(spacing: 10) {
             TextField(placeholder, text: $value)
                 .textSelection(.enabled)
             Button("Browse") {
-                if let selection = chooseRelativePaths(
-                    from: repositoryRoot,
-                    allowsMultipleSelection: allowsMultipleSelection
-                ).first {
+                if let selection = chooseRelativePaths(from: repositoryRoot, allowsMultipleSelection: false).first {
                     value = selection
                 }
             }
@@ -414,7 +489,7 @@ private struct ArtifactListEditor: View {
         ResponsiveFormRow(title: title, help: help) {
             VStack(alignment: .leading, spacing: 10) {
                 List(selection: $selectedIndex) {
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, _ in
                         TextField("project/file.py", text: binding(for: index))
                             .textSelection(.enabled)
                             .tag(index)
@@ -445,7 +520,7 @@ private struct ArtifactListEditor: View {
 
                     Spacer()
 
-                    Text("\(items.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.count) selected")
+                    Text("\(items.filter { !$0.trimmed().isEmpty }.count) entries")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
