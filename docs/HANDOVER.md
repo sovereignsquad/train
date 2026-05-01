@@ -29,6 +29,9 @@ Last completed increment:
 
 - repository-wide rename to `{train}`
 - native shell overview scoping and startup update-check fix
+- strategic architecture clarification:
+  - `{trinity}` runs brains
+  - `{train}` improves brains
 
 Implemented:
 
@@ -86,6 +89,16 @@ Implemented:
   - setup artifacts
   - dependency artifacts
   - min/max budget seconds
+- strategic repo split:
+  - `{trinity}` is the runtime workflow repository
+  - `{train}` remains the bounded optimizer for project artifacts and runtime components
+- new roadmap issues opened for the next lane:
+  - `ISSUE-12` Trinity-aware idea-to-project onboarding
+  - `ISSUE-13` managed-project bootstrap generation
+  - `ISSUE-14` runtime-to-optimizer contract for systems such as `{trinity}`
+  - `ISSUE-15` the first `{reply}` template
+  - `ISSUE-16` the first local `{reply}` benchmark contract
+  - `ISSUE-17` the first Trinity-powered optimization proof
 
 ### What Was Verified
 
@@ -138,6 +151,7 @@ Next expected work:
 2. remove remaining repo-root assumptions for packaged use
 3. decide whether managed-project folder bootstrapping belongs before or after packaged desktop delivery
 4. decide when to exercise heartbeat refresh in a longer unattended agent session
+5. add the Trinity-aware idea-to-project and `{reply}` template roadmap once runtime bootstrap priority is settled
 
 ### Watch Carefully
 
@@ -154,6 +168,7 @@ Next expected work:
 - keep packaged desktop concerns separate from engine and benchmark contracts
 - keep reference templates distinct from managed user projects in both API and UI
 - keep desktop actions in the toolbar unless there is a strong native UX reason not to
+- keep `{trinity}` runtime responsibilities out of `{train}` core while still making runtime components optimizable through project contracts
 
 ### If You Only Have 30 Minutes
 

@@ -2,6 +2,13 @@
 
 `train` is a provider-neutral autonomous optimization platform.
 
+It improves bounded components of larger systems through explicit experiments, automatic scoring, and keep-or-reject ratcheting.
+
+In the current architecture:
+
+- `{trinity}` runs brains
+- `{train}` improves brains
+
 The system is inspired by the `autoresearch` pattern:
 
 - one controlled mutable artifact
@@ -9,7 +16,7 @@ The system is inspired by the `autoresearch` pattern:
 - one bounded experiment loop
 - one ratchet that keeps improvements and reverts regressions
 
-The first reference benchmark will use mythology / folktales training to prove the loop, but the platform is intended to support other optimization domains later.
+The first reference benchmark used mythology / folktales training to prove the loop, but the platform is intended to support other optimization domains later, including bounded components of external runtime workflows such as `{trinity}`.
 
 The repository now also includes a second reference benchmark:
 
@@ -65,6 +72,13 @@ Every project should define:
 - one automatic metric
 - bounded run entrypoint
 - logs and artifacts
+
+Projects may optimize:
+
+- a standalone benchmark artifact
+- a bounded runtime component from another system such as `{trinity}`
+
+The contract stays the same either way: one controlled mutable artifact, one bounded run, and one automatic score.
 
 ### Agent Adapters
 

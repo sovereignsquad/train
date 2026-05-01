@@ -24,6 +24,11 @@ Its core loop is:
 
 Everything else is a supporting layer around that loop.
 
+In the current multi-repo direction:
+
+- `{trinity}` is the runtime workflow that runs brains
+- `{train}` is the optimizer that improves brains
+
 ## Long-Term Invariants
 
 These should remain true even as implementation evolves:
@@ -55,34 +60,39 @@ The engine contract must be usable without committing to one benchmark, one agen
 
 Open-source repository quality is part of the product, not documentation polish added later.
 
+### Invariant 6
+
+`{train}` must stay usable for optimizing external runtime systems without absorbing those runtime systems into its own core.
+
 ## Current Mental Model
 
 Today the project is best understood as:
 
 - a Python engine
 - a local API shell
-- a future operator UI
-- one reference benchmark
-- later adapters and hosted surfaces
+- a native and web operator surface
+- a bounded-project optimizer
+- reference benchmarks that prove the loop
+- a future optimizer seam for external runtimes such as `{trinity}`
 
 ## Architectural Direction
 
 Near term:
 
-- finish engine contract
-- finish runner execution path
-- add benchmark files
-- add ratchet logic
+- finish native runtime bootstrap and packaged desktop delivery
+- add managed-project bootstrap generation
+- define how raw ideas become reusable project contracts
+- prepare the first `{reply}`-style project template
 
 Mid term:
 
-- add agent integration boundary
-- add provider integration boundary
-- add operator visibility and recovery
+- optimize bounded runtime components from external systems such as `{trinity}`
+- add richer project templates beyond fixed reference benchmarks
+- strengthen unattended operator and recovery paths
 
 Long term:
 
-- validate with a second benchmark or second adapter surface
+- validate the platform across multiple brains, domains, and runtime systems
 
 ## Things To Resist
 
@@ -90,6 +100,7 @@ Resist these failure modes:
 
 - turning `mythology` into platform code
 - turning `Mistral Vibe` into platform code
+- turning `{trinity}` runtime concerns into `{train}` engine code
 - making local open-source models a prerequisite too early
 - building UI before the core execution loop is real
 

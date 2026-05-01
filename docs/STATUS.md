@@ -20,6 +20,9 @@ Phase:
 
 - repository-wide rename to `{train}` completed
 - native shell overview scoping and release-check error handling corrected
+- strategic separation clarified:
+  - `{trinity}` runs brains
+  - `{train}` improves brains
 
 Primary active issue:
 
@@ -37,6 +40,13 @@ Board intent:
 - `ISSUE-9` completed
 - `ISSUE-10` completed
 - `ISSUE-11` completed
+- follow-on roadmap work should cover:
+  - `ISSUE-12` idea-to-project onboarding
+  - `ISSUE-13` managed-project bootstrap generation
+  - `ISSUE-14` external runtime optimization seams
+  - `ISSUE-15` the first `{reply}` template path
+  - `ISSUE-16` the first local `{reply}` benchmark contract
+  - `ISSUE-17` the first Trinity-powered optimization proof
 
 ## Current Reality
 
@@ -178,6 +188,8 @@ Still missing on the critical path:
 - managed Python runtime bootstrap inside the native shell
 - packaged desktop state bootstrap independent of repo-root assumptions
 - packaged desktop update installation beyond release checks
+- turnkey project-folder bootstrap generation for new project templates
+- a formal contract for optimizing bounded runtime components from systems such as `{trinity}`
 
 ## Immediate Next Steps
 
@@ -185,6 +197,7 @@ Still missing on the critical path:
 2. decide whether the broader git mutation issue or runtime packaging has priority after that
 3. decide whether the Vibe turn-limit exit behavior deserves its own follow-up issue
 4. decide when heartbeat integration should be exercised by a longer unattended agent session
+5. define the Trinity-aware idea-to-project and `{reply}` template follow-up lane
 
 ## Current Risks
 
@@ -194,6 +207,7 @@ Still missing on the critical path:
 - the native shell currently assumes a repo-root development workflow and does not yet ship a managed Python runtime
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
 - managed projects store contract metadata, but they do not yet ship a turnkey project-folder bootstrap generator
+- the project contract is broad enough for Trinity-style components, but the onboarding path for those projects is not yet formalized
 
 ## Blockers
 
@@ -212,4 +226,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- native runtime bootstrap and packaged desktop delivery, unless roadmap priority changes
+- native runtime bootstrap and packaged desktop delivery, unless the board explicitly reprioritizes the Trinity-aware project-template lane
