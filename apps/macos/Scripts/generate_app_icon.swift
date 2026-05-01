@@ -28,56 +28,55 @@ backgroundPath.addClip()
 
 let colorSpace = CGColorSpaceCreateDeviceRGB()
 let gradientColors = [
-    NSColor(calibratedRed: 0.04, green: 0.07, blue: 0.12, alpha: 1.0).cgColor,
-    NSColor(calibratedRed: 0.07, green: 0.22, blue: 0.32, alpha: 1.0).cgColor,
-    NSColor(calibratedRed: 0.95, green: 0.55, blue: 0.18, alpha: 1.0).cgColor,
+    NSColor(calibratedRed: 0.52, green: 0.90, blue: 0.66, alpha: 1.0).cgColor,
+    NSColor(calibratedRed: 0.10, green: 0.64, blue: 0.34, alpha: 1.0).cgColor,
+    NSColor(calibratedRed: 0.03, green: 0.39, blue: 0.18, alpha: 1.0).cgColor,
 ] as CFArray
 
 let locations: [CGFloat] = [0.0, 0.56, 1.0]
 let gradient = CGGradient(colorsSpace: colorSpace, colors: gradientColors, locations: locations)!
 context.drawLinearGradient(
     gradient,
-    start: CGPoint(x: 120, y: 120),
-    end: CGPoint(x: 924, y: 924),
+    start: CGPoint(x: 132, y: 92),
+    end: CGPoint(x: 888, y: 940),
     options: []
 )
 
+NSColor.white.withAlphaComponent(0.06).setFill()
+NSBezierPath(roundedRect: CGRect(x: 122, y: 736, width: 780, height: 166), xRadius: 44, yRadius: 44).fill()
+
 context.saveGState()
-context.setShadow(offset: CGSize(width: 0, height: -28), blur: 48, color: NSColor.black.withAlphaComponent(0.24).cgColor)
-let coreRect = CGRect(x: 238, y: 238, width: 548, height: 548)
-let corePath = NSBezierPath(roundedRect: coreRect, xRadius: 160, yRadius: 160)
-NSColor(calibratedRed: 0.04, green: 0.09, blue: 0.12, alpha: 0.90).setFill()
-corePath.fill()
+context.setShadow(offset: CGSize(width: 0, height: -34), blur: 56, color: NSColor.black.withAlphaComponent(0.22).cgColor)
+let coreRect = CGRect(x: 240, y: 220, width: 544, height: 544)
+let corePath = NSBezierPath(roundedRect: coreRect, xRadius: 148, yRadius: 148)
+let plateGradient = CGGradient(
+    colorsSpace: colorSpace,
+    colors: [
+        NSColor.white.cgColor,
+        NSColor(calibratedRed: 0.93, green: 0.98, blue: 0.95, alpha: 1.0).cgColor,
+    ] as CFArray,
+    locations: [0.0, 1.0]
+)!
+context.saveGState()
+corePath.addClip()
+context.drawLinearGradient(
+    plateGradient,
+    start: CGPoint(x: 512, y: 764),
+    end: CGPoint(x: 512, y: 220),
+    options: []
+)
 context.restoreGState()
-
-context.setLineWidth(30)
-NSColor.white.withAlphaComponent(0.18).setStroke()
-let outerRing = NSBezierPath(ovalIn: CGRect(x: 150, y: 150, width: 724, height: 724))
-outerRing.stroke()
-
-context.setLineWidth(16)
-NSColor.white.withAlphaComponent(0.10).setStroke()
-let innerRing = NSBezierPath(ovalIn: CGRect(x: 214, y: 214, width: 596, height: 596))
-innerRing.stroke()
-
-let nodeFill = NSColor(calibratedRed: 0.95, green: 0.61, blue: 0.22, alpha: 1.0)
-for point in [
-    CGPoint(x: 512, y: 882),
-    CGPoint(x: 858, y: 512),
-    CGPoint(x: 512, y: 142),
-    CGPoint(x: 166, y: 512),
-] {
-    let nodePath = NSBezierPath(ovalIn: CGRect(x: point.x - 28, y: point.y - 28, width: 56, height: 56))
-    nodeFill.setFill()
-    nodePath.fill()
-}
+NSColor.white.withAlphaComponent(0.55).setStroke()
+corePath.lineWidth = 8
+corePath.stroke()
+context.restoreGState()
 
 let monogram = NSMutableParagraphStyle()
 monogram.alignment = .center
 
 let attributes: [NSAttributedString.Key: Any] = [
-    .font: NSFont.monospacedSystemFont(ofSize: 252, weight: .bold),
-    .foregroundColor: NSColor.white,
+    .font: NSFont.systemFont(ofSize: 272, weight: .bold),
+    .foregroundColor: NSColor(calibratedRed: 0.06, green: 0.55, blue: 0.25, alpha: 1.0),
     .paragraphStyle: monogram,
 ]
 
@@ -87,8 +86,8 @@ context.setShadow(
     blur: 44,
     color: NSColor.black.withAlphaComponent(0.28).cgColor
 )
-let text = NSAttributedString(string: "{t}", attributes: attributes)
-let textRect = CGRect(x: 120, y: 344, width: 784, height: 280)
+let text = NSAttributedString(string: "{0}", attributes: attributes)
+let textRect = CGRect(x: 120, y: 350, width: 784, height: 280)
 text.draw(in: textRect)
 context.restoreGState()
 
@@ -97,7 +96,7 @@ let accentBar = NSBezierPath(
     xRadius: 14,
     yRadius: 14
 )
-NSColor(calibratedRed: 0.98, green: 0.66, blue: 0.26, alpha: 0.95).setFill()
+NSColor(calibratedRed: 0.16, green: 0.73, blue: 0.35, alpha: 0.95).setFill()
 accentBar.fill()
 
 image.unlockFocus()

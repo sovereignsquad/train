@@ -5,6 +5,7 @@ export const theme = createTheme({
   fontFamilyMonospace: "var(--font-ibm-plex-mono), monospace",
   primaryColor: "orange",
   defaultRadius: "md",
+  autoContrast: true,
   headings: {
     fontFamily: "var(--font-space-grotesk), sans-serif",
   },

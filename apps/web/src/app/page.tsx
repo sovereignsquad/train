@@ -18,6 +18,7 @@ import {
 import { revalidatePath } from "next/cache";
 
 import { getApiBaseUrl, getDashboardData } from "@/lib/api";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -119,6 +120,12 @@ export default async function Home() {
                 </Text>
               </Stack>
               <Stack gap="xs" miw={260}>
+                <Group justify="flex-end">
+                  <div className="theme-toggle-shell">
+                    <Text className="section-label">Theme</Text>
+                    <ThemeToggle />
+                  </div>
+                </Group>
                 <Text tt="uppercase" fz={12} fw={700} c="dimmed">
                   API base URL
                 </Text>

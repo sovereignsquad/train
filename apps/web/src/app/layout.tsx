@@ -36,6 +36,21 @@ export default function RootLayout({
     >
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                const stored = window.localStorage.getItem("mantine-color-scheme-value") || "auto";
+                const mode = stored === "auto"
+                  ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day")
+                  : stored === "dark"
+                    ? "night"
+                    : "day";
+                document.documentElement.dataset.theme = mode;
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         <MantineProvider theme={theme}>{children}</MantineProvider>

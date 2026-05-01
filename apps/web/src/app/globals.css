@@ -1,9 +1,5 @@
 @import "./constellation.css";
 
-:root {
-  color-scheme: light;
-}
-
 html,
 body {
   min-height: 100%;
@@ -17,6 +13,7 @@ body {
     radial-gradient(circle at top right, rgba(24, 105, 93, 0.12), transparent 24%),
     linear-gradient(180deg, var(--cds-surface-canvas) 0%, #efe6d8 100%);
   color: var(--cds-text-primary);
+  color-scheme: light;
 }
 
 * {
@@ -139,4 +136,28 @@ a {
 
 .issue-list {
   color: var(--cds-text-secondary);
+}
+
+[data-theme="night"] body {
+  background:
+    radial-gradient(circle at top left, rgba(219, 116, 64, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(47, 156, 138, 0.12), transparent 24%),
+    linear-gradient(180deg, var(--cds-surface-canvas) 0%, #0f1116 100%);
+  color-scheme: dark;
+}
+
+.theme-toggle-shell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cds-space-xs);
+}
+
+.theme-toggle {
+  border: 1px solid var(--cds-border-soft);
+  background: color-mix(in srgb, var(--cds-surface-elevated) 88%, transparent);
+  color: var(--cds-text-primary);
+}
+
+.theme-toggle:hover {
+  background: color-mix(in srgb, var(--cds-surface-sidebar) 70%, transparent);
 }

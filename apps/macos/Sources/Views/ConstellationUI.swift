@@ -1,17 +1,26 @@
+import AppKit
 import SwiftUI
 
 enum ConstellationPalette {
-    static let canvas = Color(red: 0.96, green: 0.94, blue: 0.90)
-    static let panel = Color.white.opacity(0.86)
-    static let panelAlt = Color(red: 0.92, green: 0.88, blue: 0.82)
-    static let border = Color(red: 0.84, green: 0.80, blue: 0.73)
-    static let textPrimary = Color(red: 0.13, green: 0.11, blue: 0.08)
-    static let textSecondary = Color(red: 0.37, green: 0.33, blue: 0.28)
-    static let accent = Color(red: 0.72, green: 0.35, blue: 0.17)
-    static let success = Color(red: 0.16, green: 0.48, blue: 0.28)
-    static let warning = Color(red: 0.66, green: 0.42, blue: 0.0)
-    static let danger = Color(red: 0.69, green: 0.23, blue: 0.18)
-    static let info = Color(red: 0.17, green: 0.43, blue: 0.63)
+    static let canvas = adaptiveColor(light: NSColor(red: 0.96, green: 0.94, blue: 0.90, alpha: 1), dark: NSColor(red: 0.07, green: 0.08, blue: 0.10, alpha: 1))
+    static let panel = adaptiveColor(light: NSColor.white.withAlphaComponent(0.86), dark: NSColor(red: 0.11, green: 0.13, blue: 0.15, alpha: 0.96))
+    static let panelAlt = adaptiveColor(light: NSColor(red: 0.92, green: 0.88, blue: 0.82, alpha: 1), dark: NSColor(red: 0.16, green: 0.18, blue: 0.22, alpha: 1))
+    static let border = adaptiveColor(light: NSColor(red: 0.84, green: 0.80, blue: 0.73, alpha: 1), dark: NSColor(red: 0.23, green: 0.25, blue: 0.29, alpha: 1))
+    static let textPrimary = adaptiveColor(light: NSColor(red: 0.13, green: 0.11, blue: 0.08, alpha: 1), dark: NSColor(red: 0.95, green: 0.94, blue: 0.91, alpha: 1))
+    static let textSecondary = adaptiveColor(light: NSColor(red: 0.37, green: 0.33, blue: 0.28, alpha: 1), dark: NSColor(red: 0.78, green: 0.74, blue: 0.69, alpha: 1))
+    static let accent = adaptiveColor(light: NSColor(red: 0.11, green: 0.53, blue: 0.29, alpha: 1), dark: NSColor(red: 0.31, green: 0.77, blue: 0.48, alpha: 1))
+    static let success = adaptiveColor(light: NSColor(red: 0.16, green: 0.48, blue: 0.28, alpha: 1), dark: NSColor(red: 0.31, green: 0.77, blue: 0.48, alpha: 1))
+    static let warning = adaptiveColor(light: NSColor(red: 0.66, green: 0.42, blue: 0.0, alpha: 1), dark: NSColor(red: 0.88, green: 0.63, blue: 0.20, alpha: 1))
+    static let danger = adaptiveColor(light: NSColor(red: 0.69, green: 0.23, blue: 0.18, alpha: 1), dark: NSColor(red: 0.89, green: 0.40, blue: 0.35, alpha: 1))
+    static let info = adaptiveColor(light: NSColor(red: 0.17, green: 0.43, blue: 0.63, alpha: 1), dark: NSColor(red: 0.42, green: 0.67, blue: 0.89, alpha: 1))
+}
+
+private func adaptiveColor(light: NSColor, dark: NSColor) -> Color {
+    Color(
+        nsColor: NSColor(name: nil) { appearance in
+            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light
+        }
+    )
 }
 
 struct ConstellationShell<Content: View>: View {
