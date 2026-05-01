@@ -22,6 +22,7 @@ def test_project_registry_contains_second_project() -> None:
     assert "mythology" in keys
     assert "helpdesk" in keys
     assert "reply" in keys
+    assert "trinity_frontier" in keys
 
     helpdesk = get_project("helpdesk")
     assert helpdesk is not None
@@ -34,6 +35,12 @@ def test_project_registry_contains_second_project() -> None:
     assert reply.metric_name == "draft_score"
     assert reply.metric_direction.value == "maximize"
     assert reply.mutable_artifact == "projects/reply/train.py"
+
+    trinity_frontier = get_project("trinity_frontier")
+    assert trinity_frontier is not None
+    assert trinity_frontier.metric_name == "ranking_score"
+    assert trinity_frontier.metric_direction.value == "maximize"
+    assert trinity_frontier.mutable_artifact == "projects/trinity_frontier/train.py"
 
 
 def test_maximize_metric_direction_accepts_higher_scores() -> None:
@@ -72,6 +79,28 @@ def test_reply_benchmark_runs_successfully() -> None:
             "run",
             "python",
             "projects/reply/run_benchmark.py",
+            "--budget-seconds",
+            "60",
+            "--run-id",
+            "1",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    payload = json.loads(completed.stdout.strip().splitlines()[-1])
+    assert payload["status"] == "succeeded"
+    assert payload["metric_value"] > 0.0
+
+
+def test_trinity_frontier_benchmark_runs_successfully() -> None:
+    completed = subprocess.run(
+        [
+            "uv",
+            "run",
+            "python",
+            "projects/trinity_frontier/run_benchmark.py",
             "--budget-seconds",
             "60",
             "--run-id",

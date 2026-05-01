@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 APP_DIR_NAME = "train"
 SOURCE_ROOT_DIR = Path(__file__).resolve().parents[2]
 ROOT_DIR = Path(os.environ.get("TRAIN_ROOT_DIR", str(SOURCE_ROOT_DIR))).resolve()
+DEFAULT_VIBE_HOME = ROOT_DIR / "artifacts" / "local" / "vibe-home"
 
 
 def get_default_state_dir() -> Path:
@@ -55,7 +56,7 @@ class Settings(BaseSettings):
     mistral_vibe_executable: str = Field(default="vibe", alias="MISTRAL_VIBE_EXECUTABLE")
     mistral_vibe_agent_name: str = Field(default="train", alias="MISTRAL_VIBE_AGENT_NAME")
     mistral_vibe_home: str = Field(
-        default=str(DEFAULT_STATE_DIR / "vibe-home"),
+        default=str(DEFAULT_VIBE_HOME),
         alias="MISTRAL_VIBE_HOME",
     )
     ollama_base_url: str = Field(default="http://127.0.0.1:11434", alias="OLLAMA_BASE_URL")

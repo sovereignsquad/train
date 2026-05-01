@@ -67,6 +67,34 @@ class ProjectBootstrapResult:
 
 
 REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
+    "trinity_frontier": ProjectDefinition(
+        key="trinity_frontier",
+        name="Trinity Frontier Benchmark",
+        description=(
+            "Bounded Trinity runtime component benchmark for train. It optimizes the frontier "
+            "ranking heuristic without absorbing Trinity runtime ownership."
+        ),
+        mutable_artifact="projects/trinity_frontier/train.py",
+        autonomous_mutable_artifacts=("projects/trinity_frontier/train.py",),
+        setup_artifacts=(
+            "projects/trinity_frontier/prepare.py",
+            "projects/trinity_frontier/program.md",
+            "projects/trinity_frontier/run_benchmark.py",
+            "projects/trinity_frontier/eval_fixture.json",
+        ),
+        dependency_artifacts=("pyproject.toml", "uv.lock"),
+        metric_name="ranking_score",
+        metric_direction=MetricDirection.MAXIMIZE,
+        min_budget_seconds=30,
+        default_budget_seconds=60,
+        max_budget_seconds=180,
+        runner_key="python-benchmark",
+        execution_entrypoint="projects/trinity_frontier/run_benchmark.py",
+        source_kind="reference",
+        editable=False,
+        deletable=False,
+        template_key="trinity_frontier",
+    ),
     "reply": ProjectDefinition(
         key="reply",
         name="Reply Draft Benchmark",
