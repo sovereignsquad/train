@@ -6,8 +6,15 @@ It improves bounded components of larger systems through explicit experiments, a
 
 In the current architecture:
 
+- `{reply}` is the product
 - `{trinity}` runs brains
 - `{train}` improves brains
+
+That means:
+
+- `{reply}` owns the user-facing omnichannel workflow
+- `{trinity}` owns the runtime candidate-processing workflow
+- `{train}` owns bounded optimization of declared components
 
 The system is inspired by the `autoresearch` pattern:
 
@@ -30,6 +37,12 @@ The repository also now includes a native macOS operator shell:
 
 - `apps/macos`, a SwiftUI desktop shell that supervises the local engine, exposes operator status, and prepares the path toward packaged desktop delivery
 - a managed project registry with reference templates and user-defined project contracts
+
+## Overview
+
+For the high-level overview of what `{train}` is, how it works, what it can do, and what it is not, read:
+
+- [TRAIN_OVERVIEW.md](./TRAIN_OVERVIEW.md)
 
 ## License
 
@@ -173,7 +186,6 @@ The repository now includes:
 - native macOS shell scaffold in `apps/macos/`
 - Alembic-backed local `SQLite` migrations
 - run ledger and project-state foundation
-- two reference benchmarks in `projects/`:
 - three reference benchmarks in `projects/`:
   - `mythology`
   - `helpdesk`
