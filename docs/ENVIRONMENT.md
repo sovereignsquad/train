@@ -159,7 +159,7 @@ These are the current local variables:
 
 - environments: `local`
 - required: no
-- default: `artifacts/local/vibe-home`
+- default: `<TRAIN_STATE_DIR>/vibe-home`
 - purpose: isolates runtime Vibe metadata from the repo-tracked `.vibe/` contract
 
 `OLLAMA_BASE_URL`
@@ -194,7 +194,7 @@ These are the current local variables:
 
 - environments: local engine execution, especially native macOS shell launches
 - required: no
-- default: `<TRAIN_ROOT_DIR>/artifacts/local`
+- default: OS-owned app state directory such as `~/Library/Application Support/train`
 - purpose: overrides the writable state directory used for SQLite and other local runtime state
 
 `TRAIN_UV_EXECUTABLE`

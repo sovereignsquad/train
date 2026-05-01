@@ -74,7 +74,7 @@ The repository currently has:
   - `Mistral API`
   - `Ollama`
 - repo-local `.vibe/` contract and `scripts/run_vibe.py`
-- isolated runtime `VIBE_HOME` under `artifacts/local/vibe-home`
+- isolated runtime `VIBE_HOME` under the writable train state directory, separate from the repo-tracked `.vibe/` contract
 - machine-checkable autonomous guardrails:
   - mutable-artifact restriction
   - setup-artifact protection

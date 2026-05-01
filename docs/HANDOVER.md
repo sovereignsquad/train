@@ -121,7 +121,7 @@ Implemented:
 - starter Trinity-style `reply` reference project in `projects/reply/`
 - local reply benchmark contract with:
   - committed sample fixture
-  - local-only override path under `artifacts/local/reply/eval.json`
+  - local-only override path under `<TRAIN_STATE_DIR>/reply/eval.json`
   - automatic `draft_score` metric
 - third proof runner in `scripts/prove_reply_cycle.py`
 - durable `{reply}` proof notes in `docs/PROOF_REPLY_CYCLE.md`

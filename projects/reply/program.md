@@ -26,5 +26,4 @@ Rules:
 
 Execution note:
 
-The benchmark uses `artifacts/local/reply/eval.json` when present. Otherwise it falls back to the committed fixture in this project.
-
+The benchmark uses `<TRAIN_STATE_DIR>/reply/eval.json` when present. Otherwise it falls back to the committed fixture in this project.

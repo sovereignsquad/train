@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from train_core.config import DEFAULT_STATE_DIR
+
 
 PROJECT_DIR = Path(__file__).resolve().parent
-LOCAL_DATA_PATH = Path(__file__).resolve().parents[2] / "artifacts" / "local" / "reply" / "eval.json"
+LOCAL_DATA_PATH = DEFAULT_STATE_DIR / "reply" / "eval.json"
 FIXTURE_PATH = PROJECT_DIR / "eval_fixture.json"
 
 
@@ -16,4 +18,3 @@ def load_examples() -> list[dict[str, str]]:
 
 def ensure_prepared() -> None:
     LOCAL_DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-

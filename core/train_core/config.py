@@ -1,14 +1,36 @@
 import os
+import platform
 from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+APP_DIR_NAME = "train"
 SOURCE_ROOT_DIR = Path(__file__).resolve().parents[2]
 ROOT_DIR = Path(os.environ.get("TRAIN_ROOT_DIR", str(SOURCE_ROOT_DIR))).resolve()
+
+
+def get_default_state_dir() -> Path:
+    system = platform.system()
+    home = Path.home()
+
+    if system == "Darwin":
+        return home / "Library" / "Application Support" / APP_DIR_NAME
+    if system == "Windows":
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            return Path(appdata) / APP_DIR_NAME
+        return home / "AppData" / "Roaming" / APP_DIR_NAME
+
+    xdg_state_home = os.environ.get("XDG_STATE_HOME")
+    if xdg_state_home:
+        return Path(xdg_state_home) / APP_DIR_NAME
+    return home / ".local" / "state" / APP_DIR_NAME
+
+
 DEFAULT_STATE_DIR = Path(
-    os.environ.get("TRAIN_STATE_DIR", str(ROOT_DIR / "artifacts" / "local"))
+    os.environ.get("TRAIN_STATE_DIR", str(get_default_state_dir()))
 ).resolve()
 DEFAULT_DB_PATH = DEFAULT_STATE_DIR / "train.db"
 
