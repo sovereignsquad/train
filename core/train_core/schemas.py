@@ -238,3 +238,43 @@ class ProviderStatusRead(BaseModel):
     model_count: int | None
     models: tuple[str, ...]
     issues: list[str]
+
+
+class TrinityAcceptedArtifactVersion(BaseModel):
+    artifact_key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=120)
+    source_project: str = Field(min_length=1, max_length=120)
+    accepted_at: datetime
+
+
+class TrinityReplyDraftOutcome(BaseModel):
+    company_id: str = Field(min_length=1, max_length=80)
+    cycle_id: str = Field(min_length=1, max_length=80)
+    thread_ref: str = Field(min_length=1)
+    channel: str = Field(min_length=1, max_length=40)
+    disposition: str = Field(min_length=1, max_length=80)
+    occurred_at: datetime
+    candidate_id: str | None = None
+    original_draft_text: str | None = None
+    final_text: str | None = None
+    edit_distance: float | None = Field(default=None, ge=0.0, le=1.0)
+    latency_ms: int | None = Field(default=None, ge=0)
+    send_result: str | None = None
+    notes: str | None = None
+
+
+class TrinityReplyTraceRecord(BaseModel):
+    contract_version: str = Field(min_length=1, max_length=120)
+    cycle_id: str = Field(min_length=1, max_length=80)
+    exported_at: datetime
+    snapshot_hash: str = Field(min_length=1, max_length=128)
+    frontier_candidate_ids: tuple[str, ...] = Field(min_length=1)
+    feedback_events: tuple[TrinityReplyDraftOutcome, ...] = ()
+    model_routes: dict[str, str] = Field(default_factory=dict)
+    accepted_artifact_version: TrinityAcceptedArtifactVersion
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinityReplyTraceRecord":
+        if not self.contract_version.startswith("trinity.reply."):
+            raise ValueError("Trinity reply trace contract_version is invalid")
+        return self

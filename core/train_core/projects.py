@@ -123,6 +123,34 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         deletable=False,
         template_key="reply",
     ),
+    "trinity_reply_ranker": ProjectDefinition(
+        key="trinity_reply_ranker",
+        name="Trinity Reply Ranker Trace Replay",
+        description=(
+            "Trace-ingestion scaffold for train that replays Trinity reply runtime exports without "
+            "claiming live optimization readiness before enough real traces exist."
+        ),
+        mutable_artifact="projects/trinity_reply_ranker/train.py",
+        autonomous_mutable_artifacts=("projects/trinity_reply_ranker/train.py",),
+        setup_artifacts=(
+            "projects/trinity_reply_ranker/prepare.py",
+            "projects/trinity_reply_ranker/program.md",
+            "projects/trinity_reply_ranker/run_benchmark.py",
+            "projects/trinity_reply_ranker/eval_fixture.json",
+        ),
+        dependency_artifacts=("pyproject.toml", "uv.lock"),
+        metric_name="trace_alignment_score",
+        metric_direction=MetricDirection.MAXIMIZE,
+        min_budget_seconds=30,
+        default_budget_seconds=60,
+        max_budget_seconds=180,
+        runner_key="python-benchmark",
+        execution_entrypoint="projects/trinity_reply_ranker/run_benchmark.py",
+        source_kind="reference",
+        editable=False,
+        deletable=False,
+        template_key="trinity_reply_ranker",
+    ),
     "helpdesk": ProjectDefinition(
         key="helpdesk",
         name="Helpdesk Intent Benchmark",
