@@ -11,7 +11,7 @@ It is the long-term reasoning model for how the system is supposed to think.
 
 ## System Identity
 
-`train` is a platform for bounded autonomous optimization.
+`{train}` is a platform for bounded autonomous optimization.
 
 Its core loop is:
 

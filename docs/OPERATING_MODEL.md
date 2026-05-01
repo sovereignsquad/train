@@ -229,12 +229,12 @@ Keep naming rigid:
 
 Use:
 
-- `Train: <outcome>`
+- `{train}: <outcome>`
 
 Examples:
 
-- `Train: Build the engine-level experiment runner and metric contract`
-- `Train: Add provider adapters for hosted and local model backends`
+- `{train}: Build the engine-level experiment runner and metric contract`
+- `{train}: Add provider adapters for hosted and local model backends`
 
 ### Branches
 

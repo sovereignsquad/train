@@ -8,7 +8,7 @@ Read this before making changes.
 
 ## Project Identity
 
-`train` is a provider-neutral autonomous optimization platform.
+`{train}` is a provider-neutral autonomous optimization platform.
 
 It is not:
 

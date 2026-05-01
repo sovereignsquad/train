@@ -104,7 +104,7 @@ export default async function Home() {
             <Group justify="space-between" align="flex-start" gap="xl">
               <Stack gap="md" maw={760}>
                 <Badge color="amber" size="lg" variant="light">
-                  Train MVP Operator
+                  {"{train}"} MVP operator
                 </Badge>
                 <Title order={1} size={44} lh={1.02}>
                   Local control surface for the autonomous experiment engine.

@@ -95,7 +95,7 @@ struct ContentView: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Train")
+                Text("{train}")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 Text("Native operator shell for the local experiment engine.")

@@ -76,4 +76,4 @@ Recovery was verified with:
 
 The updated local bundle is:
 
-- `apps/macos/dist/Train.app`
+- `apps/macos/dist/train.app`

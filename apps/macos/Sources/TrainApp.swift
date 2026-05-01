@@ -21,7 +21,7 @@ struct TrainApp: App {
         .defaultSize(width: 1280, height: 860)
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About Train") {
+                Button("About {train}") {
                     NSApp.orderFrontStandardAboutPanel(nil)
                 }
             }

@@ -1,4 +1,4 @@
-# Train
+# {train}
 
 `train` is a provider-neutral autonomous optimization platform.
 
@@ -252,7 +252,7 @@ Native macOS shell:
 cd apps/macos
 swift build -c release
 bash Scripts/build-bundle.sh
-open dist/Train.app
+open dist/train.app
 ```
 
 If the shell cannot find `uv`, set:

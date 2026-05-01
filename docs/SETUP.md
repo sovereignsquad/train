@@ -107,7 +107,7 @@ Native shell:
 cd apps/macos
 swift build -c release
 bash Scripts/build-bundle.sh
-open dist/Train.app
+open dist/train.app
 ```
 
 If the native shell cannot resolve `uv` from its launch environment, set:

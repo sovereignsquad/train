@@ -1,4 +1,4 @@
-# Train macOS App Plan
+# {train} macOS App Plan
 
 ## Purpose
 
@@ -107,17 +107,17 @@ Use macOS app-owned paths, not repo-relative paths, in the shipped product.
 Suggested paths:
 
 - app support root:
-  - `~/Library/Application Support/Train/`
+  - `~/Library/Application Support/train/`
 - engine state:
-  - `~/Library/Application Support/Train/state/`
+  - `~/Library/Application Support/train/state/`
 - database:
-  - `~/Library/Application Support/Train/state/train.db`
+  - `~/Library/Application Support/train/state/train.db`
 - logs:
-  - `~/Library/Application Support/Train/logs/`
+  - `~/Library/Application Support/train/logs/`
 - downloaded resources:
-  - `~/Library/Application Support/Train/resources/`
+  - `~/Library/Application Support/train/resources/`
 - runtime work:
-  - `~/Library/Application Support/Train/runtime/`
+  - `~/Library/Application Support/train/runtime/`
 
 ## Delivery Decision: Browser UI vs Native UI
 
@@ -370,7 +370,7 @@ We should reuse the `calendar-agent` release model with two important modificati
 - manual "Check for Updates" action
 - download/install/restart flow
 
-### What To Extend For Train
+### What To Extend For {train}
 
 We have two update planes:
 

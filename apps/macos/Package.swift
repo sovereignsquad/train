@@ -2,16 +2,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "TrainMacOS",
+    name: "train-macos",
     platforms: [
         .macOS(.v14)
     ],
     products: [
-        .executable(name: "Train", targets: ["Train"])
+        .executable(name: "train", targets: ["train"])
     ],
     targets: [
         .executableTarget(
-            name: "Train",
+            name: "train",
             path: "Sources"
         )
     ]

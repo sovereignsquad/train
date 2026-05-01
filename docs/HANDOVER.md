@@ -27,7 +27,7 @@ Keep this document concise and current.
 
 Last completed increment:
 
-- repository-wide rename to `train`
+- repository-wide rename to `{train}`
 
 Implemented:
 
@@ -75,8 +75,8 @@ Implemented:
 - restructured the project editor into responsive native sections
 - replaced the Projects page card wall with a native list-detail layout
 - added a deterministic app icon generation pipeline and embedded `.icns` bundle icon
-- renamed the core package, API package, repo-local Vibe contract, native app target, bundle, and GitHub remote from `autotrain` to `train`
-- refreshed the generated app icon from the old `AT` monogram to a `T` mark aligned with the new app name
+- renamed the core package, API package, repo-local Vibe contract, native app target, bundle, and GitHub remote from `autotrain` to `{train}`
+- refreshed the generated app icon from the old `AT` monogram to a `{t}` mark aligned with the new app name
 - recorded the UI failure and recovery standard in `docs/UI_UX_RECOVERY.md`
 - project contract metadata for:
   - autonomous mutable artifacts

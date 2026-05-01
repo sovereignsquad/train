@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="Train"
+APP_NAME="train"
 BUILD_DIR="$PROJECT_DIR/.build/release"
 BUNDLE_DIR="$PROJECT_DIR/dist"
 ICON_SOURCE_DIR="$PROJECT_DIR/.build/icon-assets"

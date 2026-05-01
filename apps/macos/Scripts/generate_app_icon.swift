@@ -72,36 +72,33 @@ for point in [
     nodePath.fill()
 }
 
+let monogram = NSMutableParagraphStyle()
+monogram.alignment = .center
+
+let attributes: [NSAttributedString.Key: Any] = [
+    .font: NSFont.monospacedSystemFont(ofSize: 252, weight: .bold),
+    .foregroundColor: NSColor.white,
+    .paragraphStyle: monogram,
+]
+
 context.saveGState()
 context.setShadow(
     offset: CGSize(width: 0, height: -22),
     blur: 44,
     color: NSColor.black.withAlphaComponent(0.28).cgColor
 )
-
-let verticalStem = NSBezierPath(
-    roundedRect: CGRect(x: 438, y: 264, width: 148, height: 476),
-    xRadius: 74,
-    yRadius: 74
-)
-NSColor.white.setFill()
-verticalStem.fill()
-
-let topBar = NSBezierPath(
-    roundedRect: CGRect(x: 292, y: 646, width: 440, height: 118),
-    xRadius: 59,
-    yRadius: 59
-)
-topBar.fill()
+let text = NSAttributedString(string: "{t}", attributes: attributes)
+let textRect = CGRect(x: 120, y: 344, width: 784, height: 280)
+text.draw(in: textRect)
 context.restoreGState()
 
-let insetGlow = NSBezierPath(
-    roundedRect: CGRect(x: 326, y: 616, width: 372, height: 58),
-    xRadius: 29,
-    yRadius: 29
+let accentBar = NSBezierPath(
+    roundedRect: CGRect(x: 304, y: 270, width: 416, height: 28),
+    xRadius: 14,
+    yRadius: 14
 )
-NSColor(calibratedRed: 0.98, green: 0.66, blue: 0.26, alpha: 0.92).setFill()
-insetGlow.fill()
+NSColor(calibratedRed: 0.98, green: 0.66, blue: 0.26, alpha: 0.95).setFill()
+accentBar.fill()
 
 image.unlockFocus()
 

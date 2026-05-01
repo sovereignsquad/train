@@ -225,7 +225,7 @@ final class ProcessSupervisorService: ObservableObject {
 
     private func appSupportDirectory() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return base.appendingPathComponent("Train", isDirectory: true)
+        return base.appendingPathComponent("train", isDirectory: true)
     }
 
     private func appendLog(_ line: String) {

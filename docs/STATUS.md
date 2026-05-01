@@ -18,7 +18,7 @@ Update this document whenever the active implementation state changes materially
 
 Phase:
 
-- repository-wide rename to `train` completed
+- repository-wide rename to `{train}` completed
 
 Primary active issue:
 
@@ -76,7 +76,7 @@ The repository currently has:
   - native toolbar-based action placement instead of in-content action clusters
   - responsive project editor sections with file selectors, lists, and structured pickers
   - deterministic app icon generation and bundled `.icns` app icon
-  - `T`-based app icon and `Train.app` bundle naming
+  - `{t}`-based app icon and `train.app` bundle naming
 - managed project registry with:
   - reference templates
   - user-defined managed projects

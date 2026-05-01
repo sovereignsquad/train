@@ -2,7 +2,7 @@
 
 ## License Choice
 
-`train` uses the `Apache-2.0` license.
+`{train}` uses the `Apache-2.0` license.
 
 ## Why Apache-2.0
 
