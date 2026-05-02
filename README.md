@@ -37,6 +37,7 @@ The repository also now includes a native macOS operator shell:
 
 - `apps/macos`, a SwiftUI desktop shell that supervises the local engine, exposes operator status, and prepares the path toward packaged desktop delivery
 - a managed project registry with reference templates and user-defined project contracts
+- a theme/readability contract that keeps day and night mode aligned with the shared Constellation semantics
 
 ## Overview
 

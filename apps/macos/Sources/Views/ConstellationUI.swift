@@ -2,12 +2,13 @@ import AppKit
 import SwiftUI
 
 enum ConstellationPalette {
-    static let canvas = adaptiveColor(light: NSColor(red: 0.96, green: 0.94, blue: 0.90, alpha: 1), dark: NSColor(red: 0.07, green: 0.08, blue: 0.10, alpha: 1))
-    static let panel = adaptiveColor(light: NSColor.white.withAlphaComponent(0.86), dark: NSColor(red: 0.11, green: 0.13, blue: 0.15, alpha: 0.96))
-    static let panelAlt = adaptiveColor(light: NSColor(red: 0.92, green: 0.88, blue: 0.82, alpha: 1), dark: NSColor(red: 0.16, green: 0.18, blue: 0.22, alpha: 1))
-    static let border = adaptiveColor(light: NSColor(red: 0.84, green: 0.80, blue: 0.73, alpha: 1), dark: NSColor(red: 0.23, green: 0.25, blue: 0.29, alpha: 1))
+    static let chrome = adaptiveColor(light: NSColor(red: 0.99, green: 0.98, blue: 0.95, alpha: 1), dark: NSColor(red: 0.06, green: 0.07, blue: 0.09, alpha: 1))
+    static let canvas = adaptiveColor(light: NSColor(red: 0.95, green: 0.94, blue: 0.90, alpha: 1), dark: NSColor(red: 0.08, green: 0.10, blue: 0.12, alpha: 1))
+    static let panel = adaptiveColor(light: NSColor.white.withAlphaComponent(0.92), dark: NSColor(red: 0.13, green: 0.15, blue: 0.18, alpha: 0.98))
+    static let panelAlt = adaptiveColor(light: NSColor(red: 0.91, green: 0.88, blue: 0.83, alpha: 1), dark: NSColor(red: 0.18, green: 0.20, blue: 0.24, alpha: 1))
+    static let border = adaptiveColor(light: NSColor(red: 0.82, green: 0.79, blue: 0.72, alpha: 1), dark: NSColor(red: 0.27, green: 0.31, blue: 0.36, alpha: 1))
     static let textPrimary = adaptiveColor(light: NSColor(red: 0.13, green: 0.11, blue: 0.08, alpha: 1), dark: NSColor(red: 0.95, green: 0.94, blue: 0.91, alpha: 1))
-    static let textSecondary = adaptiveColor(light: NSColor(red: 0.37, green: 0.33, blue: 0.28, alpha: 1), dark: NSColor(red: 0.78, green: 0.74, blue: 0.69, alpha: 1))
+    static let textSecondary = adaptiveColor(light: NSColor(red: 0.35, green: 0.32, blue: 0.28, alpha: 1), dark: NSColor(red: 0.78, green: 0.74, blue: 0.69, alpha: 1))
     static let accent = adaptiveColor(light: NSColor(red: 0.11, green: 0.53, blue: 0.29, alpha: 1), dark: NSColor(red: 0.31, green: 0.77, blue: 0.48, alpha: 1))
     static let success = adaptiveColor(light: NSColor(red: 0.16, green: 0.48, blue: 0.28, alpha: 1), dark: NSColor(red: 0.31, green: 0.77, blue: 0.48, alpha: 1))
     static let warning = adaptiveColor(light: NSColor(red: 0.66, green: 0.42, blue: 0.0, alpha: 1), dark: NSColor(red: 0.88, green: 0.63, blue: 0.20, alpha: 1))
@@ -30,7 +31,7 @@ struct ConstellationShell<Content: View>: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color(red: 1.0, green: 0.98, blue: 0.95),
+                    ConstellationPalette.chrome,
                     ConstellationPalette.canvas
                 ],
                 startPoint: .topLeading,

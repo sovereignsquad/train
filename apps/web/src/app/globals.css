@@ -5,13 +5,41 @@ body {
   min-height: 100%;
 }
 
+:root {
+  --train-ambient-a: color-mix(in srgb, var(--cds-accent-highlight) 20%, transparent);
+  --train-ambient-b: color-mix(in srgb, var(--cds-accent-secondary) 10%, transparent);
+  --train-background-start: color-mix(in srgb, var(--cds-surface-canvas) 72%, white);
+  --train-background-end: var(--cds-surface-canvas);
+  --train-hero-start: color-mix(in srgb, var(--cds-surface-elevated) 96%, white);
+  --train-hero-end: color-mix(in srgb, var(--cds-surface-sidebar) 88%, white);
+  --train-panel-bg: color-mix(in srgb, var(--cds-surface-elevated) 84%, transparent);
+  --train-panel-alt-bg: color-mix(in srgb, var(--cds-surface-sidebar) 62%, white);
+  --train-row-hover: color-mix(in srgb, var(--cds-surface-sidebar) 54%, white);
+  --train-toggle-bg: color-mix(in srgb, var(--cds-surface-elevated) 88%, transparent);
+  --train-toggle-hover: color-mix(in srgb, var(--cds-surface-sidebar) 70%, transparent);
+}
+
+[data-theme="night"] {
+  --train-ambient-a: color-mix(in srgb, var(--cds-accent-primary) 16%, transparent);
+  --train-ambient-b: color-mix(in srgb, var(--cds-accent-secondary) 12%, transparent);
+  --train-background-start: #0f1116;
+  --train-background-end: var(--cds-surface-canvas);
+  --train-hero-start: color-mix(in srgb, var(--cds-surface-elevated) 90%, transparent);
+  --train-hero-end: color-mix(in srgb, var(--cds-surface-panel) 94%, transparent);
+  --train-panel-bg: color-mix(in srgb, var(--cds-surface-elevated) 78%, transparent);
+  --train-panel-alt-bg: color-mix(in srgb, var(--cds-surface-sidebar) 74%, transparent);
+  --train-row-hover: color-mix(in srgb, var(--cds-surface-sidebar) 72%, transparent);
+  --train-toggle-bg: color-mix(in srgb, var(--cds-surface-elevated) 82%, transparent);
+  --train-toggle-hover: color-mix(in srgb, var(--cds-surface-sidebar) 76%, transparent);
+}
+
 body {
   margin: 0;
   font-family: var(--cds-font-family-sans);
   background:
-    radial-gradient(circle at top left, rgba(207, 161, 68, 0.22), transparent 28%),
-    radial-gradient(circle at top right, rgba(24, 105, 93, 0.12), transparent 24%),
-    linear-gradient(180deg, var(--cds-surface-canvas) 0%, #efe6d8 100%);
+    radial-gradient(circle at top left, var(--train-ambient-a), transparent 28%),
+    radial-gradient(circle at top right, var(--train-ambient-b), transparent 24%),
+    linear-gradient(180deg, var(--train-background-start) 0%, var(--train-background-end) 100%);
   color: var(--cds-text-primary);
   color-scheme: light;
 }
@@ -31,21 +59,21 @@ a {
 
 .hero {
   background:
-    radial-gradient(circle at top right, rgba(207, 161, 68, 0.18), transparent 28%),
-    linear-gradient(140deg, rgba(255, 252, 247, 0.98), rgba(234, 225, 211, 0.92));
+    radial-gradient(circle at top right, var(--train-ambient-a), transparent 28%),
+    linear-gradient(140deg, var(--train-hero-start), var(--train-hero-end));
   border: 1px solid var(--cds-border-soft);
   box-shadow: var(--cds-shadow-lg);
 }
 
 .panel {
-  background: color-mix(in srgb, var(--cds-surface-elevated) 82%, transparent);
+  background: var(--train-panel-bg);
   border: 1px solid color-mix(in srgb, var(--cds-border-soft) 88%, white);
   box-shadow: var(--cds-shadow-md);
   backdrop-filter: blur(18px);
 }
 
 .panel-alt {
-  background: color-mix(in srgb, var(--cds-surface-sidebar) 62%, white);
+  background: var(--train-panel-alt-bg);
   border: 1px solid color-mix(in srgb, var(--cds-border-soft) 92%, white);
 }
 
@@ -122,7 +150,7 @@ a {
 }
 
 .section-panel tr:hover td {
-  background: color-mix(in srgb, var(--cds-surface-sidebar) 50%, white);
+  background: var(--train-row-hover);
 }
 
 .resume-button {
@@ -140,9 +168,9 @@ a {
 
 [data-theme="night"] body {
   background:
-    radial-gradient(circle at top left, rgba(219, 116, 64, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(47, 156, 138, 0.12), transparent 24%),
-    linear-gradient(180deg, var(--cds-surface-canvas) 0%, #0f1116 100%);
+    radial-gradient(circle at top left, var(--train-ambient-a), transparent 28%),
+    radial-gradient(circle at top right, var(--train-ambient-b), transparent 24%),
+    linear-gradient(180deg, var(--train-background-start) 0%, var(--train-background-end) 100%);
   color-scheme: dark;
 }
 
@@ -154,10 +182,10 @@ a {
 
 .theme-toggle {
   border: 1px solid var(--cds-border-soft);
-  background: color-mix(in srgb, var(--cds-surface-elevated) 88%, transparent);
+  background: var(--train-toggle-bg);
   color: var(--cds-text-primary);
 }
 
 .theme-toggle:hover {
-  background: color-mix(in srgb, var(--cds-surface-sidebar) 70%, transparent);
+  background: var(--train-toggle-hover);
 }
