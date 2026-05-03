@@ -29,7 +29,7 @@ Phase:
 
 Primary active issue:
 
-- no blocker remains on the broader git-mutation lane; next lane should move to packaged runtime refresh, unattended heartbeat exercise, or real `{reply}` data integration
+- no blocker remains on the broader git-mutation lane; the next structured roadmap lane is `ISSUE-24`, the round-based research contract for bounded learning cycles
 
 Board intent:
 
@@ -50,10 +50,12 @@ Board intent:
 - `ISSUE-16` completed
 - `ISSUE-17` completed
 - follow-on roadmap work should cover:
-  - broader git mutation support
-  - packaged runtime refresh and update installation
-  - real private-data and runtime integration for `{reply}`
-  - the next proof after the starter `{reply}` harness
+  - `ISSUE-24` round-based research contract
+  - `ISSUE-27` public hypothesis docs
+  - `ISSUE-25` baseline/candidate/incumbent comparison harness
+  - `ISSUE-26` invariant suite expansion
+  - `ISSUE-28` minority-report support
+  - `ISSUE-29` external research-system project class for OpenMythos-like repos
 
 ## Current Reality
 
@@ -218,11 +220,11 @@ Still missing on the critical path:
 
 ## Immediate Next Steps
 
-1. decide whether packaged runtime refresh or unattended heartbeat exercise is the next engine lane
-2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
-3. decide whether the Vibe turn-limit exit behavior deserves its own follow-up issue
-4. define the next honest proof after `{reply}` once the real data contract exists
-5. decide whether multi-artifact managed-project bootstrap examples should be added next
+1. deliver `ISSUE-24` to make round-based learning a first-class `{train}` contract
+2. deliver `ISSUE-27` so serious projects state explicit hypotheses and failure meaning
+3. deliver `ISSUE-25` so future proofs use fixed baseline/candidate/incumbent comparisons
+4. deliver `ISSUE-26` to strengthen ratchet, guardrail, recovery, and project-contract invariants
+5. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
 
 ## Current Risks
 
@@ -230,6 +232,7 @@ Still missing on the critical path:
 - `Vibe` currently exits with a non-zero code when the configured turn limit is reached, even if it completed useful work
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
 - the starter `reply` benchmark is local and deterministic, and the proof mutation is intentionally fixture-aware until real private `{reply}` data and runtime integration exist
+- `{train}` is still stronger at platform mechanics than at round-based research framing; the new issue lane exists to close that gap explicitly
 
 ## Blockers
 
@@ -248,4 +251,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- packaged desktop refinement, unattended heartbeat exercise, or real `{reply}` data integration, according to board priority
+- `ISSUE-24` first, then the round-discipline follow-on issues and remaining engine/runtime gaps according to board priority

@@ -126,6 +126,13 @@ Implemented:
 - third proof runner in `scripts/prove_reply_cycle.py`
 - durable `{reply}` proof notes in `docs/PROOF_REPLY_CYCLE.md`
 - ratchet commit and restore now operate on all changed paths inside `autonomous_mutable_artifacts`
+- new roadmap lane opened and prioritized on the GitHub project board:
+  - `ISSUE-24` round-based research contract
+  - `ISSUE-27` public hypothesis docs
+  - `ISSUE-25` comparison harness
+  - `ISSUE-26` invariant suite expansion
+  - `ISSUE-28` minority-report support
+  - `ISSUE-29` OpenMythos-like external research-system project class
 
 ### What Was Verified
 
@@ -180,11 +187,11 @@ Verified:
 
 Next expected work:
 
-1. decide whether packaged runtime refresh or unattended heartbeat exercise moves next
-2. decide when to replace the starter `{reply}` fixture with real private-data ingestion
-3. decide whether the Vibe turn-limit exit behavior deserves a dedicated follow-up issue
-4. define the next proof after `{reply}` once the real data contract exists
-5. decide whether to add a managed-project example with multiple mutable artifacts
+1. deliver `ISSUE-24` as the next explicit lane
+2. follow with `ISSUE-27`, `ISSUE-25`, and `ISSUE-26` in that order unless board priority changes
+3. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
+4. then return to packaged runtime refresh, unattended heartbeat exercise, and real `{reply}` data integration
+5. keep the board and issue comments aligned with repo SSOT as these lanes move
 
 ### Watch Carefully
 
@@ -205,6 +212,7 @@ Next expected work:
 - keep starter project generation simple and deterministic; do not hide the project contract behind clever scaffolding
 - keep the starter `reply` benchmark honest about its current limits; the current proof is valid as a seam test, not as evidence of production-quality reply drafting
 - keep multi-artifact mutation bounded to declared autonomous mutable artifacts; do not widen ratchet scope implicitly from git status alone
+- borrow OpenMythos-style benchmark discipline and skeptical framing, but do not import monolithic research-repo structure into `{train}` core
 
 ### If You Only Have 30 Minutes
 
