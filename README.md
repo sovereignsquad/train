@@ -42,7 +42,9 @@ The repository also now includes a native macOS operator shell:
 ## Native App UI Standards
 
 - `{train}` is a native app product, not a website.
+- The primary macOS workspace must be pure SwiftUI/AppKit.
 - Shipped operator flows must stay inside the app shell through app chrome, panels, dialogs, and native workflow surfaces rather than page-style detours.
+- Local services and background processes may exist, but they stay behind the native app rather than replacing the user-facing workspace.
 - Every shipped visual asset must be available locally and render offline from app-owned resources.
 - Product iconography must come from one local icon system with one shared size contract.
 - Icon buttons must be implemented consistently across shell chrome, status surfaces, project controls, and settings.
