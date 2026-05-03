@@ -39,6 +39,15 @@ The repository also now includes a native macOS operator shell:
 - a managed project registry with reference templates and user-defined project contracts
 - a theme/readability contract that keeps day and night mode aligned with the shared Constellation semantics
 
+## Native App UI Standards
+
+- `{train}` is a native app product, not a website.
+- Shipped operator flows must stay inside the app shell through app chrome, panels, dialogs, and native workflow surfaces rather than page-style detours.
+- Every shipped visual asset must be available locally and render offline from app-owned resources.
+- Product iconography must come from one local icon system with one shared size contract.
+- Icon buttons must be implemented consistently across shell chrome, status surfaces, project controls, and settings.
+- UI rendering should use explicit visual contracts rather than heuristic markup/path guessing.
+
 ## Overview
 
 For the high-level overview of what `{train}` is, how it works, what it can do, and what it is not, read:
