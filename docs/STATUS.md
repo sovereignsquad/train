@@ -26,10 +26,11 @@ Phase:
 - managed Python runtime bootstrap and starter project bootstrap generation delivered
 - first Trinity-powered `{reply}` optimization proof delivered
 - broader git mutation support delivered for multi-artifact project contracts
+- round-based research contract delivered for serious `{train}` learning cycles
 
 Primary active issue:
 
-- no blocker remains on the broader git-mutation lane; the next structured roadmap lane is `ISSUE-24`, the round-based research contract for bounded learning cycles
+- no blocker remains on the round-contract lane; the next structured roadmap lane should move to `ISSUE-27`, `ISSUE-25`, and `ISSUE-26`
 
 Board intent:
 
@@ -49,8 +50,8 @@ Board intent:
 - `ISSUE-15` completed
 - `ISSUE-16` completed
 - `ISSUE-17` completed
+- `ISSUE-24` completed
 - follow-on roadmap work should cover:
-  - `ISSUE-24` round-based research contract
   - `ISSUE-27` public hypothesis docs
   - `ISSUE-25` baseline/candidate/incumbent comparison harness
   - `ISSUE-26` invariant suite expansion
@@ -144,6 +145,7 @@ The repository currently has:
   - `scripts/prove_reply_cycle.py`
   - `docs/PROOF_REPLY_CYCLE.md`
 - ratchet mutation support across all changed paths inside declared `autonomous_mutable_artifacts`
+- first-class round contract in `docs/ROUND_CONTRACT.md`
 
 ## Verified Working
 
@@ -217,14 +219,15 @@ Still missing on the critical path:
 - longer unattended heartbeat exercise by a real agent session
 - packaged desktop update installation beyond release checks
 - real private-data and runtime integration for the eventual `{reply}` production lane
+- round-based comparison harness and hypothesis/minority-report artifacts are not implemented yet
 
 ## Immediate Next Steps
 
-1. deliver `ISSUE-24` to make round-based learning a first-class `{train}` contract
-2. deliver `ISSUE-27` so serious projects state explicit hypotheses and failure meaning
-3. deliver `ISSUE-25` so future proofs use fixed baseline/candidate/incumbent comparisons
-4. deliver `ISSUE-26` to strengthen ratchet, guardrail, recovery, and project-contract invariants
-5. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
+1. deliver `ISSUE-27` so serious projects state explicit hypotheses and failure meaning
+2. deliver `ISSUE-25` so future proofs use fixed baseline/candidate/incumbent comparisons
+3. deliver `ISSUE-26` to strengthen ratchet, guardrail, recovery, and project-contract invariants
+4. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
+5. keep packaged runtime refresh, unattended heartbeat exercise, and real `{reply}` data integration visible behind the new round-discipline lane
 
 ## Current Risks
 
@@ -233,6 +236,7 @@ Still missing on the critical path:
 - the native shell does not yet install or update the Python engine as a self-contained packaged desktop dependency
 - the starter `reply` benchmark is local and deterministic, and the proof mutation is intentionally fixture-aware until real private `{reply}` data and runtime integration exist
 - `{train}` is still stronger at platform mechanics than at round-based research framing; the new issue lane exists to close that gap explicitly
+- the round contract is now documented, but the supporting comparison, hypothesis, invariant, and minority-report artifacts are still pending
 
 ## Blockers
 
@@ -251,4 +255,4 @@ If resuming work, start by reading:
 
 Then continue on:
 
-- `ISSUE-24` first, then the round-discipline follow-on issues and remaining engine/runtime gaps according to board priority
+- `ISSUE-27`, `ISSUE-25`, and `ISSUE-26` next, then the rest of the round-discipline lane and remaining engine/runtime gaps according to board priority

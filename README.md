@@ -56,6 +56,10 @@ For the high-level overview of what `{train}` is, how it works, what it can do, 
 
 - [TRAIN_OVERVIEW.md](./TRAIN_OVERVIEW.md)
 
+For the round-based research execution model for serious project work, read:
+
+- [docs/ROUND_CONTRACT.md](./docs/ROUND_CONTRACT.md)
+
 ## License
 
 This project is licensed under `Apache-2.0`.

@@ -35,6 +35,7 @@ Last completed increment:
 - native runtime bootstrap and starter project bootstrap generation
 - first Trinity-powered `{reply}` optimization proof
 - broader git mutation support across declared autonomous mutable artifacts
+- round-based research contract for serious `{train}` learning cycles
 
 Implemented:
 
@@ -127,12 +128,12 @@ Implemented:
 - durable `{reply}` proof notes in `docs/PROOF_REPLY_CYCLE.md`
 - ratchet commit and restore now operate on all changed paths inside `autonomous_mutable_artifacts`
 - new roadmap lane opened and prioritized on the GitHub project board:
-  - `ISSUE-24` round-based research contract
   - `ISSUE-27` public hypothesis docs
   - `ISSUE-25` comparison harness
   - `ISSUE-26` invariant suite expansion
   - `ISSUE-28` minority-report support
   - `ISSUE-29` OpenMythos-like external research-system project class
+- `docs/ROUND_CONTRACT.md` now defines the lifecycle and required artifacts for one serious learning round
 
 ### What Was Verified
 
@@ -187,11 +188,11 @@ Verified:
 
 Next expected work:
 
-1. deliver `ISSUE-24` as the next explicit lane
-2. follow with `ISSUE-27`, `ISSUE-25`, and `ISSUE-26` in that order unless board priority changes
-3. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
-4. then return to packaged runtime refresh, unattended heartbeat exercise, and real `{reply}` data integration
-5. keep the board and issue comments aligned with repo SSOT as these lanes move
+1. deliver `ISSUE-27`, `ISSUE-25`, and `ISSUE-26` next unless board priority changes
+2. sequence `ISSUE-28` and `ISSUE-29` after the round contract and comparison lane are real
+3. then return to packaged runtime refresh, unattended heartbeat exercise, and real `{reply}` data integration
+4. keep the board and issue comments aligned with repo SSOT as these lanes move
+5. preserve the round contract as the upstream execution model for serious projects
 
 ### Watch Carefully
 
@@ -213,6 +214,7 @@ Next expected work:
 - keep the starter `reply` benchmark honest about its current limits; the current proof is valid as a seam test, not as evidence of production-quality reply drafting
 - keep multi-artifact mutation bounded to declared autonomous mutable artifacts; do not widen ratchet scope implicitly from git status alone
 - borrow OpenMythos-style benchmark discipline and skeptical framing, but do not import monolithic research-repo structure into `{train}` core
+- keep the round contract tied to bounded runs and ratchet semantics; do not let it drift into vague research narration
 
 ### If You Only Have 30 Minutes
 

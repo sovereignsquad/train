@@ -72,6 +72,7 @@ Today the project is best understood as:
 - a local API shell
 - a native and web operator surface
 - a bounded-project optimizer
+- a round-based research optimizer for serious project work
 - reference benchmarks that prove the loop
 - a future optimizer seam for external runtimes such as `{trinity}`
 
@@ -88,6 +89,7 @@ Mid term:
 
 - optimize bounded runtime components from external systems such as `{trinity}`
 - add richer project templates beyond fixed reference benchmarks
+- make explicit learning rounds, hypothesis framing, and fixed comparison discipline first-class
 - strengthen unattended operator and recovery paths
 
 Long term:
