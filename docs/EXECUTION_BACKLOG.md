@@ -42,6 +42,21 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 - `TRAIN-004` Web toolchain major-version upgrade lane
   `apps/web` is clean on lint, production build, and audit after safe updates, but major upgrades remain for `eslint` and `typescript`. Those should be handled as a dedicated compatibility lane against the Next 16 toolchain.
 
+- `TRAIN-POLICY-001` Training bundle loader
+  Load and validate deterministic bounded learning bundles exported from `{trinity}`, with strict contract-version checks.
+
+- `TRAIN-POLICY-002` Tone learner
+  Build the first narrow learner that proposes bounded tone policy artifacts from exported operator outcomes.
+
+- `TRAIN-POLICY-003` Brevity learner
+  Propose bounded brevity policy updates that reduce rewrite severity without regressing channel quality.
+
+- `TRAIN-POLICY-004` Channel formatting learner
+  Learn bounded per-channel formatting rules such as greeting shape, URL handling, attachment references, and newline density.
+
+- `TRAIN-POLICY-005` Proposal artifact and eval report
+  Every bounded training run must emit a versioned policy proposal plus an incumbent-vs-candidate replay report.
+
 ## Dependencies
 
 - Depends on `{trinity}` to define stable bounded artifacts for runtime components.
