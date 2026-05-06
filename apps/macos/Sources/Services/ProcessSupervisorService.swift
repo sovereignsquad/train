@@ -26,6 +26,7 @@ final class ProcessSupervisorService: ObservableObject {
     private var logFileHandle: FileHandle?
     private var healthTask: Task<Void, Never>?
     private var adoptedExternalEngine = false
+    private var consecutiveHealthFailures = 0
 
     init() {
         repositoryRoot = ProjectLocator.resolveRepositoryRoot()
@@ -102,6 +103,7 @@ final class ProcessSupervisorService: ObservableObject {
             apiBaseURL = preferredBaseURL
             status = .running
             statusMessage = "Attached to existing engine on port \(preferredPort)."
+            consecutiveHealthFailures = 0
             appendLog("Attached to existing healthy engine at \(preferredBaseURL.absoluteString)")
             startHealthPolling()
             return
@@ -151,6 +153,7 @@ final class ProcessSupervisorService: ObservableObject {
                 self?.adoptedExternalEngine = false
                 self?.healthTask?.cancel()
                 self?.healthTask = nil
+                self?.consecutiveHealthFailures = 0
                 self?.status = task.terminationStatus == 0 ? .stopped : .failed
                 self?.statusMessage = task.terminationStatus == 0
                     ? "Engine stopped."
@@ -176,6 +179,7 @@ final class ProcessSupervisorService: ObservableObject {
             self.process = process
             self.outputPipe = pipe
             self.adoptedExternalEngine = false
+            self.consecutiveHealthFailures = 0
             self.status = .starting
             self.statusMessage = "Starting local engine on port \(selectedPort)..."
             appendLog("Launching engine from \(repositoryRoot.path)")
@@ -198,6 +202,7 @@ final class ProcessSupervisorService: ObservableObject {
         healthTask = nil
         if adoptedExternalEngine {
             adoptedExternalEngine = false
+            consecutiveHealthFailures = 0
             status = .stopped
             statusMessage = "Detached from existing engine."
             appendLog("Detached from existing engine at \(apiBaseURL?.absoluteString ?? "unknown").")
@@ -206,6 +211,7 @@ final class ProcessSupervisorService: ObservableObject {
             process?.terminate()
             process = nil
             outputPipe = nil
+            consecutiveHealthFailures = 0
             status = .stopped
             statusMessage = "Engine stopped."
             appendLog("Stop requested.")
@@ -224,14 +230,21 @@ final class ProcessSupervisorService: ObservableObject {
             while !Task.isCancelled {
                 do {
                     let health = try await client.get("health", as: HealthPayload.self)
+                    consecutiveHealthFailures = 0
                     status = .running
                     statusMessage = "\(health.service) is healthy in \(health.environment) on port \(activePort)."
                 } catch {
                     if status == .starting {
                         statusMessage = "Waiting for the engine health endpoint..."
                     } else if process != nil || adoptedExternalEngine {
-                        status = .failed
-                        statusMessage = "Health check failed: \(error.localizedDescription)"
+                        consecutiveHealthFailures += 1
+                        let message = APIClient.message(for: error)
+                        if consecutiveHealthFailures < 3 {
+                            statusMessage = "Retrying health check: \(message)"
+                        } else {
+                            status = .failed
+                            statusMessage = "Health check failed: \(message)"
+                        }
                     }
                 }
                 try? await Task.sleep(for: .seconds(2))

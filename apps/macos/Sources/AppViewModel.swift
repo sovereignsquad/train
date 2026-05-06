@@ -38,7 +38,7 @@ final class AppViewModel: ObservableObject {
                 _ = try await client.post("v1/runs/\(runID)/resume", as: RunPayload.self)
                 await refreshSnapshot()
             } catch {
-                lastRefreshError = error.localizedDescription
+                lastRefreshError = APIClient.message(for: error)
             }
         }
     }
@@ -50,7 +50,7 @@ final class AppViewModel: ObservableObject {
                 _ = try await client.post("v1/projects", body: payload, as: ProjectPayload.self)
                 await refreshSnapshot()
             } catch {
-                lastRefreshError = error.localizedDescription
+                lastRefreshError = APIClient.message(for: error)
             }
         }
     }
@@ -62,7 +62,7 @@ final class AppViewModel: ObservableObject {
                 _ = try await client.put("v1/projects/\(key)", body: payload, as: ProjectPayload.self)
                 await refreshSnapshot()
             } catch {
-                lastRefreshError = error.localizedDescription
+                lastRefreshError = APIClient.message(for: error)
             }
         }
     }
@@ -74,7 +74,7 @@ final class AppViewModel: ObservableObject {
                 try await client.delete("v1/projects/\(key)")
                 await refreshSnapshot()
             } catch {
-                lastRefreshError = error.localizedDescription
+                lastRefreshError = APIClient.message(for: error)
             }
         }
     }
@@ -91,7 +91,7 @@ final class AppViewModel: ObservableObject {
                 )
                 await refreshSnapshot()
             } catch {
-                lastRefreshError = error.localizedDescription
+                lastRefreshError = APIClient.message(for: error)
             }
         }
     }
@@ -128,7 +128,11 @@ final class AppViewModel: ObservableObject {
             self.operatorStatus = try await operatorSnapshot
             self.lastRefreshError = ""
         } catch {
-            lastRefreshError = error.localizedDescription
+            if processSupervisor.status == .starting {
+                lastRefreshError = "The local engine is still starting."
+            } else {
+                lastRefreshError = APIClient.message(for: error)
+            }
         }
     }
 
