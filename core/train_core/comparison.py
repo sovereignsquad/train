@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 
 from train_core.models import MetricDirection
 
+COMPARISON_CONTRACT_VERSION = "train.comparison.v1alpha1"
+
 
 class StandardComparisonRow(BaseModel):
     label: str = Field(min_length=1, max_length=80)
@@ -26,9 +28,12 @@ class StandardComparisonDelta(BaseModel):
 class StandardComparisonReport(BaseModel):
     report_id: str = Field(min_length=1, max_length=160)
     generated_at: datetime
+    contract_version: str = Field(min_length=1, max_length=120)
+    evaluation_mode: str = Field(min_length=1, max_length=80)
     metric_name: str = Field(min_length=1, max_length=120)
     metric_direction: MetricDirection
     sample_count: int = Field(ge=1)
+    corpus_fingerprint: str = Field(min_length=1, max_length=64)
     rows: tuple[StandardComparisonRow, ...] = Field(min_length=1)
     deltas: tuple[StandardComparisonDelta, ...] = ()
     table_markdown: str = Field(min_length=1)
@@ -39,9 +44,11 @@ def build_standard_comparison_report(
     *,
     report_id: str,
     generated_at: datetime,
+    evaluation_mode: str,
     metric_name: str,
     metric_direction: MetricDirection,
     sample_count: int,
+    corpus_fingerprint: str,
     rows: list[StandardComparisonRow],
     summary: str,
 ) -> StandardComparisonReport:
@@ -49,9 +56,12 @@ def build_standard_comparison_report(
     return StandardComparisonReport(
         report_id=report_id,
         generated_at=generated_at,
+        contract_version=COMPARISON_CONTRACT_VERSION,
+        evaluation_mode=evaluation_mode,
         metric_name=metric_name,
         metric_direction=metric_direction,
         sample_count=sample_count,
+        corpus_fingerprint=corpus_fingerprint,
         rows=tuple(rows),
         deltas=tuple(deltas),
         table_markdown=_build_table_markdown(rows, deltas),

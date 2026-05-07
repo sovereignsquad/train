@@ -138,6 +138,9 @@ def test_build_reply_policy_comparison_report_compares_fixed_rows() -> None:
     )
 
     assert report.metric_name == "tone_policy_fit"
+    assert report.contract_version == "train.comparison.v1alpha1"
+    assert report.evaluation_mode == "fixed_replay_corpus"
+    assert len(report.corpus_fingerprint) == 40
     assert len(report.rows) == 3
     assert report.rows[-1].label == "candidate"
     assert report.rows[-1].score is not None
@@ -145,3 +148,23 @@ def test_build_reply_policy_comparison_report_compares_fixed_rows() -> None:
     assert report.deltas[0].from_label == "baseline"
     assert report.deltas[0].to_label == "candidate"
     assert report.table_markdown.startswith("| Label | Artifact |")
+
+
+def test_build_reply_policy_comparison_report_rejects_scope_mismatch() -> None:
+    bundles = [_bundle("Thanks Alice. I can send the update today.")]
+    candidate = learn_reply_tone_policy(bundles)
+    mismatched = candidate.model_copy(
+        update={"version": "reply_behavior_policy.tone.global", "scope_kind": "global", "scope_value": None}
+    )
+
+    try:
+        build_reply_policy_comparison_report(
+            bundles,
+            candidate,
+            learner_kind="tone",
+            baseline=mismatched,
+        )
+    except ValueError as exc:
+        assert "scope" in str(exc)
+    else:
+        raise AssertionError("Expected mismatched scope to fail comparison.")

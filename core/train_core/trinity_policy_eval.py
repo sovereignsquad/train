@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -105,8 +106,10 @@ def build_reply_policy_comparison_report(
 
     rows: list[StandardComparisonRow] = []
     if baseline is not None:
+        _validate_comparable_policy(baseline, candidate)
         rows.append(_policy_row("baseline", baseline, bundles, learner_kind))
     if incumbent is not None:
+        _validate_comparable_policy(incumbent, candidate)
         rows.append(_policy_row("incumbent", incumbent, bundles, learner_kind))
     else:
         artifact = sorted(bundles, key=lambda bundle: (bundle.exported_at, bundle.bundle_id))[-1].ranked_draft_set.accepted_artifact_version
@@ -122,12 +125,15 @@ def build_reply_policy_comparison_report(
         )
     rows.append(_policy_row("candidate", candidate, bundles, learner_kind))
     created = generated_at or max(bundle.exported_at for bundle in bundles)
+    corpus_fingerprint = _bundle_corpus_fingerprint(bundles)
     return build_standard_comparison_report(
         report_id=f"{candidate.version}.comparison",
         generated_at=created,
+        evaluation_mode="fixed_replay_corpus",
         metric_name=f"{learner_kind}_policy_fit",
         metric_direction=MetricDirection.MAXIMIZE,
         sample_count=len(bundles),
+        corpus_fingerprint=corpus_fingerprint,
         rows=rows,
         summary=(
             f"Compared {learner_kind} policy artifacts on {len(bundles)} fixed bundle(s) "
@@ -168,6 +174,26 @@ def _policy_row(
         status="evaluated",
         notes=f"Scored on fixed bundle corpus for {learner_kind}.",
     )
+
+
+def _validate_comparable_policy(
+    policy: ReplyBehaviorPolicyProposal,
+    candidate: ReplyBehaviorPolicyProposal,
+) -> None:
+    if policy.artifact_key != candidate.artifact_key:
+        raise ValueError("Comparison policy artifact_key must match candidate artifact_key")
+    if policy.scope_kind != candidate.scope_kind or policy.scope_value != candidate.scope_value:
+        raise ValueError("Comparison policy scope must match candidate scope")
+    if policy.contract_version != candidate.contract_version:
+        raise ValueError("Comparison policy contract_version must match candidate contract_version")
+
+
+def _bundle_corpus_fingerprint(bundles: list[TrinityTrainingBundleRecord]) -> str:
+    digest_input = "|".join(
+        f"{bundle.bundle_id}:{bundle.bundle_type}:{bundle.exported_at.isoformat()}"
+        for bundle in sorted(bundles, key=lambda item: (item.exported_at, item.bundle_id))
+    )
+    return hashlib.sha1(digest_input.encode("utf-8")).hexdigest()
 
 
 def score_reply_policy_against_bundles(

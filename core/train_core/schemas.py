@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -73,6 +74,8 @@ class TrinityReplyPolicyProposalRequest(BaseModel):
     def validate_request(self) -> "TrinityReplyPolicyProposalRequest":
         if self.learner_kind not in {"tone", "brevity", "channel-formatting"}:
             raise ValueError("learner_kind is invalid")
+        if len(set(self.bundle_files)) != len(self.bundle_files):
+            raise ValueError("bundle_files must not contain duplicates")
         return self
 
 
@@ -85,6 +88,34 @@ class TrinityReplyPolicyProposalRead(BaseModel):
     proposal_path: str | None = None
     eval_output_path: str | None = None
     comparison_output_path: str | None = None
+
+
+class TrinityReplyPolicyPromotionPackage(BaseModel):
+    component_key: str = Field(min_length=1, max_length=120)
+    accepted_project_key: str = Field(min_length=1, max_length=120)
+    accepted_run_id: int | None = Field(default=None, ge=1)
+    accepted_metric: float | None = None
+    accepted_artifact_version: str = Field(min_length=1, max_length=160)
+    proposal_artifact_path: str = Field(min_length=1)
+    comparison_report_path: str | None = None
+    contract_version: str = Field(min_length=1, max_length=120)
+    scope_kind: str = Field(min_length=1, max_length=40)
+    scope_value: str | None = None
+    promotion_notes: str | None = None
+
+    @model_validator(mode="after")
+    def validate_promotion_package(self) -> "TrinityReplyPolicyPromotionPackage":
+        if self.scope_kind not in {"global", "company", "channel"}:
+            raise ValueError("scope_kind is invalid for promotion package")
+        if self.scope_kind == "global" and self.scope_value is not None:
+            raise ValueError("Global promotion package must not set scope_value")
+        if self.scope_kind in {"company", "channel"} and not self.scope_value:
+            raise ValueError("Scoped promotion package requires scope_value")
+        if not os.path.isabs(self.proposal_artifact_path):
+            raise ValueError("proposal_artifact_path must be absolute")
+        if self.comparison_report_path is not None and not os.path.isabs(self.comparison_report_path):
+            raise ValueError("comparison_report_path must be absolute when provided")
+        return self
 
 
 class RunCreate(BaseModel):

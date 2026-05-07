@@ -6,7 +6,7 @@ from pathlib import Path
 
 from train_api.main import propose_trinity_reply_policy
 from train_core.trinity_tone_learner import learn_reply_tone_policy
-from train_core.schemas import TrinityReplyPolicyProposalRequest
+from train_core.schemas import TrinityReplyPolicyPromotionPackage, TrinityReplyPolicyProposalRequest
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
 from train_core.trinity_trace_loader import load_trinity_training_bundle
 
@@ -114,6 +114,8 @@ def test_propose_reply_policy_from_bundle_files_writes_outputs(tmp_path: Path) -
     assert comparison_path.exists()
     assert result.comparison_report is not None
     assert result.comparison_report["metric_name"] == "tone_policy_fit"
+    assert result.comparison_report["evaluation_mode"] == "fixed_replay_corpus"
+    assert result.comparison_report["corpus_fingerprint"]
 
 
 def test_propose_reply_policy_from_bundle_files_compares_optional_policy_artifacts(tmp_path: Path) -> None:
@@ -162,3 +164,48 @@ def test_train_api_proposes_reply_policy_from_bundle_files(tmp_path: Path) -> No
     assert response.proposal.scope_kind == "company"
     assert response.proposal.scope_value == "company-1"
     assert response.comparison_report is not None
+
+
+def test_reply_policy_request_rejects_duplicate_bundle_files() -> None:
+    try:
+        TrinityReplyPolicyProposalRequest(
+            learner_kind="tone",
+            bundle_files=("same.json", "same.json"),
+        )
+    except ValueError as exc:
+        assert "duplicates" in str(exc)
+    else:
+        raise AssertionError("Expected duplicate bundle files to fail validation.")
+
+
+def test_promotion_package_requires_absolute_paths() -> None:
+    package = TrinityReplyPolicyPromotionPackage(
+        component_key="reply.tone",
+        accepted_project_key="reply",
+        accepted_run_id=7,
+        accepted_metric=0.91,
+        accepted_artifact_version="reply_behavior_policy.tone.company-1.v1",
+        proposal_artifact_path="/tmp/proposal.json",
+        comparison_report_path="/tmp/comparison.json",
+        contract_version="trinity.reply.v1alpha1",
+        scope_kind="company",
+        scope_value="company-1",
+        promotion_notes="fixture",
+    )
+
+    assert package.scope_kind == "company"
+
+    try:
+        TrinityReplyPolicyPromotionPackage(
+            component_key="reply.tone",
+            accepted_project_key="reply",
+            accepted_artifact_version="reply_behavior_policy.tone.company-1.v1",
+            proposal_artifact_path="relative/proposal.json",
+            contract_version="trinity.reply.v1alpha1",
+            scope_kind="company",
+            scope_value="company-1",
+        )
+    except ValueError as exc:
+        assert "absolute" in str(exc)
+    else:
+        raise AssertionError("Expected relative proposal path to fail validation.")
