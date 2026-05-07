@@ -168,3 +168,42 @@ def test_build_reply_policy_comparison_report_rejects_scope_mismatch() -> None:
         assert "scope" in str(exc)
     else:
         raise AssertionError("Expected mismatched scope to fail comparison.")
+
+
+def test_build_reply_policy_comparison_report_rejects_contract_mismatch() -> None:
+    bundles = [_bundle("Thanks Alice. I can send the update today.")]
+    candidate = learn_reply_tone_policy(bundles)
+    mismatched = candidate.model_copy(
+        update={"version": "reply_behavior_policy.tone.other-contract", "contract_version": "trinity.reply.v9"}
+    )
+
+    try:
+        build_reply_policy_comparison_report(
+            bundles,
+            candidate,
+            learner_kind="tone",
+            baseline=mismatched,
+        )
+    except ValueError as exc:
+        assert "contract_version" in str(exc)
+    else:
+        raise AssertionError("Expected mismatched contract_version to fail comparison.")
+
+
+def test_build_reply_policy_comparison_report_has_stable_corpus_fingerprint_for_same_bundles() -> None:
+    first = _bundle("Thanks Alice. I can send the update today.")
+    second = _bundle("Thanks Alice. I can share the details today.")
+    candidate = learn_reply_tone_policy([first, second])
+
+    report_a = build_reply_policy_comparison_report(
+        [first, second],
+        candidate,
+        learner_kind="tone",
+    )
+    report_b = build_reply_policy_comparison_report(
+        [second, first],
+        candidate,
+        learner_kind="tone",
+    )
+
+    assert report_a.corpus_fingerprint == report_b.corpus_fingerprint
