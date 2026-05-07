@@ -26,3 +26,9 @@
 3. keep benchmark deterministic and fixture-bound
 4. refuse malformed or incompatible trace exports
 5. add a fixture-builder path from real `{trinity}` exports and `{reply}` shadow logs
+
+## Related Contract
+
+For the full `{trinity}` to `{train}` project handoff template, read:
+
+- `docs/TRINITY_TRAIN_HANDOFF_TEMPLATE.md`

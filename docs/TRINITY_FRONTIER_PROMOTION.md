@@ -31,3 +31,9 @@ When `{trinity}` is ready to consume optimized frontier policies:
 - `{train}` proposes an improvement.
 - `{trinity}` owns the runtime implementation of that improvement.
 - `{reply}` validates downstream operator behavior but does not define the ranking contract.
+
+## Related Contract
+
+For the full handoff shape before promotion, read:
+
+- `docs/TRINITY_TRAIN_HANDOFF_TEMPLATE.md`
