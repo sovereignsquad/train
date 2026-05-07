@@ -13,6 +13,10 @@ Do not use it for:
 - product-side behavior in `{reply}`
 - unbounded multi-component experiments
 
+For the recommended operating posture after the seam exists, read:
+
+- `docs/TRINITY_HANDOFF_RECOMMENDATIONS.md`
+
 ## Boundary Rule
 
 The handoff is always:
