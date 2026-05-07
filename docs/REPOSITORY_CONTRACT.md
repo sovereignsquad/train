@@ -118,6 +118,7 @@ Each project should provide:
 - one setup artifact or setup entrypoint
 - one controlled mutable artifact
 - `program.md`
+- `hypothesis.md`
 - one bounded run entrypoint
 - one automatic metric
 - logs and artifacts

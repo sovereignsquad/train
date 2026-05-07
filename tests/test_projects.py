@@ -6,6 +6,7 @@ from train_core.config import ROOT_DIR
 from train_core.db import SessionLocal, init_db
 from train_core.models import MetricDirection
 from train_core.projects import (
+    ProjectMutationError,
     ProjectMutation,
     bootstrap_project_workspace,
     create_managed_project,
@@ -154,7 +155,11 @@ def test_managed_project_crud_overlay() -> None:
         description="Managed project used to verify CRUD behavior.",
         mutable_artifact="projects/custom/train.py",
         autonomous_mutable_artifacts=("projects/custom/train.py",),
-        setup_artifacts=("projects/custom/prepare.py", "projects/custom/program.md"),
+        setup_artifacts=(
+            "projects/custom/prepare.py",
+            "projects/custom/program.md",
+            "projects/custom/hypothesis.md",
+        ),
         dependency_artifacts=("pyproject.toml", "uv.lock"),
         metric_name="score",
         metric_direction=MetricDirection.MAXIMIZE,
@@ -208,6 +213,7 @@ def test_managed_project_bootstrap_generates_starter_files() -> None:
         setup_artifacts=(
             f"projects/{project_key}/prepare.py",
             f"projects/{project_key}/program.md",
+            f"projects/{project_key}/hypothesis.md",
             f"projects/{project_key}/run_benchmark.py",
         ),
         dependency_artifacts=("pyproject.toml", "uv.lock"),
@@ -232,14 +238,51 @@ def test_managed_project_bootstrap_generates_starter_files() -> None:
         mutable_path = ROOT_DIR / created.mutable_artifact
         entrypoint_path = ROOT_DIR / created.execution_entrypoint
         program_path = ROOT_DIR / f"projects/{project_key}/program.md"
+        hypothesis_path = ROOT_DIR / f"projects/{project_key}/hypothesis.md"
 
         assert mutable_path.exists()
         assert entrypoint_path.exists()
         assert program_path.exists()
+        assert hypothesis_path.exists()
         assert result.project_key == project_key
         assert "def evaluate_metric()" in mutable_path.read_text(encoding="utf-8")
         assert '"status": "succeeded"' in entrypoint_path.read_text(encoding="utf-8")
         assert created.metric_name in program_path.read_text(encoding="utf-8")
+        assert created.metric_name in hypothesis_path.read_text(encoding="utf-8")
 
         delete_managed_project(db, project_key)
         shutil.rmtree(ROOT_DIR / f"projects/{project_key}", ignore_errors=True)
+
+
+def test_managed_project_requires_hypothesis_artifact() -> None:
+    init_db()
+    project_key = "test-missing-hypothesis"
+    mutation = ProjectMutation(
+        key=project_key,
+        name="Missing Hypothesis Project",
+        description="Should fail because hypothesis.md is missing.",
+        mutable_artifact=f"projects/{project_key}/train.py",
+        autonomous_mutable_artifacts=(f"projects/{project_key}/train.py",),
+        setup_artifacts=(
+            f"projects/{project_key}/prepare.py",
+            f"projects/{project_key}/program.md",
+            f"projects/{project_key}/run_benchmark.py",
+        ),
+        dependency_artifacts=("pyproject.toml", "uv.lock"),
+        metric_name="score",
+        metric_direction=MetricDirection.MAXIMIZE,
+        min_budget_seconds=30,
+        default_budget_seconds=60,
+        max_budget_seconds=120,
+        runner_key="python-benchmark",
+        execution_entrypoint=f"projects/{project_key}/run_benchmark.py",
+        template_key="helpdesk",
+    )
+
+    with SessionLocal() as db:
+        try:
+            create_managed_project(db, mutation)
+        except ProjectMutationError as exc:
+            assert "hypothesis.md" in str(exc)
+        else:
+            raise AssertionError("Expected missing hypothesis.md to be rejected.")

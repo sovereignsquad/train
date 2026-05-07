@@ -93,9 +93,9 @@ A project is ready only when it has:
 - a project folder
 - a mutable artifact
 - `program.md`
+- `hypothesis.md`
 - `run_benchmark.py`
 - setup artifacts
 - dependency artifacts
 - metric name and direction
 - budget bounds
-

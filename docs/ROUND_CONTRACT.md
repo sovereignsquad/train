@@ -91,7 +91,7 @@ State:
 - what metric should move
 - what failure would mean
 
-This may later live in a dedicated hypothesis artifact, but the round contract requires the concept now.
+For serious projects, this should live in `hypothesis.md` and stay aligned with the current round.
 
 ### 2. Baseline
 

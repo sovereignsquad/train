@@ -125,6 +125,7 @@ If an issue conflicts with chat, the issue wins after it is updated.
 ### Architecture SSOT
 
 - `docs/OPERATING_MODEL.md`
+- `docs/HYPOTHESIS_CONTRACT.md`
 - `docs/ROUND_CONTRACT.md`
 - `docs/TECH_STACK.md`
 - `docs/OPEN_SOURCE.md`
@@ -136,6 +137,7 @@ Authoritative for:
 
 - system boundaries
 - round-based learning contract
+- hypothesis artifact contract
 - stack choices
 - adapter boundaries
 - repository contract

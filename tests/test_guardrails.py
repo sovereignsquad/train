@@ -26,13 +26,17 @@ def test_workspace_classification_distinguishes_dependency_and_setup_paths() -> 
         [
             "projects/mythology/train.py",
             "projects/mythology/program.md",
+            "projects/mythology/hypothesis.md",
             "pyproject.toml",
             "scripts/run_vibe.py",
         ],
     )
 
     assert report.allowed_paths == ("projects/mythology/train.py",)
-    assert report.setup_paths == ("projects/mythology/program.md",)
+    assert report.setup_paths == (
+        "projects/mythology/hypothesis.md",
+        "projects/mythology/program.md",
+    )
     assert report.dependency_paths == ("pyproject.toml",)
     assert report.unauthorized_paths == ("scripts/run_vibe.py",)
 

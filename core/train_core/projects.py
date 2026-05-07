@@ -79,6 +79,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         setup_artifacts=(
             "projects/trinity_frontier/prepare.py",
             "projects/trinity_frontier/program.md",
+            "projects/trinity_frontier/hypothesis.md",
             "projects/trinity_frontier/run_benchmark.py",
             "projects/trinity_frontier/eval_fixture.json",
         ),
@@ -107,6 +108,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         setup_artifacts=(
             "projects/reply/prepare.py",
             "projects/reply/program.md",
+            "projects/reply/hypothesis.md",
             "projects/reply/run_benchmark.py",
             "projects/reply/eval_fixture.json",
         ),
@@ -135,6 +137,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         setup_artifacts=(
             "projects/trinity_reply_ranker/prepare.py",
             "projects/trinity_reply_ranker/program.md",
+            "projects/trinity_reply_ranker/hypothesis.md",
             "projects/trinity_reply_ranker/run_benchmark.py",
             "projects/trinity_reply_ranker/eval_fixture.json",
         ),
@@ -163,6 +166,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         setup_artifacts=(
             "projects/helpdesk/prepare.py",
             "projects/helpdesk/program.md",
+            "projects/helpdesk/hypothesis.md",
             "projects/helpdesk/run_benchmark.py",
         ),
         dependency_artifacts=("pyproject.toml", "uv.lock"),
@@ -190,6 +194,7 @@ REFERENCE_PROJECTS: dict[str, ProjectDefinition] = {
         setup_artifacts=(
             "projects/mythology/prepare.py",
             "projects/mythology/program.md",
+            "projects/mythology/hypothesis.md",
             "projects/mythology/run_benchmark.py",
         ),
         dependency_artifacts=("pyproject.toml", "uv.lock"),
@@ -416,6 +421,11 @@ def _validate_project_mutation(mutation: ProjectMutation) -> None:
         )
     if not mutation.setup_artifacts:
         raise ProjectMutationError("At least one setup artifact is required.")
+    setup_names = {Path(path).name for path in mutation.setup_artifacts}
+    if "program.md" not in setup_names:
+        raise ProjectMutationError("Setup artifacts must include program.md.")
+    if "hypothesis.md" not in setup_names:
+        raise ProjectMutationError("Setup artifacts must include hypothesis.md for serious projects.")
     if not mutation.dependency_artifacts:
         raise ProjectMutationError("At least one dependency artifact is required.")
     _validate_project_paths(mutation)
@@ -483,6 +493,8 @@ def _build_bootstrap_file_payloads(project: ProjectDefinition) -> dict[str, str]
             payloads[setup_artifact] = _starter_prepare_module(project)
         elif name == "program.md":
             payloads[setup_artifact] = _starter_program_doc(project)
+        elif name == "hypothesis.md":
+            payloads[setup_artifact] = _starter_hypothesis_doc(project)
         else:
             payloads[setup_artifact] = _starter_placeholder(project, setup_artifact)
     return payloads
@@ -612,7 +624,49 @@ def _starter_program_doc(project: ProjectDefinition) -> str:
 
         1. Only modify the declared mutable artifact during autonomous runs.
         2. Keep setup and benchmark files deterministic.
-        3. Replace the placeholder logic with a real local evaluation before trusting results.
+        3. Keep `hypothesis.md` aligned with what the project is actually trying to improve.
+        4. Replace the placeholder logic with a real local evaluation before trusting results.
+        """
+    )
+
+
+def _starter_hypothesis_doc(project: ProjectDefinition) -> str:
+    comparison_hint = "increase" if project.metric_direction is MetricDirection.MAXIMIZE else "decrease"
+    return dedent(
+        f"""\
+        # {project.name} Hypothesis
+
+        ## Component Under Optimization
+
+        - mutable artifact: `{project.mutable_artifact}`
+        - entrypoint: `{project.execution_entrypoint}`
+
+        ## Hypothesis
+
+        State the smallest credible claim for this project:
+
+        - what behavior should improve
+        - why that improvement is expected
+        - what change mechanism should produce it
+
+        ## Expected Metric Movement
+
+        - metric: `{project.metric_name}`
+        - expected direction: {comparison_hint}
+
+        ## Failure Meaning
+
+        Explain what a non-improving result should mean:
+
+        - weak hypothesis
+        - wrong project boundary
+        - insufficient data or fixture quality
+        - candidate change did not target the real bottleneck
+
+        ## Notes
+
+        Keep this file concise, public, and durable.
+        Update it when the project's learning claim changes materially.
         """
     )
 
