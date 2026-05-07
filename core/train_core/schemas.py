@@ -6,6 +6,86 @@ from train_core.agents import AgentMode
 from train_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
 from train_core.providers import ProviderKind
 
+TRINITY_REPLY_ADAPTER_NAME = "reply"
+TRINITY_REPLY_ADAPTER_CONTRACT_PREFIX = "trinity.reply."
+
+
+class ReplyTonePreferencesProposal(BaseModel):
+    target_tone: str = Field(min_length=1, max_length=80)
+    formality: str = Field(min_length=1, max_length=40)
+    warmth: str = Field(min_length=1, max_length=40)
+    directness: str = Field(min_length=1, max_length=40)
+    forbidden_tones: tuple[str, ...] = ()
+
+
+class ReplyBrevityPreferencesProposal(BaseModel):
+    target_length: str = Field(min_length=1, max_length=40)
+    max_sentences: int | None = Field(default=None, ge=1)
+    max_chars: int | None = Field(default=None, ge=1)
+    prefer_single_paragraph: bool = True
+
+
+class ReplyChannelRulesProposal(BaseModel):
+    opening_style: str = Field(min_length=1, max_length=80)
+    closing_style: str = Field(min_length=1, max_length=80)
+    emoji_policy: str = Field(min_length=1, max_length=40)
+    url_policy: str = Field(min_length=1, max_length=40)
+    attachment_reference_policy: str = Field(min_length=1, max_length=80)
+    newline_policy: str = Field(min_length=1, max_length=80)
+
+
+class ReplyBehaviorPolicyProposal(BaseModel):
+    artifact_key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    scope_kind: str = Field(min_length=1, max_length=40)
+    scope_value: str | None = None
+    created_at: datetime
+    source_project: str = Field(min_length=1, max_length=120)
+    tone_preferences: ReplyTonePreferencesProposal
+    brevity_preferences: ReplyBrevityPreferencesProposal
+    channel_rules: ReplyChannelRulesProposal
+    notes: str | None = None
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_policy_scope(self) -> "ReplyBehaviorPolicyProposal":
+        if self.scope_kind not in {"global", "company", "channel"}:
+            raise ValueError("Reply behavior policy scope_kind is invalid")
+        if self.scope_kind == "global" and self.scope_value is not None:
+            raise ValueError("Global reply behavior policy must not set scope_value")
+        if self.scope_kind in {"company", "channel"} and not self.scope_value:
+            raise ValueError("Company and channel reply behavior policy require scope_value")
+        if not _is_reply_adapter_contract_version(self.contract_version):
+            raise ValueError("Reply behavior policy contract_version is invalid")
+        return self
+
+
+class TrinityReplyPolicyProposalRequest(BaseModel):
+    learner_kind: str = Field(min_length=1, max_length=80)
+    bundle_files: tuple[str, ...] = Field(min_length=1)
+    baseline_policy_file: str | None = None
+    incumbent_policy_file: str | None = None
+    proposal_output_path: str | None = None
+    eval_output_path: str | None = None
+    comparison_output_path: str | None = None
+
+    @model_validator(mode="after")
+    def validate_request(self) -> "TrinityReplyPolicyProposalRequest":
+        if self.learner_kind not in {"tone", "brevity", "channel-formatting"}:
+            raise ValueError("learner_kind is invalid")
+        return self
+
+
+class TrinityReplyPolicyProposalRead(BaseModel):
+    learner_kind: str = Field(min_length=1, max_length=80)
+    bundle_count: int = Field(ge=1)
+    proposal: ReplyBehaviorPolicyProposal
+    eval_report: dict[str, object]
+    comparison_report: dict[str, object] | None = None
+    proposal_path: str | None = None
+    eval_output_path: str | None = None
+    comparison_output_path: str | None = None
+
 
 class RunCreate(BaseModel):
     project_key: str = Field(min_length=1, max_length=120)
@@ -263,6 +343,117 @@ class TrinityReplyDraftOutcome(BaseModel):
     notes: str | None = None
 
 
+class TrinityThreadMessageSnapshot(BaseModel):
+    message_id: str = Field(min_length=1)
+    role: str = Field(min_length=1, max_length=40)
+    text: str = Field(min_length=1)
+    occurred_at: datetime
+    channel: str = Field(min_length=1, max_length=40)
+    source: str = Field(min_length=1, max_length=80)
+    handle: str = Field(min_length=1)
+
+
+class TrinityThreadContextSnippet(BaseModel):
+    source: str = Field(min_length=1, max_length=120)
+    path: str = Field(min_length=1)
+    text: str = Field(min_length=1)
+
+
+class TrinityGoldenExample(BaseModel):
+    path: str = Field(min_length=1)
+    text: str = Field(min_length=1)
+
+
+class TrinityThreadSnapshotRecord(BaseModel):
+    company_id: str = Field(min_length=1, max_length=80)
+    thread_ref: str = Field(min_length=1)
+    channel: str = Field(min_length=1, max_length=40)
+    contact_handle: str = Field(min_length=1)
+    latest_inbound_text: str = Field(min_length=1)
+    requested_at: datetime
+    messages: tuple[TrinityThreadMessageSnapshot, ...] = ()
+    context_snippets: tuple[TrinityThreadContextSnippet, ...] = ()
+    golden_examples: tuple[TrinityGoldenExample, ...] = ()
+    metadata: dict[str, str] = Field(default_factory=dict)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinityThreadSnapshotRecord":
+        if not _is_reply_adapter_contract_version(self.contract_version):
+            raise ValueError("Thread snapshot contract_version is invalid")
+        return self
+
+
+class TrinityEvidenceSourceRef(BaseModel):
+    external_id: str = Field(min_length=1)
+    locator: str | None = None
+    version: str | None = None
+
+
+class TrinityEvidenceUnitRecord(BaseModel):
+    company_id: str = Field(min_length=1, max_length=80)
+    evidence_id: str = Field(min_length=1, max_length=80)
+    source_type: str = Field(min_length=1, max_length=80)
+    source_ref: TrinityEvidenceSourceRef
+    content_raw: str = Field(min_length=1)
+    content_canonical: str = Field(min_length=1)
+    content_hash: str = Field(min_length=1, max_length=128)
+    metadata: dict[str, str] = Field(default_factory=dict)
+    topic_hints: tuple[str, ...] = ()
+    created_at: datetime
+    updated_at: datetime
+
+
+class TrinityCandidateScoresRecord(BaseModel):
+    impact: int
+    confidence: int
+    ease: int
+    quality_score: float
+    urgency_score: float
+    freshness_score: float
+    feedback_score: float
+
+
+class TrinityRankedDraftCandidateRecord(BaseModel):
+    company_id: str = Field(min_length=1, max_length=80)
+    candidate_id: str = Field(min_length=1, max_length=80)
+    thread_ref: str = Field(min_length=1)
+    recipient_handle: str = Field(min_length=1)
+    channel: str = Field(min_length=1, max_length=40)
+    rank: int = Field(ge=1)
+    draft_text: str = Field(min_length=1)
+    rationale: str = Field(min_length=1)
+    risk_flags: tuple[str, ...] = ()
+    delivery_eligible: bool
+    scores: TrinityCandidateScoresRecord
+    source_evidence_ids: tuple[str, ...] = Field(min_length=1)
+    candidate_type: str = Field(min_length=1, max_length=80)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinityRankedDraftCandidateRecord":
+        if not _is_reply_adapter_contract_version(self.contract_version):
+            raise ValueError("Ranked draft candidate contract_version is invalid")
+        return self
+
+
+class TrinityRankedDraftSetRecord(BaseModel):
+    cycle_id: str = Field(min_length=1, max_length=80)
+    thread_ref: str = Field(min_length=1)
+    channel: str = Field(min_length=1, max_length=40)
+    generated_at: datetime
+    drafts: tuple[TrinityRankedDraftCandidateRecord, ...] = Field(min_length=1)
+    accepted_artifact_version: TrinityAcceptedArtifactVersion
+    trace_ref: str | None = None
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinityRankedDraftSetRecord":
+        if not _is_reply_adapter_contract_version(self.contract_version):
+            raise ValueError("Ranked draft set contract_version is invalid")
+        return self
+
+
 class TrinityReplyTraceRecord(BaseModel):
     contract_version: str = Field(min_length=1, max_length=120)
     cycle_id: str = Field(min_length=1, max_length=80)
@@ -275,6 +466,40 @@ class TrinityReplyTraceRecord(BaseModel):
 
     @model_validator(mode="after")
     def validate_contract_version(self) -> "TrinityReplyTraceRecord":
-        if not self.contract_version.startswith("trinity.reply."):
+        if not _is_reply_adapter_contract_version(self.contract_version):
             raise ValueError("Trinity reply trace contract_version is invalid")
         return self
+
+
+class TrinityTrainingBundleRecord(BaseModel):
+    bundle_id: str = Field(min_length=1, max_length=80)
+    bundle_type: str = Field(min_length=1, max_length=120)
+    exported_at: datetime
+    thread_snapshot: TrinityThreadSnapshotRecord
+    evidence_units: tuple[TrinityEvidenceUnitRecord, ...]
+    ranked_draft_set: TrinityRankedDraftSetRecord
+    selected_candidate_id: str | None = None
+    draft_outcome_event: TrinityReplyDraftOutcome
+    labels: dict[str, str] = Field(default_factory=dict)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_bundle(self) -> "TrinityTrainingBundleRecord":
+        if not _is_reply_adapter_contract_version(self.contract_version):
+            raise ValueError("Training bundle contract_version is invalid")
+        allowed_bundle_types = {
+            "tone-learning",
+            "brevity-learning",
+            "channel-formatting-learning",
+        }
+        if self.bundle_type not in allowed_bundle_types:
+            raise ValueError("Training bundle type is invalid")
+        if self.selected_candidate_id is not None:
+            ranked_candidate_ids = {draft.candidate_id for draft in self.ranked_draft_set.drafts}
+            if self.selected_candidate_id not in ranked_candidate_ids:
+                raise ValueError("selected_candidate_id must exist in ranked_draft_set.drafts")
+        return self
+
+
+def _is_reply_adapter_contract_version(contract_version: str) -> bool:
+    return str(contract_version or "").startswith(TRINITY_REPLY_ADAPTER_CONTRACT_PREFIX)

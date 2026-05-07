@@ -172,6 +172,10 @@ The benchmark should compare:
 - candidate
 - baseline when relevant
 
+For the standard comparison artifact shape, read:
+
+- `docs/COMPARISON_HARNESS.md`
+
 ## Mutable Artifact Contract
 
 The mutable artifact should be the smallest artifact that can express the learning claim.

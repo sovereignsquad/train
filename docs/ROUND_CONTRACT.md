@@ -132,7 +132,7 @@ State:
 - whether the evaluation path is identical
 - what direct deltas matter
 
-The comparison harness may be implemented later, but the round contract requires the comparison semantics now.
+The comparison semantics must follow the standard harness in `docs/COMPARISON_HARNESS.md`.
 
 ### 6. Main Decision
 

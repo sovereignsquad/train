@@ -61,7 +61,10 @@ from train_core.schemas import (
     RunCreate,
     RunHeartbeat,
     RunRead,
+    TrinityReplyPolicyProposalRead,
+    TrinityReplyPolicyProposalRequest,
 )
+from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -298,6 +301,27 @@ def get_run(run_id: int, db: Session = Depends(get_db)) -> RunRecord:
     if run is None:
         raise HTTPException(status_code=404, detail="Run not found")
     return run
+
+
+@app.post(
+    "/v1/trinity/reply/policies/propose",
+    response_model=TrinityReplyPolicyProposalRead,
+)
+def propose_trinity_reply_policy(
+    payload: TrinityReplyPolicyProposalRequest,
+) -> TrinityReplyPolicyProposalRead:
+    try:
+        return propose_reply_policy_from_bundle_files(
+            learner_kind=payload.learner_kind,
+            bundle_files=list(payload.bundle_files),
+            baseline_policy_file=payload.baseline_policy_file,
+            incumbent_policy_file=payload.incumbent_policy_file,
+            proposal_output_path=payload.proposal_output_path,
+            eval_output_path=payload.eval_output_path,
+            comparison_output_path=payload.comparison_output_path,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 def _project_mutation_from_payload(payload: ProjectWrite) -> ProjectMutation:
