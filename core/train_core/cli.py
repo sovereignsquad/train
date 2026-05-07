@@ -22,6 +22,11 @@ def main(argv: list[str] | None = None) -> int:
     propose_parser.add_argument("--proposal-output-path")
     propose_parser.add_argument("--eval-output-path")
     propose_parser.add_argument("--comparison-output-path")
+    propose_parser.add_argument(
+        "--output-format",
+        choices=("json", "summary", "matrix"),
+        default="json",
+    )
 
     args = parser.parse_args(argv)
 
@@ -35,11 +40,39 @@ def main(argv: list[str] | None = None) -> int:
             eval_output_path=args.eval_output_path,
             comparison_output_path=args.comparison_output_path,
         )
-        json.dump(result.model_dump(mode="json"), sys.stdout, indent=2, sort_keys=True)
-        sys.stdout.write("\n")
+        if args.output_format == "json":
+            json.dump(result.model_dump(mode="json"), sys.stdout, indent=2, sort_keys=True)
+            sys.stdout.write("\n")
+        elif args.output_format == "summary":
+            _write_summary(result)
+        else:
+            _write_matrix(result)
         return 0
 
     raise AssertionError("Unhandled command.")
+
+
+def _write_summary(result) -> None:
+    comparison = result.comparison_report or {}
+    summary = str(comparison.get("summary") or "")
+    if summary:
+        sys.stdout.write(f"{summary}\n")
+    rows = comparison.get("rows") or []
+    for row in rows:
+        label = str(row.get("label") or "?")
+        score = row.get("score")
+        status = str(row.get("status") or "")
+        rendered_score = "-" if score is None else f"{float(score):.6f}"
+        sys.stdout.write(f"{label}: {rendered_score} [{status}]\n")
+
+
+def _write_matrix(result) -> None:
+    comparison = result.comparison_report or {}
+    table = str(comparison.get("table_markdown") or "").strip()
+    if table:
+        sys.stdout.write(f"{table}\n")
+    else:
+        _write_summary(result)
 
 
 if __name__ == "__main__":

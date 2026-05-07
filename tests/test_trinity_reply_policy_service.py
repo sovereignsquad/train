@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from train_api.main import propose_trinity_reply_policy
+from train_core.cli import main as train_cli_main
 from train_core.trinity_tone_learner import learn_reply_tone_policy
 from train_core.schemas import TrinityReplyPolicyPromotionPackage, TrinityReplyPolicyProposalRequest
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
@@ -164,6 +165,28 @@ def test_train_api_proposes_reply_policy_from_bundle_files(tmp_path: Path) -> No
     assert response.proposal.scope_kind == "company"
     assert response.proposal.scope_value == "company-1"
     assert response.comparison_report is not None
+
+
+def test_train_cli_can_render_matrix_output(tmp_path: Path, capsys) -> None:
+    bundle_path = tmp_path / "bundle.json"
+    bundle_path.write_text(json.dumps({"bundle": _bundle_payload()}, indent=2), encoding="utf-8")
+
+    exit_code = train_cli_main(
+        [
+            "propose-reply-policy",
+            "--learner-kind",
+            "tone",
+            "--bundle-file",
+            str(bundle_path),
+            "--output-format",
+            "matrix",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "| Label | Artifact | Version | Score | Status | Notes |" in captured.out
+    assert "candidate" in captured.out
 
 
 def test_reply_policy_request_rejects_duplicate_bundle_files() -> None:
