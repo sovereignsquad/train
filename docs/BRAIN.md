@@ -64,6 +64,10 @@ Open-source repository quality is part of the product, not documentation polish 
 
 `{train}` must stay usable for optimizing external runtime systems without absorbing those runtime systems into its own core.
 
+### Invariant 7
+
+`{train}` must borrow optimization and evaluation discipline from adjacent ecosystems without collapsing into a generic prompt framework.
+
 ## Current Mental Model
 
 Today the project is best understood as:
@@ -103,6 +107,7 @@ Resist these failure modes:
 - turning `mythology` into platform code
 - turning `Mistral Vibe` into platform code
 - turning `{trinity}` runtime concerns into `{train}` engine code
+- turning `{train}` into "yet another prompt framework"
 - making local open-source models a prerequisite too early
 - building UI before the core execution loop is real
 

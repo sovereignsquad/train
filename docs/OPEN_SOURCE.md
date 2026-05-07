@@ -57,6 +57,33 @@ When writing code and docs:
 - avoid vendor lock-in in platform contracts
 - separate core platform logic from project-specific benchmarks
 - keep third-party integration boundaries explicit
+- borrow evaluation rigor from adjacent tools without reducing `{train}` to a prompt tool or pure eval runner
+
+## Ecosystem Positioning
+
+The project should learn from adjacent open-source systems such as:
+
+- optimization frameworks
+- eval runners
+- lightweight prompt/function toolkits
+
+But it should not rebrand itself as one of them.
+
+The intended identity is:
+
+- bounded optimizer
+- replay-based offline teacher
+- proposal generator with governance
+
+Not:
+
+- prompt IDE
+- prompt registry
+- thin prompt test runner
+
+See:
+
+- `docs/ECOSYSTEM_POSITIONING.md`
 
 ## Future Supporting Files
 
