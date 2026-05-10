@@ -17,6 +17,7 @@ Last meaningful tranche:
 - Spot review-policy proposals now carry explicit scope, so one-company corpora emit company-scoped artifacts that Trinity can adopt without cross-tenant leakage
 - open-source docs and comment guidance were tightened so README, setup, boundary docs, coding standards, and handover/status files describe the same bounded Reply-plus-Spot reality
 - the ranking-learning export contract required before future Trinity ranking-policy learner work is now defined explicitly in-repo
+- the retrieval-selection export contract required before future Trinity retrieval learner work is now defined explicitly in-repo
 
 Implemented or now present in the active working tree:
 
@@ -36,6 +37,7 @@ Implemented or now present in the active working tree:
 - docs aligned around the `{reply}` / `{trinity}` / `{train}` operating split
 - docs and inline comment standards now explicitly require public documentation to stay aligned with shipped behavior
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
+- `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
 - Spot review-policy proposal service from bundle files
 - `/v1/trinity/spot/policies/propose` endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI surface
@@ -48,18 +50,19 @@ Verified:
 - `uv run ruff check .`
 - targeted Spot and Reply proposal tests after the documentation consistency pass
 - ranking-export contract documentation pass for issue `#33`
+- retrieval-export contract documentation pass for issue `#34`
 
 ### What Needs To Happen Next
 
 1. decide whether `{train}` should own supervised API startup helpers or remain API-server passive
-2. define the retrieval-selection export contract tracked in GitHub issue `#34` before attempting learner work from `#31`
-3. define the skeptical-eval report contract tracked in GitHub issue `#35` before treating the broader `#32` lane as immediate implementation work
-4. keep the Reply-adapter policy lane reproducible and bounded
-5. avoid direct runtime mutation paths
-6. do not let ecosystem inspiration turn `{train}` into a prompt framework
-7. keep the Spot lane bounded to review-policy until Trinity has company-scoped Spot adoption and broader Spot artifact contracts
-8. keep README, coding standards, setup, boundary docs, and handover/status docs in sync whenever bounded capability scope changes
-9. do not start `#30` implementation until real `{trinity}` exports satisfy the new ranking-learning contract document
+2. define the skeptical-eval report contract tracked in GitHub issue `#35` before treating the broader `#32` lane as immediate implementation work
+3. keep the Reply-adapter policy lane reproducible and bounded
+4. avoid direct runtime mutation paths
+5. do not let ecosystem inspiration turn `{train}` into a prompt framework
+6. keep the Spot lane bounded to review-policy until Trinity has company-scoped Spot adoption and broader Spot artifact contracts
+7. keep README, coding standards, setup, boundary docs, and handover/status docs in sync whenever bounded capability scope changes
+8. do not start `#30` implementation until real `{trinity}` exports satisfy the ranking-learning contract document
+9. do not start `#31` implementation until real `{trinity}` exports satisfy the retrieval-selection contract document
 
 ### Watch Carefully
 

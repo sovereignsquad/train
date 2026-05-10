@@ -83,6 +83,10 @@ For the first explicit ranking-family contract definition, read:
 
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 
+For the first explicit retrieval-family contract definition, read:
+
+- `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
+
 ## Required Export Shape From `{trinity}`
 
 For `{train}` to improve richer runtime behavior safely, `{trinity}` must export:

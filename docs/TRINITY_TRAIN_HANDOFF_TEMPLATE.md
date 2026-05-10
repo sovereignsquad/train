@@ -53,6 +53,7 @@ Good first handoff candidates:
 For the current ranking-family export contract definition, read:
 
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
+- `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
 
 Bad first handoff candidates:
 
