@@ -43,6 +43,7 @@ The repository currently has:
 - company-aware scope inference for Reply policy proposals
 - fixed-shape baseline/incumbent/candidate comparison reporting for Reply policy proposals
 - repo-resident optimizer-boundary spec for the live-brain direction in `docs/TRINITY_LIVE_BRAIN_OPTIMIZATION_BOUNDARY.md`
+- repo-resident ranking-learning export contract spec for the future `{trinity}` ranking-family seam in `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - first bounded Spot training-bundle consumer and review-policy learner/eval path
 - `/v1/trinity/spot/policies/propose` API endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI entrypoint
@@ -55,6 +56,7 @@ Verified locally in the current implementation lane:
 - `uv run pytest`
 - `uv run ruff check .`
 - targeted Reply-adapter learner tests
+- targeted Spot review-policy tests
 - Reply proof lane through `scripts/prove_reply_cycle.py`
 
 ## Current Gaps
@@ -72,15 +74,16 @@ Still open:
 - more explicit minority-report and skeptical-eval lanes
 - longer unattended operator/runtime recovery exercises
 - richer Trinity runtime artifact families have not been exported yet, so no ranking or retrieval learners should be added ahead of those contracts
-- the next actionable board work for brain-adjacent learners is to define the missing export contracts captured in GitHub issues `#33` and `#34`, not to start learner implementation from `#30` or `#31` directly
+- the ranking-learning export contract lane from GitHub issue `#33` is now defined in-repo; the next contract blocker is retrieval-selection in `#34`
 - the skeptical-eval report contract should be pulled forward as explicit contract work via GitHub issue `#35` before the broader implementation lane in `#32`
 - Spot proposal/eval support is still only the first review-policy slice; no broader Spot threshold/routing/prompt artifact families are implemented yet
 - Spot scope support is still intentionally narrow: only `company` and `global` are supported for the first review-policy slice
+- public docs must keep describing the current bounded Reply-plus-Spot state accurately; do not let README or contributor docs drift back to Reply-only wording
 
 ## Immediate Next Steps
 
 1. keep the new Trinity-callable proposal seam stable and explicit
-2. define the missing `{trinity}` export contracts for ranking-learning and retrieval-selection so issues `#30` and `#31` become actually actionable
+2. define the retrieval-selection export contract so issue `#31` becomes actually actionable
 3. pull the skeptical-eval report shape forward as explicit contract work through issue `#35`, ahead of the broader implementation lane in `#32`
 4. keep proposal artifacts explicit and versioned
 5. avoid turning `{train}` into a second runtime

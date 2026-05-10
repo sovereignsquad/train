@@ -10,18 +10,19 @@ Current split:
 - `{trinity}` is the live drafting runtime
 - `{train}` improves bounded policy slices from exported traces and bundles
 
-## Current Role In The Reply Policy Loop
+## Current Policy Proposal Role
 
 `{train}` currently exists to consume replayable `{trinity}` artifacts and emit explicit proposals, not hidden runtime mutations.
 
-Current Reply-adapter policy work in this repo covers:
+Current bounded proposal work in this repo covers:
 
 - Trinity training-bundle ingestion
 - tone policy proposal generation
 - brevity policy proposal generation
 - channel-formatting policy proposal generation
+- Spot review-policy proposal generation
 - incumbent-vs-candidate policy eval reporting
-- API and CLI proposal surfaces for Trinity to request bounded Reply behavior policy proposals
+- API and CLI proposal surfaces for Trinity to request bounded Reply and Spot policy proposals
 
 ## Current Dependency Surface
 
@@ -68,24 +69,26 @@ uv run ruff check .
 uv run pytest
 ```
 
-## Current Reply-Oriented Capabilities
+## Current Bounded Capabilities
 
 Delivered or in active working tree:
 
 - `TrinityTrainingBundleRecord` ingestion schemas
+- `TrinitySpotTrainingBundleRecord` ingestion schemas
 - trace and training-bundle loaders
 - bounded tone learner
 - bounded brevity learner
 - bounded channel-formatting learner
-- reply policy eval report builder
+- bounded Spot review-policy learner
+- reply and Spot policy eval report builders
 
-These all operate on explicit Reply-adapter bundle inputs and explicit proposal outputs.
+These all operate on explicit exported bundle inputs and explicit proposal outputs.
 
 Current adapter posture:
 
 - `{trinity}` is now adapter-aware at the runtime and CLI layer
-- `{train}` currently consumes only Reply adapter artifacts
-- broad multi-adapter training support is not implemented yet
+- `{train}` currently consumes Reply adapter artifacts plus the first bounded Spot review-policy artifact family
+- broad multi-adapter training support beyond Reply and the first Spot slice is not implemented yet
 
 ## Setup And Run Surfaces
 
@@ -103,6 +106,16 @@ uv run python -m train_core.cli propose-reply-policy \
   --bundle-file /absolute/path/to/bundle.json \
   --proposal-output-path /absolute/path/to/proposal.json \
   --eval-output-path /absolute/path/to/eval_report.json
+```
+
+Spot review-policy proposal CLI:
+
+```bash
+uv run python -m train_core.cli propose-spot-review-policy \
+  --learner-kind review-policy \
+  --bundle-file /absolute/path/to/spot_bundle.json \
+  --proposal-output-path /absolute/path/to/spot_proposal.json \
+  --eval-output-path /absolute/path/to/spot_eval_report.json
 ```
 
 Provider checks:
@@ -136,6 +149,7 @@ uv run python scripts/prove_reply_cycle.py
 - [docs/STATUS.md](/Users/Shared/Projects/train/docs/STATUS.md)
 - [docs/HANDOVER.md](/Users/Shared/Projects/train/docs/HANDOVER.md)
 - [docs/SETUP.md](/Users/Shared/Projects/train/docs/SETUP.md)
+- [docs/CODING_STANDARDS.md](/Users/Shared/Projects/train/docs/CODING_STANDARDS.md)
 - [docs/HYPOTHESIS_CONTRACT.md](/Users/Shared/Projects/train/docs/HYPOTHESIS_CONTRACT.md)
 - [docs/POLICY_LOOP_REPO_BREAKDOWN.md](/Users/Shared/Projects/train/docs/POLICY_LOOP_REPO_BREAKDOWN.md)
 

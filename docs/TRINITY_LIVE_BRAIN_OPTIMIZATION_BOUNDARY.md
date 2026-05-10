@@ -79,6 +79,10 @@ Each artifact family must stay:
 - replayable
 - narrow enough to review and reject
 
+For the first explicit ranking-family contract definition, read:
+
+- `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
+
 ## Required Export Shape From `{trinity}`
 
 For `{train}` to improve richer runtime behavior safely, `{trinity}` must export:
@@ -115,6 +119,7 @@ Already implemented:
 
 - training-bundle ingestion
 - bounded Reply policy learners
+- bounded Spot review-policy learner
 - evaluation reports
 - comparison harness
 - proposal API and CLI surfaces
@@ -129,34 +134,35 @@ Not yet implemented, and not currently required:
 
 ## Comparison To Open GitHub Issues
 
-Checked against the public GitHub issue list on May 8, 2026.
+Checked against the public GitHub issue list on May 10, 2026.
 
 Already aligned:
 
 - issue `#1` provider-neutral autonomous optimization platform remains the umbrella
 - issue `#28` minority-report support becomes more important once proposals affect richer runtime behavior
+- issue `#30` tracks the future ranking-policy learner lane
+- issue `#31` tracks the future retrieval-selection learner lane
+- issue `#32` tracks the broader skeptical-eval lane
+- issue `#33` tracks the ranking-learning export contract prerequisite
+- issue `#34` tracks the retrieval-selection export contract prerequisite
+- issue `#35` tracks the skeptical-eval report contract prerequisite
 
-The public issue list does not yet explicitly cover:
+## Current Board Read
 
-- bounded optimization for retrieval or ranking policies from `{trinity}`
-- proposal-review rigor for prepared-draft or memory-adjacent artifacts
+The learner issues already exist, but they should not be treated as immediately implementable.
 
-Those should be added only after `{trinity}` exports the corresponding bounded artifacts.
+Current actionable unblockers:
 
-## Required New Issue Lanes
+1. define the ranking-learning export contract in issue `#33`
+2. define the retrieval-selection export contract in issue `#34`
+3. define the skeptical-eval report contract in issue `#35`
 
-Add these issues to `{train}`:
-
-1. `{train}: Add bounded ranking-policy learner for exported Trinity runtime cycles`
-2. `{train}: Add bounded retrieval-selection learner for exported Trinity retrieval traces`
-3. `{train}: Add skeptical eval lane for prepared-draft and retrieval policy proposals`
-
-These must stay blocked on `{trinity}` exposing explicit artifact families first.
+The broader learner lanes in `#30`-`#32` still depend on explicit `{trinity}` exports and review seams.
 
 ## Delivery Order
 
 1. keep current Reply policy learners stable
-2. wait for `{trinity}` to export richer bounded artifact families
+2. define and preserve explicit export contracts before learner implementation begins
 3. add one learner at a time with explicit replay and comparison reports
 4. preserve review and promotion discipline in `{trinity}`
 

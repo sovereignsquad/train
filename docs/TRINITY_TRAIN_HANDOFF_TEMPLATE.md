@@ -50,6 +50,10 @@ Good first handoff candidates:
 - retrieval weighting policy
 - abstain/escalation policy
 
+For the current ranking-family export contract definition, read:
+
+- `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
+
 Bad first handoff candidates:
 
 - whole conversation runtime
@@ -251,6 +255,10 @@ Not included:
 - UI behavior
 - transport semantics
 - live message retrieval
+
+The concrete ranking-learning export shape for this family should follow:
+
+- `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 
 ## Example Handoff: Tone Policy
 

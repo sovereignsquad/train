@@ -4,7 +4,7 @@
 
 This document defines the current local setup path for contributors working on `{train}`.
 
-It now includes the Reply-adapter policy learner lane, not just the earlier benchmark scaffolds.
+It now includes the bounded Reply and Spot policy learner lanes, not just the earlier benchmark scaffolds.
 
 ## Required Base Tools
 
@@ -31,9 +31,9 @@ uv run ruff check .
 uv run pytest
 ```
 
-## Current Reply Policy Loop Setup
+## Current Policy Loop Setup
 
-To work on the `{reply}` / `{trinity}` / `{train}` loop locally, also prepare:
+To work on the current `{trinity}` / `{train}` policy loops locally, also prepare:
 
 - `/Users/Shared/Projects/trinity`
 - replayable `{trinity}` training bundles or exported traces
@@ -42,7 +42,7 @@ Expected local sequence:
 
 1. bootstrap `{train}`
 2. bootstrap `{trinity}`
-3. generate or load Reply adapter training bundles
+3. generate or load Reply or Spot training bundles
 4. run learners and eval helpers
 
 ## API And UI
@@ -76,7 +76,7 @@ If the native shell cannot resolve `uv` from its launch environment:
 export TRAIN_UV_EXECUTABLE="$(command -v uv)"
 ```
 
-## Reply-Oriented Verification
+## Bounded Policy Verification
 
 Recommended checks for the current policy loop:
 
@@ -86,6 +86,8 @@ uv run pytest tests/test_trinity_tone_learner.py
 uv run pytest tests/test_trinity_brevity_learner.py
 uv run pytest tests/test_trinity_channel_formatting_learner.py
 uv run pytest tests/test_trinity_policy_eval.py
+uv run pytest tests/test_trinity_spot_training_bundle_loader.py
+uv run pytest tests/test_trinity_spot_policy_service.py
 ```
 
 Reply proof lane:
@@ -98,6 +100,14 @@ Provider connectivity:
 
 ```bash
 uv run python scripts/check_providers.py
+```
+
+Spot proposal lane:
+
+```bash
+uv run python -m train_core.cli propose-spot-review-policy \
+  --learner-kind review-policy \
+  --bundle-file /absolute/path/to/spot_bundle.json
 ```
 
 ## Environment Rules

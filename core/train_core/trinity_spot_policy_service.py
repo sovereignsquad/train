@@ -60,6 +60,8 @@ def learn_spot_review_policy(
         if bundle.spot_review_outcome.final_label == "Not Antisemitic"
         and bundle.spot_review_outcome.disposition == "CONFIRMED_NEGATIVE"
     ]
+    # This first bounded learner only derives the negative auto-approve threshold.
+    # Positive and fallback behavior remain explicit fixed policy flags.
     threshold = round(sum(negatives) / len(negatives), 4) if negatives else 0.72
     created = created_at or max(bundle.exported_at for bundle in ordered)
     return SpotReviewPolicyProposal(
@@ -162,6 +164,8 @@ def _write_json_file(path: str | Path | None, payload: dict[str, object]) -> Pat
 def _infer_spot_policy_scope(
     bundles: list[TrinitySpotTrainingBundleRecord],
 ) -> tuple[str, str | None]:
+    # Keep the first Spot scope contract intentionally narrow: one-company corpora
+    # produce a company-scoped artifact, and mixed corpora fall back to global.
     company_ids = {
         str(bundle.spot_reasoning_request.company_id).strip().lower() for bundle in bundles
     }

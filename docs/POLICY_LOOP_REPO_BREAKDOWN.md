@@ -97,13 +97,13 @@ Initial sections:
 - `channel_rules`
 
 Initial scopes:
+- `company`
 - `global`
 - `channel`
 
 Out of scope initially:
 - `thread_type`
 - contact-specific policy
-- company-specific policy
 - hidden runtime heuristics
 
 Acceptance:
@@ -257,7 +257,21 @@ Acceptance:
 
 Canonical schema ownership stays in `{trinity}`.
 
-This repo should consume one canonical field-level schema definition rather than carrying a copied catalog locally.
+This repo currently carries local validation models for the exported Trinity contract surface.
+Those models must stay aligned with the canonical exported contract, and the docs should not
+pretend the schema catalog lives only in another repo today.
+
+## Current Open-Source Reality
+
+Today the shipped bounded lanes are:
+
+- Reply behavior proposals for `tone`, `brevity`, and `channel-formatting`
+- Spot review-policy proposals for the first review-policy slice
+
+Current scope posture:
+
+- Reply proposals can be `global`, `company`, or `channel` scoped
+- Spot review-policy proposals are intentionally narrower and currently support only `company` and `global`
 
 Canonical reference:
 - `/Users/Shared/Projects/trinity/docs/POLICY_LOOP_REPO_BREAKDOWN.md`
