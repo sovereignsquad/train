@@ -9,6 +9,8 @@ from train_core.providers import ProviderKind
 
 TRINITY_REPLY_ADAPTER_NAME = "reply"
 TRINITY_REPLY_ADAPTER_CONTRACT_PREFIX = "trinity.reply."
+TRINITY_SPOT_ADAPTER_NAME = "spot"
+TRINITY_SPOT_ADAPTER_CONTRACT_PREFIX = "trinity.spot."
 
 
 class ReplyTonePreferencesProposal(BaseModel):
@@ -116,6 +118,59 @@ class TrinityReplyPolicyPromotionPackage(BaseModel):
         if self.comparison_report_path is not None and not os.path.isabs(self.comparison_report_path):
             raise ValueError("comparison_report_path must be absolute when provided")
         return self
+
+
+class SpotReviewPolicyProposal(BaseModel):
+    artifact_key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    scope_kind: str = Field(min_length=1, max_length=40)
+    scope_value: str | None = None
+    created_at: datetime
+    source_project: str = Field(min_length=1, max_length=120)
+    auto_approve_negative_threshold: float = Field(ge=0.0, le=1.0)
+    positive_review_required: bool = True
+    default_review_required: bool = True
+    notes: str | None = None
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_policy(self) -> "SpotReviewPolicyProposal":
+        if self.scope_kind not in {"global", "company"}:
+            raise ValueError("Spot review policy scope_kind is invalid")
+        if self.scope_kind == "global" and self.scope_value is not None:
+            raise ValueError("Global Spot review policy must not set scope_value")
+        if self.scope_kind == "company" and not self.scope_value:
+            raise ValueError("Company Spot review policy requires scope_value")
+        if not _is_spot_adapter_contract_version(self.contract_version):
+            raise ValueError("Spot review policy contract_version is invalid")
+        return self
+
+
+class TrinitySpotPolicyProposalRequest(BaseModel):
+    learner_kind: str = Field(min_length=1, max_length=80)
+    bundle_files: tuple[str, ...] = Field(min_length=1)
+    proposal_output_path: str | None = None
+    eval_output_path: str | None = None
+    comparison_output_path: str | None = None
+
+    @model_validator(mode="after")
+    def validate_request(self) -> "TrinitySpotPolicyProposalRequest":
+        if self.learner_kind != "review-policy":
+            raise ValueError("learner_kind is invalid")
+        if len(set(self.bundle_files)) != len(self.bundle_files):
+            raise ValueError("bundle_files must not contain duplicates")
+        return self
+
+
+class TrinitySpotPolicyProposalRead(BaseModel):
+    learner_kind: str = Field(min_length=1, max_length=80)
+    bundle_count: int = Field(ge=1)
+    proposal: SpotReviewPolicyProposal
+    eval_report: dict[str, object]
+    comparison_report: dict[str, object] | None = None
+    proposal_path: str | None = None
+    eval_output_path: str | None = None
+    comparison_output_path: str | None = None
 
 
 class RunCreate(BaseModel):
@@ -532,5 +587,110 @@ class TrinityTrainingBundleRecord(BaseModel):
         return self
 
 
+class TrinitySpotReasoningRequestRecord(BaseModel):
+    company_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    row_ref: str = Field(min_length=1)
+    language: str = Field(min_length=1)
+    message_text: str = Field(min_length=1)
+    source_platform: str | None = None
+    source_handle: str | None = None
+    occurred_at: datetime
+    metadata: dict[str, object] = Field(default_factory=dict)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinitySpotReasoningRequestRecord":
+        if not _is_spot_adapter_contract_version(self.contract_version):
+            raise ValueError("Spot reasoning request contract_version is invalid")
+        return self
+
+
+class TrinitySpotReasoningCandidateRecord(BaseModel):
+    candidate_key: str = Field(min_length=1)
+    interpretation: str = Field(min_length=1)
+    rationale: str = Field(min_length=1)
+    threat_label_hint: str | None = None
+    review_recommended: bool = False
+
+
+class TrinitySpotConfidenceBundleRecord(BaseModel):
+    generator_confidence: float = Field(ge=0.0, le=1.0)
+    refiner_confidence: float = Field(ge=0.0, le=1.0)
+    evaluator_confidence: float = Field(ge=0.0, le=1.0)
+    frontier_confidence: float = Field(ge=0.0, le=1.0)
+    combined_confidence: float = Field(ge=0.0, le=1.0)
+    disagreement_severity: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+class TrinitySpotReasoningResultRecord(BaseModel):
+    company_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    row_ref: str = Field(min_length=1)
+    generated_at: datetime
+    candidates: tuple[TrinitySpotReasoningCandidateRecord, ...] = Field(min_length=1)
+    selected_candidate_key: str = Field(min_length=1)
+    confidence_bundle: TrinitySpotConfidenceBundleRecord
+    review_required: bool = False
+    review_reason: str = ""
+    policy_sensitive: bool = False
+    automatic_disposition: str = Field(min_length=1)
+    human_override_allowed: bool = True
+    deeper_analysis_available: bool = True
+    escalation_recommended: bool = False
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinitySpotReasoningResultRecord":
+        if not _is_spot_adapter_contract_version(self.contract_version):
+            raise ValueError("Spot reasoning result contract_version is invalid")
+        return self
+
+
+class TrinitySpotReviewOutcomeRecord(BaseModel):
+    company_id: str = Field(min_length=1)
+    cycle_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    row_ref: str = Field(min_length=1)
+    selected_candidate_key: str = Field(min_length=1)
+    disposition: str = Field(min_length=1)
+    final_label: str = Field(min_length=1)
+    occurred_at: datetime
+    reviewer_notes: str | None = None
+    metadata: dict[str, object] = Field(default_factory=dict)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_contract_version(self) -> "TrinitySpotReviewOutcomeRecord":
+        if not _is_spot_adapter_contract_version(self.contract_version):
+            raise ValueError("Spot review outcome contract_version is invalid")
+        return self
+
+
+class TrinitySpotTrainingBundleRecord(BaseModel):
+    bundle_id: str = Field(min_length=1, max_length=80)
+    bundle_type: str = Field(min_length=1, max_length=120)
+    exported_at: datetime
+    spot_reasoning_request: TrinitySpotReasoningRequestRecord
+    spot_reasoning_result: TrinitySpotReasoningResultRecord
+    spot_review_outcome: TrinitySpotReviewOutcomeRecord
+    labels: dict[str, str] = Field(default_factory=dict)
+    contract_version: str = Field(min_length=1, max_length=120)
+
+    @model_validator(mode="after")
+    def validate_bundle(self) -> "TrinitySpotTrainingBundleRecord":
+        if not _is_spot_adapter_contract_version(self.contract_version):
+            raise ValueError("Spot training bundle contract_version is invalid")
+        if self.bundle_type != "spot-review-policy-learning":
+            raise ValueError("Spot training bundle type is invalid")
+        if self.spot_reasoning_request.run_id != self.spot_review_outcome.run_id:
+            raise ValueError("Spot review outcome run_id must match request run_id")
+        return self
+
+
 def _is_reply_adapter_contract_version(contract_version: str) -> bool:
     return str(contract_version or "").startswith(TRINITY_REPLY_ADAPTER_CONTRACT_PREFIX)
+
+
+def _is_spot_adapter_contract_version(contract_version: str) -> bool:
+    return str(contract_version or "").startswith(TRINITY_SPOT_ADAPTER_CONTRACT_PREFIX)

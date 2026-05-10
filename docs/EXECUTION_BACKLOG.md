@@ -37,25 +37,34 @@ Deliver the `{train}` portion of the cross-project boundary program without mixi
 - `TRAIN-003` Missing promotion contract for `{train}` to `{trinity}`
   The benchmark existed after implementation, but the repo still needed an explicit promotion rule for how optimized ranking artifacts map back into `{trinity}`-owned code. Fixed by adding `docs/TRINITY_FRONTIER_PROMOTION.md`.
 
+- `TRAIN-POLICY-001` Training bundle loader
+  The policy loop plan required `{train}` to consume bounded `{trinity}` learning bundles safely, but the repo only had a narrower trace loader. Fixed by extending the Trinity ingestion schemas with a validated training-bundle record, adding `load_trinity_training_bundle()` and directory loading helpers, and covering accepted, invalid-contract, and missing-candidate cases in tests.
+
+- `TRAIN-POLICY-002` Tone learner
+  The bundle loader established the input boundary, but `{train}` still had no first bounded learner that could turn exported operator outcomes into a candidate reply behavior artifact. Fixed by adding `core/train_core/trinity_tone_learner.py`, extending `core/train_core/schemas.py` with a versioned `ReplyBehaviorPolicyProposal` shape, and covering channel-scoped, global-scope, and invalid-bundle cases in tests.
+
+- `TRAIN-POLICY-003` Brevity learner
+  `{train}` could now learn tone, but it still lacked the bounded brevity slice needed to reduce operator rewrite severity caused by length mismatch. Fixed by adding `core/train_core/trinity_brevity_learner.py`, deriving deterministic brevity constraints from `brevity-learning` bundles, and covering channel-scoped, global-scope, and invalid-bundle cases in tests.
+
+- `TRAIN-POLICY-004` Channel formatting learner
+  `{train}` still lacked the bounded formatting slice for channel-specific presentation rules such as openings, URL handling, attachment mentions, and newline density. Fixed by adding `core/train_core/trinity_channel_formatting_learner.py`, deriving deterministic formatting rules from `channel-formatting-learning` bundles, and covering channel-scoped, global-scope, and invalid-bundle cases in tests.
+
+- `TRAIN-POLICY-005` Proposal artifact and eval report
+  The individual learners could emit candidate policy proposals, but `{train}` still lacked a deterministic report surface that packaged a candidate proposal alongside incumbent provenance and replay-corpus summary metrics. Fixed by adding `core/train_core/trinity_policy_eval.py`, defining a versioned replay-ready eval report shape, and covering incumbent-vs-candidate report generation in tests.
+
 ### Open
 
 - `TRAIN-004` Web toolchain major-version upgrade lane
   `apps/web` is clean on lint, production build, and audit after safe updates, but major upgrades remain for `eslint` and `typescript`. Those should be handled as a dedicated compatibility lane against the Next 16 toolchain.
 
-- `TRAIN-POLICY-001` Training bundle loader
-  Load and validate deterministic bounded learning bundles exported from `{trinity}`, with strict contract-version checks.
+- `TRAIN-BRAIN-001` Bounded ranking-policy learner for richer Trinity runtime exports
+  The live-brain direction may eventually let `{trinity}` export bounded ranking-policy artifacts, but `{train}` must only learn from explicit exported artifact families and must not infer live runtime ownership from this.
 
-- `TRAIN-POLICY-002` Tone learner
-  Build the first narrow learner that proposes bounded tone policy artifacts from exported operator outcomes.
+- `TRAIN-BRAIN-002` Bounded retrieval-selection learner for richer Trinity runtime exports
+  If `{trinity}` later exports replayable retrieval traces, `{train}` may optimize retrieval-selection policy proposals offline without becoming the live retrieval owner.
 
-- `TRAIN-POLICY-003` Brevity learner
-  Propose bounded brevity policy updates that reduce rewrite severity without regressing channel quality.
-
-- `TRAIN-POLICY-004` Channel formatting learner
-  Learn bounded per-channel formatting rules such as greeting shape, URL handling, attachment references, and newline density.
-
-- `TRAIN-POLICY-005` Proposal artifact and eval report
-  Every bounded training run must emit a versioned policy proposal plus an incumbent-vs-candidate replay report.
+- `TRAIN-BRAIN-003` Skeptical eval lane for prepared-draft and retrieval proposals
+  Brain-adjacent runtime artifacts will require stronger minority-report and skeptical-eval coverage before promotion back into `{trinity}`.
 
 ## Dependencies
 

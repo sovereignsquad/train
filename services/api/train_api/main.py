@@ -63,8 +63,11 @@ from train_core.schemas import (
     RunRead,
     TrinityReplyPolicyProposalRead,
     TrinityReplyPolicyProposalRequest,
+    TrinitySpotPolicyProposalRead,
+    TrinitySpotPolicyProposalRequest,
 )
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
+from train_core.trinity_spot_policy_service import propose_spot_review_policy_from_bundle_files
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -316,6 +319,25 @@ def propose_trinity_reply_policy(
             bundle_files=list(payload.bundle_files),
             baseline_policy_file=payload.baseline_policy_file,
             incumbent_policy_file=payload.incumbent_policy_file,
+            proposal_output_path=payload.proposal_output_path,
+            eval_output_path=payload.eval_output_path,
+            comparison_output_path=payload.comparison_output_path,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post(
+    "/v1/trinity/spot/policies/propose",
+    response_model=TrinitySpotPolicyProposalRead,
+)
+def propose_trinity_spot_policy(
+    payload: TrinitySpotPolicyProposalRequest,
+) -> TrinitySpotPolicyProposalRead:
+    try:
+        return propose_spot_review_policy_from_bundle_files(
+            learner_kind=payload.learner_kind,
+            bundle_files=list(payload.bundle_files),
             proposal_output_path=payload.proposal_output_path,
             eval_output_path=payload.eval_output_path,
             comparison_output_path=payload.comparison_output_path,
