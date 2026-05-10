@@ -18,6 +18,7 @@ Last meaningful tranche:
 - open-source docs and comment guidance were tightened so README, setup, boundary docs, coding standards, and handover/status files describe the same bounded Reply-plus-Spot reality
 - the ranking-learning export contract required before future Trinity ranking-policy learner work is now defined explicitly in-repo
 - the retrieval-selection export contract required before future Trinity retrieval learner work is now defined explicitly in-repo
+- the skeptical-eval report contract required before broader brain-adjacent review work is now defined explicitly in-repo
 
 Implemented or now present in the active working tree:
 
@@ -38,6 +39,7 @@ Implemented or now present in the active working tree:
 - docs and inline comment standards now explicitly require public documentation to stay aligned with shipped behavior
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
+- `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
 - Spot review-policy proposal service from bundle files
 - `/v1/trinity/spot/policies/propose` endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI surface
@@ -51,11 +53,12 @@ Verified:
 - targeted Spot and Reply proposal tests after the documentation consistency pass
 - ranking-export contract documentation pass for issue `#33`
 - retrieval-export contract documentation pass for issue `#34`
+- skeptical-eval report contract documentation pass for issue `#35`
 
 ### What Needs To Happen Next
 
 1. decide whether `{train}` should own supervised API startup helpers or remain API-server passive
-2. define the skeptical-eval report contract tracked in GitHub issue `#35` before treating the broader `#32` lane as immediate implementation work
+2. build the broader skeptical-eval lane in GitHub issue `#32` against the explicit report contract from `#35`
 3. keep the Reply-adapter policy lane reproducible and bounded
 4. avoid direct runtime mutation paths
 5. do not let ecosystem inspiration turn `{train}` into a prompt framework

@@ -87,6 +87,10 @@ For the first explicit retrieval-family contract definition, read:
 
 - `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
 
+For the first explicit skeptical review contract definition, read:
+
+- `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
+
 ## Required Export Shape From `{trinity}`
 
 For `{train}` to improve richer runtime behavior safely, `{trinity}` must export:
@@ -151,22 +155,20 @@ Already aligned:
 - issue `#34` tracks the retrieval-selection export contract prerequisite
 - issue `#35` tracks the skeptical-eval report contract prerequisite
 
+The explicit contract documents for issues `#33`-`#35` now exist in-repo.
+
 ## Current Board Read
 
 The learner issues already exist, but they should not be treated as immediately implementable.
 
-Current actionable unblockers:
-
-1. define the ranking-learning export contract in issue `#33`
-2. define the retrieval-selection export contract in issue `#34`
-3. define the skeptical-eval report contract in issue `#35`
-
-The broader learner lanes in `#30`-`#32` still depend on explicit `{trinity}` exports and review seams.
+The broader learner lanes in `#30`-`#32` still depend on explicit `{trinity}` exports and review
+seams. The contract prerequisites for `#33`-`#35` are now documented, so the next remaining work is
+implementation against those published seams.
 
 ## Delivery Order
 
 1. keep current Reply policy learners stable
-2. define and preserve explicit export contracts before learner implementation begins
+2. preserve the explicit export and skeptical-review contracts before learner implementation begins
 3. add one learner at a time with explicit replay and comparison reports
 4. preserve review and promotion discipline in `{trinity}`
 

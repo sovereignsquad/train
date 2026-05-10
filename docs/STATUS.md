@@ -45,6 +45,7 @@ The repository currently has:
 - repo-resident optimizer-boundary spec for the live-brain direction in `docs/TRINITY_LIVE_BRAIN_OPTIMIZATION_BOUNDARY.md`
 - repo-resident ranking-learning export contract spec for the future `{trinity}` ranking-family seam in `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - repo-resident retrieval-selection export contract spec for the future `{trinity}` retrieval-family seam in `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
+- repo-resident skeptical-eval report contract spec for higher-risk proposal review in `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
 - first bounded Spot training-bundle consumer and review-policy learner/eval path
 - `/v1/trinity/spot/policies/propose` API endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI entrypoint
@@ -76,8 +77,8 @@ Still open:
 - longer unattended operator/runtime recovery exercises
 - richer Trinity runtime artifact families have not been exported yet, so no ranking or retrieval learners should be added ahead of those contracts
 - the ranking-learning export contract lane from GitHub issue `#33` is now defined in-repo
-- the retrieval-selection export contract lane from GitHub issue `#34` is now defined in-repo; the next contract blocker is the skeptical-eval report shape in `#35`
-- the skeptical-eval report contract should be pulled forward as explicit contract work via GitHub issue `#35` before the broader implementation lane in `#32`
+- the retrieval-selection export contract lane from GitHub issue `#34` is now defined in-repo
+- the skeptical-eval report contract lane from GitHub issue `#35` is now defined in-repo; the next remaining work is broader skeptical-eval implementation in `#32`
 - Spot proposal/eval support is still only the first review-policy slice; no broader Spot threshold/routing/prompt artifact families are implemented yet
 - Spot scope support is still intentionally narrow: only `company` and `global` are supported for the first review-policy slice
 - public docs must keep describing the current bounded Reply-plus-Spot state accurately; do not let README or contributor docs drift back to Reply-only wording
@@ -85,8 +86,8 @@ Still open:
 ## Immediate Next Steps
 
 1. keep the new Trinity-callable proposal seam stable and explicit
-2. define the skeptical-eval report contract so issue `#32` can become more concrete before wider brain-adjacent learner work
-3. pull the skeptical-eval report shape forward as explicit contract work through issue `#35`, ahead of the broader implementation lane in `#32`
+2. build the broader skeptical-eval implementation lane in issue `#32` against the new explicit report contract
+3. keep rejection-ready review artifacts explicit, versioned, and replayable as richer proposal families widen
 4. keep proposal artifacts explicit and versioned
 5. avoid turning `{train}` into a second runtime
 6. avoid drifting into a generic prompt framework as the seam expands

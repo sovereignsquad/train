@@ -50,10 +50,11 @@ Good first handoff candidates:
 - retrieval weighting policy
 - abstain/escalation policy
 
-For the current ranking-family export contract definition, read:
+For the current contract definitions that gate richer Trinity handoffs, read:
 
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
+- `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
 
 Bad first handoff candidates:
 
