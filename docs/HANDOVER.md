@@ -19,6 +19,7 @@ Last meaningful tranche:
 - the ranking-learning export contract required before future Trinity ranking-policy learner work is now defined explicitly in-repo
 - the retrieval-selection export contract required before future Trinity retrieval learner work is now defined explicitly in-repo
 - the skeptical-eval report contract required before broader brain-adjacent review work is now defined explicitly in-repo
+- the first bounded skeptical-eval implementation lane now exists in code, API, CLI, and tests for higher-risk proposal review
 
 Implemented or now present in the active working tree:
 
@@ -40,6 +41,9 @@ Implemented or now present in the active working tree:
 - `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
 - `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
+- skeptical-eval report builder from comparison artifacts
+- `/v1/trinity/reviews/skeptical-eval` endpoint
+- `python -m train_core.cli build-skeptical-eval-report` CLI surface
 - Spot review-policy proposal service from bundle files
 - `/v1/trinity/spot/policies/propose` endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI surface
@@ -54,11 +58,12 @@ Verified:
 - ranking-export contract documentation pass for issue `#33`
 - retrieval-export contract documentation pass for issue `#34`
 - skeptical-eval report contract documentation pass for issue `#35`
+- targeted skeptical-eval implementation tests for issue `#32`
 
 ### What Needs To Happen Next
 
 1. decide whether `{train}` should own supervised API startup helpers or remain API-server passive
-2. build the broader skeptical-eval lane in GitHub issue `#32` against the explicit report contract from `#35`
+2. build the eval dataset registry in GitHub issue `#36` as the next shared substrate lane
 3. keep the Reply-adapter policy lane reproducible and bounded
 4. avoid direct runtime mutation paths
 5. do not let ecosystem inspiration turn `{train}` into a prompt framework
@@ -78,4 +83,4 @@ Verified:
 - do not let future “brain” language blur the ownership line: `{train}` improves exported artifacts, `{trinity}` remains the live runtime
 - do not overstate the current Spot support: `{train}` now has a first bounded Spot proposal/eval lane, not a broad Spot optimizer surface
 - do not drop the new scope discipline: one-company Spot corpora must stay company-scoped unless Trinity’s adoption contract is intentionally widened later
-- do not let public docs drift back to Reply-only wording while Spot support is present in the shipped repo
+- do not let public docs drift back to Reply-only wording while Spot and skeptical-review support are present in the shipped repo

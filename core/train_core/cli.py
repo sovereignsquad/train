@@ -5,6 +5,7 @@ import json
 import sys
 
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
+from train_core.trinity_skeptical_eval import build_skeptical_eval_report
 from train_core.trinity_spot_policy_service import propose_spot_review_policy_from_bundle_files
 
 
@@ -41,6 +42,30 @@ def main(argv: list[str] | None = None) -> int:
     propose_spot_parser.add_argument(
         "--output-format",
         choices=("json", "summary", "matrix"),
+        default="json",
+    )
+
+    skeptical_eval_parser = subparsers.add_parser(
+        "build-skeptical-eval-report",
+        help="Generate one skeptical review artifact from a bounded proposal and comparison report.",
+    )
+    skeptical_eval_parser.add_argument("--component-key", required=True)
+    skeptical_eval_parser.add_argument("--artifact-family", required=True)
+    skeptical_eval_parser.add_argument("--proposal-artifact-version", required=True)
+    skeptical_eval_parser.add_argument("--proposal-ref", required=True)
+    skeptical_eval_parser.add_argument("--comparison-report-file", required=True)
+    skeptical_eval_parser.add_argument("--review-scope-kind", required=True)
+    skeptical_eval_parser.add_argument("--review-scope-value")
+    skeptical_eval_parser.add_argument("--minimum-sample-count", type=int, default=5)
+    skeptical_eval_parser.add_argument("--minimum-improvement-delta", type=float, default=0.02)
+    skeptical_eval_parser.add_argument("--hidden-confound", action="append", default=[])
+    skeptical_eval_parser.add_argument("--overfitting-risk", action="append", default=[])
+    skeptical_eval_parser.add_argument("--weak-assumption", action="append", default=[])
+    skeptical_eval_parser.add_argument("--disconfirming-signal", action="append", default=[])
+    skeptical_eval_parser.add_argument("--skeptical-eval-output-path")
+    skeptical_eval_parser.add_argument(
+        "--output-format",
+        choices=("json", "summary"),
         default="json",
     )
 
@@ -82,6 +107,30 @@ def main(argv: list[str] | None = None) -> int:
             _write_matrix(result)
         return 0
 
+    if args.command == "build-skeptical-eval-report":
+        result = build_skeptical_eval_report(
+            component_key=str(args.component_key),
+            artifact_family=str(args.artifact_family),
+            proposal_artifact_version=str(args.proposal_artifact_version),
+            proposal_ref=str(args.proposal_ref),
+            comparison_report_file=str(args.comparison_report_file),
+            review_scope_kind=str(args.review_scope_kind),
+            review_scope_value=args.review_scope_value,
+            minimum_sample_count=int(args.minimum_sample_count),
+            minimum_improvement_delta=float(args.minimum_improvement_delta),
+            hidden_confounds=tuple(str(item) for item in args.hidden_confound),
+            overfitting_risks=tuple(str(item) for item in args.overfitting_risk),
+            weak_assumptions=tuple(str(item) for item in args.weak_assumption),
+            disconfirming_signals=tuple(str(item) for item in args.disconfirming_signal),
+            skeptical_eval_output_path=args.skeptical_eval_output_path,
+        )
+        if args.output_format == "json":
+            json.dump(result.model_dump(mode="json"), sys.stdout, indent=2, sort_keys=True)
+            sys.stdout.write("\n")
+        else:
+            _write_skeptical_summary(result)
+        return 0
+
     raise AssertionError("Unhandled command.")
 
 
@@ -106,6 +155,20 @@ def _write_matrix(result) -> None:
         sys.stdout.write(f"{table}\n")
     else:
         _write_summary(result)
+
+
+def _write_skeptical_summary(result) -> None:
+    report = result.skeptical_eval_report or {}
+    sys.stdout.write(f"{report.get('primary_decision_summary', '')}\n")
+    sys.stdout.write(
+        f"review_outcome: {report.get('review_outcome', '?')} "
+        f"[{report.get('promotion_readiness', '?')}]\n"
+    )
+    for item in report.get("rejection_evidence") or []:
+        reason = str(item.get("reason_code") or "?")
+        severity = str(item.get("severity") or "?")
+        blocking = "blocking" if item.get("blocking") else "advisory"
+        sys.stdout.write(f"{reason}: {severity} [{blocking}]\n")
 
 
 if __name__ == "__main__":

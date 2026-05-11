@@ -22,6 +22,7 @@ Current bounded proposal work in this repo covers:
 - channel-formatting policy proposal generation
 - Spot review-policy proposal generation
 - incumbent-vs-candidate policy eval reporting
+- skeptical-eval report generation for higher-risk proposal review
 - API and CLI proposal surfaces for Trinity to request bounded Reply and Spot policy proposals
 
 ## Current Dependency Surface
@@ -81,6 +82,7 @@ Delivered or in active working tree:
 - bounded channel-formatting learner
 - bounded Spot review-policy learner
 - reply and Spot policy eval report builders
+- skeptical-eval report builder for proposal review artifacts
 
 These all operate on explicit exported bundle inputs and explicit proposal outputs.
 
@@ -118,6 +120,19 @@ uv run python -m train_core.cli propose-spot-review-policy \
   --eval-output-path /absolute/path/to/spot_eval_report.json
 ```
 
+Skeptical-eval review CLI:
+
+```bash
+uv run python -m train_core.cli build-skeptical-eval-report \
+  --component-key memory_retriever \
+  --artifact-family retrieval_selection_policy \
+  --proposal-artifact-version retrieval_selection_policy.candidate.v1 \
+  --proposal-ref /absolute/path/to/proposal.json \
+  --comparison-report-file /absolute/path/to/comparison_report.json \
+  --review-scope-kind company \
+  --review-scope-value company-1
+```
+
 Provider checks:
 
 ```bash
@@ -137,6 +152,7 @@ uv run python scripts/prove_reply_cycle.py
 - consume exported `{trinity}` bundles
 - generate proposal artifacts
 - generate eval reports
+- generate skeptical review artifacts
 
 `{train}` may not:
 

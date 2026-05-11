@@ -46,6 +46,9 @@ The repository currently has:
 - repo-resident ranking-learning export contract spec for the future `{trinity}` ranking-family seam in `docs/TRINITY_RANKING_LEARNING_EXPORT_CONTRACT.md`
 - repo-resident retrieval-selection export contract spec for the future `{trinity}` retrieval-family seam in `docs/TRINITY_RETRIEVAL_SELECTION_EXPORT_CONTRACT.md`
 - repo-resident skeptical-eval report contract spec for higher-risk proposal review in `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
+- first bounded skeptical-eval report builder for higher-risk proposal review
+- `POST /v1/trinity/reviews/skeptical-eval` API endpoint
+- `python -m train_core.cli build-skeptical-eval-report` CLI entrypoint
 - first bounded Spot training-bundle consumer and review-policy learner/eval path
 - `/v1/trinity/spot/policies/propose` API endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI entrypoint
@@ -59,6 +62,7 @@ Verified locally in the current implementation lane:
 - `uv run ruff check .`
 - targeted Reply-adapter learner tests
 - targeted Spot review-policy tests
+- targeted skeptical-eval lane tests
 - Reply proof lane through `scripts/prove_reply_cycle.py`
 
 ## Current Gaps
@@ -73,21 +77,21 @@ Still intentionally not owned by `{train}`:
 Still open:
 
 - broader comparison harnesses and invariants beyond the first Reply-adapter slice
-- more explicit minority-report and skeptical-eval lanes
 - longer unattended operator/runtime recovery exercises
 - richer Trinity runtime artifact families have not been exported yet, so no ranking or retrieval learners should be added ahead of those contracts
 - the ranking-learning export contract lane from GitHub issue `#33` is now defined in-repo
 - the retrieval-selection export contract lane from GitHub issue `#34` is now defined in-repo
-- the skeptical-eval report contract lane from GitHub issue `#35` is now defined in-repo; the next remaining work is broader skeptical-eval implementation in `#32`
+- the skeptical-eval report contract lane from GitHub issue `#35` is now defined in-repo
+- the broader skeptical-eval implementation lane from GitHub issue `#32` is now implemented in a first bounded reusable form
 - Spot proposal/eval support is still only the first review-policy slice; no broader Spot threshold/routing/prompt artifact families are implemented yet
 - Spot scope support is still intentionally narrow: only `company` and `global` are supported for the first review-policy slice
-- public docs must keep describing the current bounded Reply-plus-Spot state accurately; do not let README or contributor docs drift back to Reply-only wording
+- public docs must keep describing the current bounded Reply-plus-Spot-plus-skeptical-review state accurately; do not let README or contributor docs drift backward
 
 ## Immediate Next Steps
 
 1. keep the new Trinity-callable proposal seam stable and explicit
-2. build the broader skeptical-eval implementation lane in issue `#32` against the new explicit report contract
-3. keep rejection-ready review artifacts explicit, versioned, and replayable as richer proposal families widen
+2. keep rejection-ready review artifacts explicit, versioned, and replayable as richer proposal families widen
+3. build the first-class eval dataset registry in issue `#36`
 4. keep proposal artifacts explicit and versioned
 5. avoid turning `{train}` into a second runtime
 6. avoid drifting into a generic prompt framework as the seam expands

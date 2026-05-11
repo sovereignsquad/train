@@ -130,6 +130,7 @@ Already implemented:
 - bounded Spot review-policy learner
 - evaluation reports
 - comparison harness
+- bounded skeptical-eval review lane for higher-risk proposal artifacts
 - proposal API and CLI surfaces
 - provider and agent registries
 
@@ -138,7 +139,7 @@ Not yet implemented, and not currently required:
 - learners for runtime ranking policies
 - learners for retrieval-selection policies
 - learners for prepared-draft refresh policies
-- richer minority-report and skeptical-eval lanes for brain-oriented proposals
+- richer retrieval-native and prepared-draft-native skeptical review specializations
 
 ## Comparison To Open GitHub Issues
 

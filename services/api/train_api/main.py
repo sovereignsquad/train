@@ -63,10 +63,13 @@ from train_core.schemas import (
     RunRead,
     TrinityReplyPolicyProposalRead,
     TrinityReplyPolicyProposalRequest,
+    TrinitySkepticalEvalRead,
+    TrinitySkepticalEvalRequest,
     TrinitySpotPolicyProposalRead,
     TrinitySpotPolicyProposalRequest,
 )
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
+from train_core.trinity_skeptical_eval import build_skeptical_eval_report
 from train_core.trinity_spot_policy_service import propose_spot_review_policy_from_bundle_files
 
 @asynccontextmanager
@@ -341,6 +344,36 @@ def propose_trinity_spot_policy(
             proposal_output_path=payload.proposal_output_path,
             eval_output_path=payload.eval_output_path,
             comparison_output_path=payload.comparison_output_path,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post(
+    "/v1/trinity/reviews/skeptical-eval",
+    response_model=TrinitySkepticalEvalRead,
+)
+def build_trinity_skeptical_eval(
+    payload: TrinitySkepticalEvalRequest,
+) -> TrinitySkepticalEvalRead:
+    try:
+        return build_skeptical_eval_report(
+            component_key=payload.component_key,
+            artifact_family=payload.artifact_family,
+            proposal_artifact_version=payload.proposal_artifact_version,
+            proposal_ref=payload.proposal_ref,
+            comparison_report_file=payload.comparison_report_file,
+            review_scope_kind=payload.review_scope_kind,
+            review_scope_value=payload.review_scope_value,
+            minimum_sample_count=payload.minimum_sample_count,
+            minimum_improvement_delta=payload.minimum_improvement_delta,
+            hidden_confounds=payload.hidden_confounds,
+            overfitting_risks=payload.overfitting_risks,
+            weak_assumptions=payload.weak_assumptions,
+            disconfirming_signals=payload.disconfirming_signals,
+            additional_rejection_evidence=payload.additional_rejection_evidence,
+            additional_disproof_tests=payload.additional_disproof_tests,
+            skeptical_eval_output_path=payload.skeptical_eval_output_path,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

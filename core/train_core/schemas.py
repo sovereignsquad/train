@@ -173,6 +173,69 @@ class TrinitySpotPolicyProposalRead(BaseModel):
     comparison_output_path: str | None = None
 
 
+class SkepticalEvalRejectionEvidenceInput(BaseModel):
+    reason_code: str = Field(min_length=1, max_length=80)
+    severity: str = Field(min_length=1, max_length=20)
+    evidence_summary: str = Field(min_length=1)
+    supporting_signal: str = Field(min_length=1)
+    blocking: bool = True
+
+    @model_validator(mode="after")
+    def validate_evidence(self) -> "SkepticalEvalRejectionEvidenceInput":
+        if self.severity not in {"LOW", "MEDIUM", "HIGH"}:
+            raise ValueError("skeptical rejection evidence severity is invalid")
+        return self
+
+
+class SkepticalEvalDisproofTestInput(BaseModel):
+    test_name: str = Field(min_length=1, max_length=160)
+    purpose: str = Field(min_length=1)
+    expected_failure_signal: str = Field(min_length=1)
+
+
+class TrinitySkepticalEvalRequest(BaseModel):
+    component_key: str = Field(min_length=1, max_length=120)
+    artifact_family: str = Field(min_length=1, max_length=120)
+    proposal_artifact_version: str = Field(min_length=1, max_length=160)
+    proposal_ref: str = Field(min_length=1)
+    comparison_report_file: str = Field(min_length=1)
+    review_scope_kind: str = Field(min_length=1, max_length=40)
+    review_scope_value: str | None = None
+    minimum_sample_count: int = Field(default=5, ge=1, le=10_000)
+    minimum_improvement_delta: float = Field(default=0.02, ge=0.0, le=1.0)
+    hidden_confounds: tuple[str, ...] = ()
+    overfitting_risks: tuple[str, ...] = ()
+    weak_assumptions: tuple[str, ...] = ()
+    disconfirming_signals: tuple[str, ...] = ()
+    additional_rejection_evidence: tuple[SkepticalEvalRejectionEvidenceInput, ...] = ()
+    additional_disproof_tests: tuple[SkepticalEvalDisproofTestInput, ...] = ()
+    skeptical_eval_output_path: str | None = None
+
+    @model_validator(mode="after")
+    def validate_request(self) -> "TrinitySkepticalEvalRequest":
+        if self.review_scope_kind not in {"global", "company", "channel"}:
+            raise ValueError("review_scope_kind is invalid")
+        if self.review_scope_kind == "global" and self.review_scope_value is not None:
+            raise ValueError("Global skeptical eval request must not set review_scope_value")
+        if self.review_scope_kind in {"company", "channel"} and not self.review_scope_value:
+            raise ValueError("Scoped skeptical eval request requires review_scope_value")
+        if not os.path.isabs(self.comparison_report_file):
+            raise ValueError("comparison_report_file must be absolute")
+        if self.skeptical_eval_output_path is not None and not os.path.isabs(
+            self.skeptical_eval_output_path
+        ):
+            raise ValueError("skeptical_eval_output_path must be absolute when provided")
+        return self
+
+
+class TrinitySkepticalEvalRead(BaseModel):
+    component_key: str = Field(min_length=1, max_length=120)
+    artifact_family: str = Field(min_length=1, max_length=120)
+    proposal_artifact_version: str = Field(min_length=1, max_length=160)
+    skeptical_eval_report: dict[str, object]
+    skeptical_eval_output_path: str | None = None
+
+
 class RunCreate(BaseModel):
     project_key: str = Field(min_length=1, max_length=120)
     title: str = Field(min_length=1, max_length=200)
