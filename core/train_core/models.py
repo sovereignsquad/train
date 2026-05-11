@@ -127,3 +127,48 @@ class ManagedProject(Base):
         default=utc_now,
         onupdate=utc_now,
     )
+
+
+class EvalDatasetRecord(Base):
+    __tablename__ = "eval_datasets"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    source_kind: Mapped[str] = mapped_column(String(40))
+    scope_kind: Mapped[str] = mapped_column(String(40))
+    scope_value: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    items_json: Mapped[str] = mapped_column(Text)
+    provenance_json: Mapped[str] = mapped_column(Text)
+    item_count: Mapped[int] = mapped_column(Integer)
+    fingerprint: Mapped[str] = mapped_column(String(64), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class EvalDatasetSliceRecord(Base):
+    __tablename__ = "eval_dataset_slices"
+
+    dataset_key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    dataset_version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    scope_kind: Mapped[str] = mapped_column(String(40))
+    scope_value: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    selection_item_keys_json: Mapped[str] = mapped_column(Text)
+    provenance_json: Mapped[str] = mapped_column(Text)
+    item_count: Mapped[int] = mapped_column(Integer)
+    fingerprint: Mapped[str] = mapped_column(String(64), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
+    )

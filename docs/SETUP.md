@@ -4,8 +4,8 @@
 
 This document defines the current local setup path for contributors working on `{train}`.
 
-It now includes the bounded Reply and Spot policy learner lanes plus the skeptical-eval review lane,
-not just the earlier benchmark scaffolds.
+It now includes the eval dataset registry, the bounded Reply and Spot policy learner lanes, and the
+skeptical-eval review lane, not just the earlier benchmark scaffolds.
 
 ## Required Base Tools
 
@@ -44,7 +44,8 @@ Expected local sequence:
 1. bootstrap `{train}`
 2. bootstrap `{trinity}`
 3. generate or load Reply or Spot training bundles
-4. run learners, comparison helpers, and skeptical review helpers
+4. optionally register reusable corpora and saved slices
+5. run learners, comparison helpers, and skeptical review helpers
 
 ## API And UI
 
@@ -90,6 +91,7 @@ uv run pytest tests/test_trinity_policy_eval.py
 uv run pytest tests/test_trinity_spot_training_bundle_loader.py
 uv run pytest tests/test_trinity_spot_policy_service.py
 uv run pytest tests/test_trinity_skeptical_eval.py
+uv run pytest tests/test_eval_datasets.py
 ```
 
 Reply proof lane:
@@ -111,6 +113,13 @@ uv run python -m train_core.cli propose-spot-review-policy \
   --learner-kind review-policy \
   --bundle-file /absolute/path/to/spot_bundle.json
 ```
+
+Dataset registry lane:
+
+Use the local API to register one reusable corpus, then save durable slices under it.
+
+See [docs/EVAL_DATASET_REGISTRY.md](/Users/Shared/Projects/train/docs/EVAL_DATASET_REGISTRY.md) for
+the current dataset and slice shape.
 
 Skeptical review lane:
 

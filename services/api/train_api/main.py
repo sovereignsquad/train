@@ -12,6 +12,19 @@ from train_core.agents import (
     serialize_launch_plan,
 )
 from train_core.config import settings
+from train_core.datasets import (
+    EvalDatasetError,
+    create_eval_dataset,
+    create_eval_dataset_slice,
+    delete_eval_dataset,
+    delete_eval_dataset_slice,
+    get_eval_dataset,
+    get_eval_dataset_slice,
+    list_eval_dataset_slices,
+    list_eval_datasets,
+    serialize_eval_dataset,
+    serialize_eval_dataset_slice,
+)
 from train_core.db import get_db, init_db
 from train_core.models import ProjectState, RunRecord
 from train_core.operator import (
@@ -49,6 +62,10 @@ from train_core.schemas import (
     AgentAdapterRead,
     AgentLaunchPlanRead,
     AgentStatusRead,
+    EvalDatasetRead,
+    EvalDatasetSliceRead,
+    EvalDatasetSliceWrite,
+    EvalDatasetWrite,
     OperatorStatusRead,
     ProviderAdapterRead,
     ProviderStatusRead,
@@ -223,6 +240,114 @@ def list_project_states(db: Session = Depends(get_db)) -> list[ProjectState]:
     return list(db.scalars(query))
 
 
+@app.get("/v1/eval-datasets", response_model=list[EvalDatasetRead])
+def get_eval_datasets(db: Session = Depends(get_db)) -> list[EvalDatasetRead]:
+    return [serialize_eval_dataset(dataset) for dataset in list_eval_datasets(db)]
+
+
+@app.post("/v1/eval-datasets", response_model=EvalDatasetRead, status_code=201)
+def create_eval_dataset_route(
+    payload: EvalDatasetWrite,
+    db: Session = Depends(get_db),
+) -> EvalDatasetRead:
+    try:
+        return serialize_eval_dataset(create_eval_dataset(db, payload))
+    except EvalDatasetError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/eval-datasets/{dataset_key}/versions/{dataset_version}", response_model=EvalDatasetRead)
+def get_eval_dataset_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    db: Session = Depends(get_db),
+) -> EvalDatasetRead:
+    dataset = get_eval_dataset(dataset_key, dataset_version, db)
+    if dataset is None:
+        raise HTTPException(status_code=404, detail="Eval dataset not found")
+    return serialize_eval_dataset(dataset)
+
+
+@app.delete("/v1/eval-datasets/{dataset_key}/versions/{dataset_version}", status_code=204)
+def delete_eval_dataset_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        delete_eval_dataset(db, dataset_key, dataset_version)
+    except EvalDatasetError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices",
+    response_model=list[EvalDatasetSliceRead],
+)
+def get_eval_dataset_slices_route(
+    dataset_key: str,
+    dataset_version: str,
+    db: Session = Depends(get_db),
+) -> list[EvalDatasetSliceRead]:
+    return [
+        serialize_eval_dataset_slice(item)
+        for item in list_eval_dataset_slices(dataset_key, dataset_version, db)
+    ]
+
+
+@app.post(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices",
+    response_model=EvalDatasetSliceRead,
+    status_code=201,
+)
+def create_eval_dataset_slice_route(
+    dataset_key: str,
+    dataset_version: str,
+    payload: EvalDatasetSliceWrite,
+    db: Session = Depends(get_db),
+) -> EvalDatasetSliceRead:
+    try:
+        return serialize_eval_dataset_slice(
+            create_eval_dataset_slice(db, dataset_key, dataset_version, payload)
+        )
+    except EvalDatasetError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices/{slice_key}/versions/{slice_version}",
+    response_model=EvalDatasetSliceRead,
+)
+def get_eval_dataset_slice_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    slice_key: str,
+    slice_version: str,
+    db: Session = Depends(get_db),
+) -> EvalDatasetSliceRead:
+    item = get_eval_dataset_slice(dataset_key, dataset_version, slice_key, slice_version, db)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Eval dataset slice not found")
+    return serialize_eval_dataset_slice(item)
+
+
+@app.delete(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices/{slice_key}/versions/{slice_version}",
+    status_code=204,
+)
+def delete_eval_dataset_slice_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    slice_key: str,
+    slice_version: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        delete_eval_dataset_slice(db, dataset_key, dataset_version, slice_key, slice_version)
+    except EvalDatasetError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @app.post("/v1/runs", response_model=RunRead)
 def create_run(payload: RunCreate, db: Session = Depends(get_db)) -> RunRecord:
     try:
@@ -320,6 +445,10 @@ def propose_trinity_reply_policy(
         return propose_reply_policy_from_bundle_files(
             learner_kind=payload.learner_kind,
             bundle_files=list(payload.bundle_files),
+            eval_dataset_key=payload.eval_dataset_key,
+            eval_dataset_version=payload.eval_dataset_version,
+            eval_dataset_slice_key=payload.eval_dataset_slice_key,
+            eval_dataset_slice_version=payload.eval_dataset_slice_version,
             baseline_policy_file=payload.baseline_policy_file,
             incumbent_policy_file=payload.incumbent_policy_file,
             proposal_output_path=payload.proposal_output_path,
@@ -341,6 +470,10 @@ def propose_trinity_spot_policy(
         return propose_spot_review_policy_from_bundle_files(
             learner_kind=payload.learner_kind,
             bundle_files=list(payload.bundle_files),
+            eval_dataset_key=payload.eval_dataset_key,
+            eval_dataset_version=payload.eval_dataset_version,
+            eval_dataset_slice_key=payload.eval_dataset_slice_key,
+            eval_dataset_slice_version=payload.eval_dataset_slice_version,
             proposal_output_path=payload.proposal_output_path,
             eval_output_path=payload.eval_output_path,
             comparison_output_path=payload.comparison_output_path,

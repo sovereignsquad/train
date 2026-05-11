@@ -16,6 +16,7 @@ Current split:
 
 Current bounded proposal work in this repo covers:
 
+- eval dataset registry with versioned corpora and saved slices
 - Trinity training-bundle ingestion
 - tone policy proposal generation
 - brevity policy proposal generation
@@ -74,6 +75,7 @@ uv run pytest
 
 Delivered or in active working tree:
 
+- eval dataset registry and saved slice model
 - `TrinityTrainingBundleRecord` ingestion schemas
 - `TrinitySpotTrainingBundleRecord` ingestion schemas
 - trace and training-bundle loaders
@@ -100,6 +102,13 @@ API:
 uv run uvicorn train_api.main:app --reload
 ```
 
+Eval dataset registry API:
+
+- `GET /v1/eval-datasets`
+- `POST /v1/eval-datasets`
+- `GET /v1/eval-datasets/{dataset_key}/versions/{dataset_version}`
+- `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices`
+
 Reply policy proposal CLI:
 
 ```bash
@@ -118,6 +127,15 @@ uv run python -m train_core.cli propose-spot-review-policy \
   --bundle-file /absolute/path/to/spot_bundle.json \
   --proposal-output-path /absolute/path/to/spot_proposal.json \
   --eval-output-path /absolute/path/to/spot_eval_report.json
+```
+
+Reply policy proposal from a registered dataset:
+
+```bash
+uv run python -m train_core.cli propose-reply-policy \
+  --learner-kind tone \
+  --eval-dataset-key reply_tone_corpus \
+  --eval-dataset-version 2026-05-11.1
 ```
 
 Skeptical-eval review CLI:
@@ -165,6 +183,7 @@ uv run python scripts/prove_reply_cycle.py
 - [docs/STATUS.md](/Users/Shared/Projects/train/docs/STATUS.md)
 - [docs/HANDOVER.md](/Users/Shared/Projects/train/docs/HANDOVER.md)
 - [docs/SETUP.md](/Users/Shared/Projects/train/docs/SETUP.md)
+- [docs/EVAL_DATASET_REGISTRY.md](/Users/Shared/Projects/train/docs/EVAL_DATASET_REGISTRY.md)
 - [docs/CODING_STANDARDS.md](/Users/Shared/Projects/train/docs/CODING_STANDARDS.md)
 - [docs/HYPOTHESIS_CONTRACT.md](/Users/Shared/Projects/train/docs/HYPOTHESIS_CONTRACT.md)
 - [docs/POLICY_LOOP_REPO_BREAKDOWN.md](/Users/Shared/Projects/train/docs/POLICY_LOOP_REPO_BREAKDOWN.md)

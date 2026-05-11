@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from pathlib import Path
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -65,7 +66,11 @@ class ReplyBehaviorPolicyProposal(BaseModel):
 
 class TrinityReplyPolicyProposalRequest(BaseModel):
     learner_kind: str = Field(min_length=1, max_length=80)
-    bundle_files: tuple[str, ...] = Field(min_length=1)
+    bundle_files: tuple[str, ...] = ()
+    eval_dataset_key: str | None = Field(default=None, max_length=120)
+    eval_dataset_version: str | None = Field(default=None, max_length=160)
+    eval_dataset_slice_key: str | None = Field(default=None, max_length=120)
+    eval_dataset_slice_version: str | None = Field(default=None, max_length=160)
     baseline_policy_file: str | None = None
     incumbent_policy_file: str | None = None
     proposal_output_path: str | None = None
@@ -76,8 +81,17 @@ class TrinityReplyPolicyProposalRequest(BaseModel):
     def validate_request(self) -> "TrinityReplyPolicyProposalRequest":
         if self.learner_kind not in {"tone", "brevity", "channel-formatting"}:
             raise ValueError("learner_kind is invalid")
-        if len(set(self.bundle_files)) != len(self.bundle_files):
+        if self.bundle_files and len(set(self.bundle_files)) != len(self.bundle_files):
             raise ValueError("bundle_files must not contain duplicates")
+        has_registry_ref = self.eval_dataset_key is not None or self.eval_dataset_version is not None
+        if not self.bundle_files and not has_registry_ref:
+            raise ValueError("Either bundle_files or eval_dataset_key/eval_dataset_version is required")
+        if has_registry_ref and (not self.eval_dataset_key or not self.eval_dataset_version):
+            raise ValueError("eval_dataset_key and eval_dataset_version must be provided together")
+        if self.eval_dataset_slice_key and not self.eval_dataset_slice_version:
+            raise ValueError("eval_dataset_slice_version is required when eval_dataset_slice_key is set")
+        if self.eval_dataset_slice_version and not self.eval_dataset_slice_key:
+            raise ValueError("eval_dataset_slice_key is required when eval_dataset_slice_version is set")
         return self
 
 
@@ -148,7 +162,11 @@ class SpotReviewPolicyProposal(BaseModel):
 
 class TrinitySpotPolicyProposalRequest(BaseModel):
     learner_kind: str = Field(min_length=1, max_length=80)
-    bundle_files: tuple[str, ...] = Field(min_length=1)
+    bundle_files: tuple[str, ...] = ()
+    eval_dataset_key: str | None = Field(default=None, max_length=120)
+    eval_dataset_version: str | None = Field(default=None, max_length=160)
+    eval_dataset_slice_key: str | None = Field(default=None, max_length=120)
+    eval_dataset_slice_version: str | None = Field(default=None, max_length=160)
     proposal_output_path: str | None = None
     eval_output_path: str | None = None
     comparison_output_path: str | None = None
@@ -157,8 +175,17 @@ class TrinitySpotPolicyProposalRequest(BaseModel):
     def validate_request(self) -> "TrinitySpotPolicyProposalRequest":
         if self.learner_kind != "review-policy":
             raise ValueError("learner_kind is invalid")
-        if len(set(self.bundle_files)) != len(self.bundle_files):
+        if self.bundle_files and len(set(self.bundle_files)) != len(self.bundle_files):
             raise ValueError("bundle_files must not contain duplicates")
+        has_registry_ref = self.eval_dataset_key is not None or self.eval_dataset_version is not None
+        if not self.bundle_files and not has_registry_ref:
+            raise ValueError("Either bundle_files or eval_dataset_key/eval_dataset_version is required")
+        if has_registry_ref and (not self.eval_dataset_key or not self.eval_dataset_version):
+            raise ValueError("eval_dataset_key and eval_dataset_version must be provided together")
+        if self.eval_dataset_slice_key and not self.eval_dataset_slice_version:
+            raise ValueError("eval_dataset_slice_version is required when eval_dataset_slice_key is set")
+        if self.eval_dataset_slice_version and not self.eval_dataset_slice_key:
+            raise ValueError("eval_dataset_slice_key is required when eval_dataset_slice_version is set")
         return self
 
 
@@ -234,6 +261,100 @@ class TrinitySkepticalEvalRead(BaseModel):
     proposal_artifact_version: str = Field(min_length=1, max_length=160)
     skeptical_eval_report: dict[str, object]
     skeptical_eval_output_path: str | None = None
+
+
+class EvalDatasetItem(BaseModel):
+    item_key: str = Field(min_length=1, max_length=120)
+    path: str = Field(min_length=1)
+    labels: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_item(self) -> "EvalDatasetItem":
+        if not os.path.isabs(self.path):
+            raise ValueError("dataset item path must be absolute")
+        if not Path(self.path).exists():
+            raise ValueError("dataset item path must exist")
+        return self
+
+
+class EvalDatasetWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    source_kind: str = Field(min_length=1, max_length=40)
+    scope_kind: str = Field(min_length=1, max_length=40)
+    scope_value: str | None = None
+    items: tuple[EvalDatasetItem, ...] = Field(min_length=1)
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_dataset(self) -> "EvalDatasetWrite":
+        if self.scope_kind not in {"global", "company", "channel"}:
+            raise ValueError("dataset scope_kind is invalid")
+        if self.scope_kind == "global" and self.scope_value is not None:
+            raise ValueError("Global dataset must not set scope_value")
+        if self.scope_kind in {"company", "channel"} and not self.scope_value:
+            raise ValueError("Scoped dataset requires scope_value")
+        item_keys = [item.item_key for item in self.items]
+        if len(set(item_keys)) != len(item_keys):
+            raise ValueError("dataset items must not contain duplicate item_key values")
+        return self
+
+
+class EvalDatasetRead(BaseModel):
+    key: str
+    version: str
+    ref: str
+    name: str
+    description: str
+    source_kind: str
+    scope_kind: str
+    scope_value: str | None
+    items: tuple[EvalDatasetItem, ...]
+    provenance: dict[str, object]
+    item_count: int
+    fingerprint: str
+
+
+class EvalDatasetSliceWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    scope_kind: str = Field(min_length=1, max_length=40)
+    scope_value: str | None = None
+    selection_item_keys: tuple[str, ...] = Field(min_length=1)
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_slice(self) -> "EvalDatasetSliceWrite":
+        if self.scope_kind not in {"global", "company", "channel"}:
+            raise ValueError("dataset slice scope_kind is invalid")
+        if self.scope_kind == "global" and self.scope_value is not None:
+            raise ValueError("Global dataset slice must not set scope_value")
+        if self.scope_kind in {"company", "channel"} and not self.scope_value:
+            raise ValueError("Scoped dataset slice requires scope_value")
+        if len(set(self.selection_item_keys)) != len(self.selection_item_keys):
+            raise ValueError("selection_item_keys must not contain duplicates")
+        return self
+
+
+class EvalDatasetSliceRead(BaseModel):
+    dataset_key: str
+    dataset_version: str
+    dataset_ref: str
+    key: str
+    version: str
+    ref: str
+    name: str
+    description: str
+    scope_kind: str
+    scope_value: str | None
+    selection_item_keys: tuple[str, ...]
+    provenance: dict[str, object]
+    item_count: int
+    fingerprint: str
 
 
 class RunCreate(BaseModel):

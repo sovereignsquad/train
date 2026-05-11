@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from train_core.datasets import resolve_eval_dataset_paths
 from train_core.schemas import TrinityReplyPolicyProposalRead
 from train_core.trinity_brevity_learner import learn_reply_brevity_policy
 from train_core.trinity_channel_formatting_learner import (
@@ -21,17 +22,28 @@ from train_core.trinity_trace_loader import load_trinity_training_bundle
 def propose_reply_policy_from_bundle_files(
     *,
     learner_kind: str,
-    bundle_files: list[str | Path],
+    bundle_files: list[str | Path] | None = None,
+    eval_dataset_key: str | None = None,
+    eval_dataset_version: str | None = None,
+    eval_dataset_slice_key: str | None = None,
+    eval_dataset_slice_version: str | None = None,
     baseline_policy_file: str | Path | None = None,
     incumbent_policy_file: str | Path | None = None,
     proposal_output_path: str | Path | None = None,
     eval_output_path: str | Path | None = None,
     comparison_output_path: str | Path | None = None,
 ) -> TrinityReplyPolicyProposalRead:
-    if not bundle_files:
+    resolved_bundle_files = _resolve_bundle_files(
+        bundle_files=bundle_files or [],
+        eval_dataset_key=eval_dataset_key,
+        eval_dataset_version=eval_dataset_version,
+        eval_dataset_slice_key=eval_dataset_slice_key,
+        eval_dataset_slice_version=eval_dataset_slice_version,
+    )
+    if not resolved_bundle_files:
         raise ValueError("At least one training bundle file is required.")
 
-    bundles = [load_trinity_training_bundle(path) for path in bundle_files]
+    bundles = [load_trinity_training_bundle(path) for path in resolved_bundle_files]
     proposal = _learn_policy(learner_kind, bundles)
     eval_report = build_reply_policy_eval_report(
         bundles,
@@ -74,6 +86,28 @@ def _learn_policy(learner_kind: str, bundles: list[Any]):
     if learner_kind == "channel-formatting":
         return learn_reply_channel_formatting_policy(bundles)
     raise ValueError("learner_kind is invalid")
+
+
+def _resolve_bundle_files(
+    *,
+    bundle_files: list[str | Path],
+    eval_dataset_key: str | None,
+    eval_dataset_version: str | None,
+    eval_dataset_slice_key: str | None,
+    eval_dataset_slice_version: str | None,
+) -> list[str | Path]:
+    if bundle_files:
+        return list(bundle_files)
+    if not eval_dataset_key or not eval_dataset_version:
+        return []
+    return list(
+        resolve_eval_dataset_paths(
+            dataset_key=eval_dataset_key,
+            dataset_version=eval_dataset_version,
+            slice_key=eval_dataset_slice_key,
+            slice_version=eval_dataset_slice_version,
+        )
+    )
 
 
 def _write_json_file(path: str | Path | None, payload: dict[str, Any]) -> Path | None:

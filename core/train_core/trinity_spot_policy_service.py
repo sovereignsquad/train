@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from train_core.datasets import resolve_eval_dataset_paths
 from train_core.schemas import (
     SpotReviewPolicyProposal,
     TrinitySpotPolicyProposalRead,
@@ -15,17 +16,28 @@ from train_core.trinity_trace_loader import load_trinity_spot_training_bundle
 def propose_spot_review_policy_from_bundle_files(
     *,
     learner_kind: str,
-    bundle_files: list[str | Path],
+    bundle_files: list[str | Path] | None = None,
+    eval_dataset_key: str | None = None,
+    eval_dataset_version: str | None = None,
+    eval_dataset_slice_key: str | None = None,
+    eval_dataset_slice_version: str | None = None,
     proposal_output_path: str | Path | None = None,
     eval_output_path: str | Path | None = None,
     comparison_output_path: str | Path | None = None,
 ) -> TrinitySpotPolicyProposalRead:
     if learner_kind != "review-policy":
         raise ValueError("learner_kind is invalid")
-    if not bundle_files:
+    resolved_bundle_files = _resolve_bundle_files(
+        bundle_files=bundle_files or [],
+        eval_dataset_key=eval_dataset_key,
+        eval_dataset_version=eval_dataset_version,
+        eval_dataset_slice_key=eval_dataset_slice_key,
+        eval_dataset_slice_version=eval_dataset_slice_version,
+    )
+    if not resolved_bundle_files:
         raise ValueError("At least one training bundle file is required.")
 
-    bundles = [load_trinity_spot_training_bundle(path) for path in bundle_files]
+    bundles = [load_trinity_spot_training_bundle(path) for path in resolved_bundle_files]
     proposal = learn_spot_review_policy(bundles)
     eval_report = build_spot_review_policy_eval_report(bundles, proposal)
     comparison_report = build_spot_review_policy_comparison_report(eval_report, proposal)
@@ -172,3 +184,25 @@ def _infer_spot_policy_scope(
     if len(company_ids) == 1:
         return "company", next(iter(company_ids))
     return "global", None
+
+
+def _resolve_bundle_files(
+    *,
+    bundle_files: list[str | Path],
+    eval_dataset_key: str | None,
+    eval_dataset_version: str | None,
+    eval_dataset_slice_key: str | None,
+    eval_dataset_slice_version: str | None,
+) -> list[str | Path]:
+    if bundle_files:
+        return list(bundle_files)
+    if not eval_dataset_key or not eval_dataset_version:
+        return []
+    return list(
+        resolve_eval_dataset_paths(
+            dataset_key=eval_dataset_key,
+            dataset_version=eval_dataset_version,
+            slice_key=eval_dataset_slice_key,
+            slice_version=eval_dataset_slice_version,
+        )
+    )
