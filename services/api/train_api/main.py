@@ -26,6 +26,15 @@ from train_core.datasets import (
     serialize_eval_dataset_slice,
 )
 from train_core.db import get_db, init_db
+from train_core.grader_suites import (
+    GraderSuiteError,
+    create_grader_suite,
+    delete_grader_suite,
+    get_grader_suite,
+    list_grader_suites,
+    run_grader_suite,
+    serialize_grader_suite,
+)
 from train_core.models import ProjectState, RunRecord
 from train_core.operator import (
     OperatorError,
@@ -66,6 +75,10 @@ from train_core.schemas import (
     EvalDatasetSliceRead,
     EvalDatasetSliceWrite,
     EvalDatasetWrite,
+    GraderSuiteRead,
+    GraderSuiteRunRead,
+    GraderSuiteRunRequest,
+    GraderSuiteWrite,
     OperatorStatusRead,
     ProviderAdapterRead,
     ProviderStatusRead,
@@ -346,6 +359,97 @@ def delete_eval_dataset_slice_by_version(
         delete_eval_dataset_slice(db, dataset_key, dataset_version, slice_key, slice_version)
     except EvalDatasetError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites",
+    response_model=list[GraderSuiteRead],
+)
+def get_grader_suites_route(
+    dataset_key: str,
+    dataset_version: str,
+    db: Session = Depends(get_db),
+) -> list[GraderSuiteRead]:
+    return [
+        serialize_grader_suite(item)
+        for item in list_grader_suites(dataset_key, dataset_version, db)
+    ]
+
+
+@app.post(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites",
+    response_model=GraderSuiteRead,
+    status_code=201,
+)
+def create_grader_suite_route(
+    dataset_key: str,
+    dataset_version: str,
+    payload: GraderSuiteWrite,
+    db: Session = Depends(get_db),
+) -> GraderSuiteRead:
+    try:
+        return serialize_grader_suite(create_grader_suite(db, dataset_key, dataset_version, payload))
+    except (EvalDatasetError, GraderSuiteError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites/{suite_key}/versions/{suite_version}",
+    response_model=GraderSuiteRead,
+)
+def get_grader_suite_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    suite_key: str,
+    suite_version: str,
+    db: Session = Depends(get_db),
+) -> GraderSuiteRead:
+    suite = get_grader_suite(dataset_key, dataset_version, suite_key, suite_version, db)
+    if suite is None:
+        raise HTTPException(status_code=404, detail="Grader suite not found")
+    return serialize_grader_suite(suite)
+
+
+@app.delete(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites/{suite_key}/versions/{suite_version}",
+    status_code=204,
+)
+def delete_grader_suite_by_version(
+    dataset_key: str,
+    dataset_version: str,
+    suite_key: str,
+    suite_version: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        delete_grader_suite(db, dataset_key, dataset_version, suite_key, suite_version)
+    except GraderSuiteError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post(
+    "/v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites/{suite_key}/versions/{suite_version}/runs",
+    response_model=GraderSuiteRunRead,
+)
+def run_grader_suite_route(
+    dataset_key: str,
+    dataset_version: str,
+    suite_key: str,
+    suite_version: str,
+    payload: GraderSuiteRunRequest,
+    db: Session = Depends(get_db),
+) -> GraderSuiteRunRead:
+    try:
+        return run_grader_suite(
+            dataset_key=dataset_key,
+            dataset_version=dataset_version,
+            key=suite_key,
+            version=suite_version,
+            payload=payload,
+            db=db,
+        )
+    except GraderSuiteError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/v1/runs", response_model=RunRead)

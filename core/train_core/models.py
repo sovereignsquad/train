@@ -172,3 +172,23 @@ class EvalDatasetSliceRecord(Base):
         default=utc_now,
         onupdate=utc_now,
     )
+
+
+class GraderSuiteRecord(Base):
+    __tablename__ = "grader_suites"
+
+    dataset_key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    dataset_version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    proposal_family: Mapped[str] = mapped_column(String(120), index=True)
+    graders_json: Mapped[str] = mapped_column(Text)
+    provenance_json: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
+    )

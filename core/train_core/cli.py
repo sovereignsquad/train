@@ -4,6 +4,8 @@ import argparse
 import json
 import sys
 
+from train_core.grader_suites import run_grader_suite
+from train_core.schemas import GraderSuiteRunRequest
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
 from train_core.trinity_skeptical_eval import build_skeptical_eval_report
 from train_core.trinity_spot_policy_service import propose_spot_review_policy_from_bundle_files
@@ -72,6 +74,24 @@ def main(argv: list[str] | None = None) -> int:
     skeptical_eval_parser.add_argument("--disconfirming-signal", action="append", default=[])
     skeptical_eval_parser.add_argument("--skeptical-eval-output-path")
     skeptical_eval_parser.add_argument(
+        "--output-format",
+        choices=("json", "summary"),
+        default="json",
+    )
+
+    grader_suite_parser = subparsers.add_parser(
+        "run-grader-suite",
+        help="Run one persistent grader suite against a comparison artifact.",
+    )
+    grader_suite_parser.add_argument("--dataset-key", required=True)
+    grader_suite_parser.add_argument("--dataset-version", required=True)
+    grader_suite_parser.add_argument("--suite-key", required=True)
+    grader_suite_parser.add_argument("--suite-version", required=True)
+    grader_suite_parser.add_argument("--proposal-family", required=True)
+    grader_suite_parser.add_argument("--proposal-artifact-version", required=True)
+    grader_suite_parser.add_argument("--comparison-report-file", required=True)
+    grader_suite_parser.add_argument("--output-path")
+    grader_suite_parser.add_argument(
         "--output-format",
         choices=("json", "summary"),
         default="json",
@@ -147,6 +167,26 @@ def main(argv: list[str] | None = None) -> int:
             _write_skeptical_summary(result)
         return 0
 
+    if args.command == "run-grader-suite":
+        result = run_grader_suite(
+            dataset_key=str(args.dataset_key),
+            dataset_version=str(args.dataset_version),
+            key=str(args.suite_key),
+            version=str(args.suite_version),
+            payload=GraderSuiteRunRequest(
+                proposal_family=str(args.proposal_family),
+                proposal_artifact_version=str(args.proposal_artifact_version),
+                comparison_report_file=str(args.comparison_report_file),
+                output_path=args.output_path,
+            ),
+        )
+        if args.output_format == "json":
+            json.dump(result.model_dump(mode="json"), sys.stdout, indent=2, sort_keys=True)
+            sys.stdout.write("\n")
+        else:
+            _write_grader_suite_summary(result)
+        return 0
+
     raise AssertionError("Unhandled command.")
 
 
@@ -185,6 +225,15 @@ def _write_skeptical_summary(result) -> None:
         severity = str(item.get("severity") or "?")
         blocking = "blocking" if item.get("blocking") else "advisory"
         sys.stdout.write(f"{reason}: {severity} [{blocking}]\n")
+
+
+def _write_grader_suite_summary(result) -> None:
+    sys.stdout.write(f"{result.summary}\n")
+    for item in result.grader_results:
+        status = str(item.get("status") or "?")
+        score = item.get("score")
+        rendered_score = "-" if score is None else f"{float(score):.6f}"
+        sys.stdout.write(f"{item.get('grader_key', '?')}: {rendered_score} [{status}]\n")
 
 
 if __name__ == "__main__":

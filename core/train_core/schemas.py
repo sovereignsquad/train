@@ -357,6 +357,79 @@ class EvalDatasetSliceRead(BaseModel):
     fingerprint: str
 
 
+class GraderDefinition(BaseModel):
+    grader_key: str = Field(min_length=1, max_length=120)
+    grader_kind: str = Field(min_length=1, max_length=20)
+    entrypoint_ref: str = Field(min_length=1, max_length=200)
+    metric_name: str = Field(min_length=1, max_length=120)
+    pass_threshold: float | None = None
+    config: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_grader(self) -> "GraderDefinition":
+        if self.grader_kind not in {"code", "model"}:
+            raise ValueError("grader_kind is invalid")
+        return self
+
+
+class GraderSuiteWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    proposal_family: str = Field(min_length=1, max_length=120)
+    graders: tuple[GraderDefinition, ...] = Field(min_length=1)
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_suite(self) -> "GraderSuiteWrite":
+        grader_keys = [grader.grader_key for grader in self.graders]
+        if len(set(grader_keys)) != len(grader_keys):
+            raise ValueError("grader suites must not contain duplicate grader_key values")
+        return self
+
+
+class GraderSuiteRead(BaseModel):
+    dataset_key: str
+    dataset_version: str
+    dataset_ref: str
+    key: str
+    version: str
+    ref: str
+    name: str
+    description: str
+    proposal_family: str
+    graders: tuple[GraderDefinition, ...]
+    provenance: dict[str, object]
+
+
+class GraderSuiteRunRequest(BaseModel):
+    proposal_family: str = Field(min_length=1, max_length=120)
+    proposal_artifact_version: str = Field(min_length=1, max_length=160)
+    comparison_report_file: str = Field(min_length=1)
+    output_path: str | None = None
+
+    @model_validator(mode="after")
+    def validate_run_request(self) -> "GraderSuiteRunRequest":
+        if not os.path.isabs(self.comparison_report_file):
+            raise ValueError("comparison_report_file must be absolute")
+        if self.output_path is not None and not os.path.isabs(self.output_path):
+            raise ValueError("output_path must be absolute when provided")
+        return self
+
+
+class GraderSuiteRunRead(BaseModel):
+    suite_ref: str
+    dataset_ref: str
+    proposal_family: str
+    proposal_artifact_version: str
+    comparison_ref: str
+    generated_at: str
+    grader_results: tuple[dict[str, object], ...]
+    summary: str
+    output_path: str | None = None
+
+
 class RunCreate(BaseModel):
     project_key: str = Field(min_length=1, max_length=120)
     title: str = Field(min_length=1, max_length=200)

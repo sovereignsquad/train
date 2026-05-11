@@ -32,6 +32,7 @@ The repository currently has:
 - web operator UI
 - project registry and run lifecycle
 - eval dataset registry with versioned corpora and saved slices
+- persistent grader-suite registry attached to datasets and proposal families
 - provider registry and operator recovery
 - reference benchmark projects
 - `{trinity}` trace and training-bundle ingestion models
@@ -52,6 +53,9 @@ The repository currently has:
 - `python -m train_core.cli build-skeptical-eval-report` CLI entrypoint
 - `POST /v1/eval-datasets` API endpoint
 - `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices` API endpoint
+- `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites` API endpoint
+- `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites/{suite_key}/versions/{suite_version}/runs` API endpoint
+- `python -m train_core.cli run-grader-suite` CLI entrypoint
 - first bounded Spot training-bundle consumer and review-policy learner/eval path
 - `/v1/trinity/spot/policies/propose` API endpoint
 - `python -m train_core.cli propose-spot-review-policy` CLI entrypoint
@@ -67,6 +71,7 @@ Verified locally in the current implementation lane:
 - targeted Spot review-policy tests
 - targeted skeptical-eval lane tests
 - targeted eval dataset registry tests
+- targeted persistent grader-suite tests
 - Reply proof lane through `scripts/prove_reply_cycle.py`
 
 ## Current Gaps
@@ -88,6 +93,7 @@ Still open:
 - the skeptical-eval report contract lane from GitHub issue `#35` is now defined in-repo
 - the broader skeptical-eval implementation lane from GitHub issue `#32` is now implemented in a first bounded reusable form
 - the eval dataset registry lane from GitHub issue `#36` is now implemented in a first bounded reusable form
+- the persistent grader-suite lane from GitHub issue `#37` is now implemented in a first bounded reusable form
 - Spot proposal/eval support is still only the first review-policy slice; no broader Spot threshold/routing/prompt artifact families are implemented yet
 - Spot scope support is still intentionally narrow: only `company` and `global` are supported for the first review-policy slice
 - public docs must keep describing the current bounded Reply-plus-Spot-plus-skeptical-review state accurately; do not let README or contributor docs drift backward
@@ -96,7 +102,7 @@ Still open:
 
 1. keep the new Trinity-callable proposal seam stable and explicit
 2. keep rejection-ready review artifacts explicit, versioned, and replayable as richer proposal families widen
-3. build persistent grader suites in issue `#37`
+3. build hybrid evaluator support in issue `#38`
 4. keep proposal artifacts explicit and versioned
 5. avoid turning `{train}` into a second runtime
 6. avoid drifting into a generic prompt framework as the seam expands

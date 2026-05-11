@@ -4,8 +4,8 @@
 
 This document defines the current local setup path for contributors working on `{train}`.
 
-It now includes the eval dataset registry, the bounded Reply and Spot policy learner lanes, and the
-skeptical-eval review lane, not just the earlier benchmark scaffolds.
+It now includes the eval dataset registry, persistent grader suites, the bounded Reply and Spot
+policy learner lanes, and the skeptical-eval review lane, not just the earlier benchmark scaffolds.
 
 ## Required Base Tools
 
@@ -92,6 +92,7 @@ uv run pytest tests/test_trinity_spot_training_bundle_loader.py
 uv run pytest tests/test_trinity_spot_policy_service.py
 uv run pytest tests/test_trinity_skeptical_eval.py
 uv run pytest tests/test_eval_datasets.py
+uv run pytest tests/test_grader_suites.py
 ```
 
 Reply proof lane:
@@ -120,6 +121,19 @@ Use the local API to register one reusable corpus, then save durable slices unde
 
 See [docs/EVAL_DATASET_REGISTRY.md](/Users/Shared/Projects/train/docs/EVAL_DATASET_REGISTRY.md) for
 the current dataset and slice shape.
+
+Persistent grader-suite lane:
+
+```bash
+uv run python -m train_core.cli run-grader-suite \
+  --dataset-key reply_tone_corpus \
+  --dataset-version 2026-05-11.1 \
+  --suite-key core_review \
+  --suite-version 2026-05-11.1 \
+  --proposal-family reply_behavior_policy \
+  --proposal-artifact-version reply_behavior_policy.tone.candidate.v2 \
+  --comparison-report-file /absolute/path/to/comparison_report.json
+```
 
 Skeptical review lane:
 

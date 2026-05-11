@@ -9,7 +9,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 from train_core.db import SessionLocal
-from train_core.models import EvalDatasetRecord, EvalDatasetSliceRecord
+from train_core.models import EvalDatasetRecord, EvalDatasetSliceRecord, GraderSuiteRecord
 from train_core.schemas import (
     EvalDatasetItem,
     EvalDatasetRead,
@@ -110,6 +110,10 @@ def delete_eval_dataset(db: Session, key: str, version: str) -> None:
     db.query(EvalDatasetSliceRecord).filter(
         EvalDatasetSliceRecord.dataset_key == key,
         EvalDatasetSliceRecord.dataset_version == version,
+    ).delete()
+    db.query(GraderSuiteRecord).filter(
+        GraderSuiteRecord.dataset_key == key,
+        GraderSuiteRecord.dataset_version == version,
     ).delete()
     db.delete(row)
     db.commit()
