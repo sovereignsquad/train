@@ -367,7 +367,7 @@ class GraderDefinition(BaseModel):
 
     @model_validator(mode="after")
     def validate_grader(self) -> "GraderDefinition":
-        if self.grader_kind not in {"code", "model"}:
+        if self.grader_kind not in {"code", "model", "human"}:
             raise ValueError("grader_kind is invalid")
         return self
 
@@ -407,12 +407,22 @@ class GraderSuiteRunRequest(BaseModel):
     proposal_family: str = Field(min_length=1, max_length=120)
     proposal_artifact_version: str = Field(min_length=1, max_length=160)
     comparison_report_file: str = Field(min_length=1)
+    evaluator_artifact_files: tuple[dict[str, str], ...] = ()
     output_path: str | None = None
 
     @model_validator(mode="after")
     def validate_run_request(self) -> "GraderSuiteRunRequest":
         if not os.path.isabs(self.comparison_report_file):
             raise ValueError("comparison_report_file must be absolute")
+        for item in self.evaluator_artifact_files:
+            grader_key = str(item.get("grader_key") or "").strip()
+            path = str(item.get("path") or "").strip()
+            if not grader_key:
+                raise ValueError("evaluator_artifact_files entries require grader_key")
+            if not path:
+                raise ValueError("evaluator_artifact_files entries require path")
+            if not os.path.isabs(path):
+                raise ValueError("evaluator artifact path must be absolute")
         if self.output_path is not None and not os.path.isabs(self.output_path):
             raise ValueError("output_path must be absolute when provided")
         return self
@@ -426,6 +436,7 @@ class GraderSuiteRunRead(BaseModel):
     comparison_ref: str
     generated_at: str
     grader_results: tuple[dict[str, object], ...]
+    disagreements: tuple[dict[str, object], ...] = ()
     summary: str
     output_path: str | None = None
 

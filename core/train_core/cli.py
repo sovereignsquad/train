@@ -90,6 +90,12 @@ def main(argv: list[str] | None = None) -> int:
     grader_suite_parser.add_argument("--proposal-family", required=True)
     grader_suite_parser.add_argument("--proposal-artifact-version", required=True)
     grader_suite_parser.add_argument("--comparison-report-file", required=True)
+    grader_suite_parser.add_argument(
+        "--evaluator-artifact-file",
+        action="append",
+        default=[],
+        help="Pair in the form grader_key=/absolute/path/to/artifact.json",
+    )
     grader_suite_parser.add_argument("--output-path")
     grader_suite_parser.add_argument(
         "--output-format",
@@ -177,6 +183,7 @@ def main(argv: list[str] | None = None) -> int:
                 proposal_family=str(args.proposal_family),
                 proposal_artifact_version=str(args.proposal_artifact_version),
                 comparison_report_file=str(args.comparison_report_file),
+                evaluator_artifact_files=tuple(_parse_evaluator_artifact_files(args.evaluator_artifact_file)),
                 output_path=args.output_path,
             ),
         )
@@ -234,6 +241,18 @@ def _write_grader_suite_summary(result) -> None:
         score = item.get("score")
         rendered_score = "-" if score is None else f"{float(score):.6f}"
         sys.stdout.write(f"{item.get('grader_key', '?')}: {rendered_score} [{status}]\n")
+    for item in result.disagreements:
+        sys.stdout.write(f"disagreement: {item.get('summary', '')}\n")
+
+
+def _parse_evaluator_artifact_files(values: list[str]) -> list[dict[str, str]]:
+    parsed: list[dict[str, str]] = []
+    for value in values:
+        grader_key, separator, path = str(value).partition("=")
+        if not separator or not grader_key.strip() or not path.strip():
+            raise ValueError("evaluator artifact files must use grader_key=/absolute/path syntax")
+        parsed.append({"grader_key": grader_key.strip(), "path": path.strip()})
+    return parsed
 
 
 if __name__ == "__main__":

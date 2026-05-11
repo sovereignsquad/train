@@ -140,7 +140,10 @@ def test_grader_suite_persists_and_runs(tmp_path: Path) -> None:
         assert result.output_path == str(output_path.resolve())
         assert result.suite_ref == f"{dataset_key}@{dataset_version}:{suite_key}@{suite_version}"
         assert any(item["grader_key"] == "incumbent_delta" and item["passed"] is True for item in result.grader_results)
-        assert any(item["grader_key"] == "retrieval_judge_ref" and item["status"] == "reference_only" for item in result.grader_results)
+        assert any(
+            item["grader_key"] == "retrieval_judge_ref" and item["status"] == "missing_artifact"
+            for item in result.grader_results
+        )
 
         delete_eval_dataset(db, dataset_key, dataset_version)
 
@@ -244,4 +247,130 @@ def test_grader_suite_routes_and_cli(tmp_path: Path, capsys) -> None:
     assert "sample_count" in captured.out
 
     with SessionLocal() as db:
+        delete_eval_dataset(db, dataset_key, dataset_version)
+
+
+def test_hybrid_grader_suite_imports_model_and_human_artifacts(tmp_path: Path) -> None:
+    init_db()
+    dataset_key = "hybrid-grader-dataset"
+    dataset_version = "2026-05-11.1"
+    suite_key = "hybrid-suite"
+    suite_version = "2026-05-11.1"
+    corpus_file = tmp_path / "corpus.json"
+    corpus_file.write_text("{}", encoding="utf-8")
+    comparison_path = _write_comparison_report(tmp_path / "comparison.json")
+    model_artifact = tmp_path / "model-judge.json"
+    human_artifact = tmp_path / "human-review.json"
+    model_artifact.write_text(
+        json.dumps(
+            {
+                "grader_kind": "model",
+                "score": 0.64,
+                "passed": False,
+                "notes": "Model judge is unconvinced by the candidate gain.",
+                "provenance": {"model": "gpt-5.5"},
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    human_artifact.write_text(
+        json.dumps(
+            {
+                "grader_kind": "human",
+                "score": 1.0,
+                "passed": True,
+                "notes": "Reviewer accepts the proposal for limited rollout.",
+                "provenance": {"reviewer": "ops-1"},
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    with SessionLocal() as db:
+        if get_eval_dataset(dataset_key, dataset_version, db) is not None:
+            delete_eval_dataset(db, dataset_key, dataset_version)
+        create_eval_dataset(
+            db,
+            EvalDatasetWrite(
+                key=dataset_key,
+                version=dataset_version,
+                name="Hybrid Grader Dataset",
+                description="Dataset for hybrid evaluator tests.",
+                source_kind="trinity-retrieval",
+                scope_kind="company",
+                scope_value="company-1",
+                items=(
+                    {
+                        "item_key": "corpus-1",
+                        "path": str(corpus_file.resolve()),
+                        "labels": {"slice": "core"},
+                    },
+                ),
+                provenance={"purpose": "hybrid"},
+            ),
+        )
+        create_grader_suite(
+            db,
+            dataset_key,
+            dataset_version,
+            GraderSuiteWrite(
+                key=suite_key,
+                version=suite_version,
+                name="Hybrid Suite",
+                description="Hybrid evaluator suite.",
+                proposal_family="retrieval_selection_policy",
+                graders=(
+                    {
+                        "grader_key": "code_delta",
+                        "grader_kind": "code",
+                        "entrypoint_ref": "builtin://candidate-vs-incumbent-delta",
+                        "metric_name": "candidate_vs_incumbent_delta",
+                        "pass_threshold": 0.03,
+                    },
+                    {
+                        "grader_key": "model_judge",
+                        "grader_kind": "model",
+                        "entrypoint_ref": "model://gpt-5.5",
+                        "metric_name": "model_judge_acceptance",
+                    },
+                    {
+                        "grader_key": "human_review",
+                        "grader_kind": "human",
+                        "entrypoint_ref": "human://review-form",
+                        "metric_name": "human_review_acceptance",
+                    },
+                ),
+                provenance={"kind": "hybrid"},
+            ),
+        )
+        result = run_grader_suite(
+            dataset_key,
+            dataset_version,
+            suite_key,
+            suite_version,
+            GraderSuiteRunRequest(
+                proposal_family="retrieval_selection_policy",
+                proposal_artifact_version="candidate.v2",
+                comparison_report_file=str(comparison_path.resolve()),
+                evaluator_artifact_files=(
+                    {"grader_key": "model_judge", "path": str(model_artifact.resolve())},
+                    {"grader_key": "human_review", "path": str(human_artifact.resolve())},
+                ),
+            ),
+            db,
+        )
+
+        results = {item["grader_key"]: item for item in result.grader_results}
+        assert results["code_delta"]["passed"] is True
+        assert results["model_judge"]["status"] == "imported"
+        assert results["model_judge"]["passed"] is False
+        assert results["human_review"]["status"] == "imported"
+        assert results["human_review"]["passed"] is True
+        assert result.disagreements
+        assert any(
+            item["left_grader_kind"] != item["right_grader_kind"] for item in result.disagreements
+        )
+
         delete_eval_dataset(db, dataset_key, dataset_version)

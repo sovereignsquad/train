@@ -15,6 +15,7 @@ The current grader-suite layer supports:
 - explicit attachment to one proposal family
 - code-based grader definitions
 - model-based grader references
+- human-review evaluator references
 - bounded reruns against new comparison artifacts
 
 It does not support:
@@ -55,7 +56,8 @@ Current allowed `grader_kind` values:
 Current bounded execution posture:
 
 - builtin `code` graders execute
-- `model` graders are preserved as persistent references but are not executed yet
+- `model` graders can be satisfied by imported model-judge artifacts
+- `human` graders can be satisfied by imported human-review artifacts
 
 ## Current Builtin Code Graders
 
@@ -85,6 +87,7 @@ The rerun output preserves:
 - proposal artifact version
 - comparison artifact reference
 - per-grader results
+- disagreements across evaluator types when pass/fail outcomes diverge
 
 ## Current API Surface
 
@@ -105,10 +108,12 @@ The rerun output preserves:
 - keep execution bounded to explicit replay artifacts
 - keep changed assumptions visible by versioning the suite
 - do not let persistent graders imply automatic promotion authority
+- preserve evaluator-type provenance instead of flattening every result into one synthetic judge
 
 ## Related Documents
 
 - `docs/EVAL_DATASET_REGISTRY.md`
+- `docs/HYBRID_EVALUATORS.md`
 - `docs/COMPARISON_HARNESS.md`
 - `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
 - `docs/STATUS.md`

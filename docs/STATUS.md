@@ -33,6 +33,7 @@ The repository currently has:
 - project registry and run lifecycle
 - eval dataset registry with versioned corpora and saved slices
 - persistent grader-suite registry attached to datasets and proposal families
+- hybrid evaluator replay support for code, model-judge, and human-review inputs
 - provider registry and operator recovery
 - reference benchmark projects
 - `{trinity}` trace and training-bundle ingestion models
@@ -72,6 +73,7 @@ Verified locally in the current implementation lane:
 - targeted skeptical-eval lane tests
 - targeted eval dataset registry tests
 - targeted persistent grader-suite tests
+- targeted hybrid evaluator tests
 - Reply proof lane through `scripts/prove_reply_cycle.py`
 
 ## Current Gaps
@@ -94,6 +96,7 @@ Still open:
 - the broader skeptical-eval implementation lane from GitHub issue `#32` is now implemented in a first bounded reusable form
 - the eval dataset registry lane from GitHub issue `#36` is now implemented in a first bounded reusable form
 - the persistent grader-suite lane from GitHub issue `#37` is now implemented in a first bounded reusable form
+- the hybrid evaluator lane from GitHub issue `#38` is now implemented in a first bounded reusable form
 - Spot proposal/eval support is still only the first review-policy slice; no broader Spot threshold/routing/prompt artifact families are implemented yet
 - Spot scope support is still intentionally narrow: only `company` and `global` are supported for the first review-policy slice
 - public docs must keep describing the current bounded Reply-plus-Spot-plus-skeptical-review state accurately; do not let README or contributor docs drift backward
@@ -102,7 +105,7 @@ Still open:
 
 1. keep the new Trinity-callable proposal seam stable and explicit
 2. keep rejection-ready review artifacts explicit, versioned, and replayable as richer proposal families widen
-3. build hybrid evaluator support in issue `#38`
+3. decide whether to widen runtime-facing learner families or strengthen issue `#30` and `#31` once real `{trinity}` exports exist
 4. keep proposal artifacts explicit and versioned
 5. avoid turning `{train}` into a second runtime
 6. avoid drifting into a generic prompt framework as the seam expands

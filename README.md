@@ -18,6 +18,7 @@ Current bounded proposal work in this repo covers:
 
 - eval dataset registry with versioned corpora and saved slices
 - persistent grader suites attached to datasets and proposal families
+- hybrid evaluator support for code, model-judge, and human-review inputs
 - Trinity training-bundle ingestion
 - tone policy proposal generation
 - brevity policy proposal generation
@@ -78,6 +79,7 @@ Delivered or in active working tree:
 
 - eval dataset registry and saved slice model
 - persistent grader-suite registry and rerun layer
+- hybrid evaluator imports with disagreement reporting
 - `TrinityTrainingBundleRecord` ingestion schemas
 - `TrinitySpotTrainingBundleRecord` ingestion schemas
 - trace and training-bundle loaders
@@ -151,7 +153,9 @@ uv run python -m train_core.cli run-grader-suite \
   --suite-version 2026-05-11.1 \
   --proposal-family reply_behavior_policy \
   --proposal-artifact-version reply_behavior_policy.tone.candidate.v2 \
-  --comparison-report-file /absolute/path/to/comparison_report.json
+  --comparison-report-file /absolute/path/to/comparison_report.json \
+  --evaluator-artifact-file model_judge=/absolute/path/to/model_judge.json \
+  --evaluator-artifact-file human_review=/absolute/path/to/human_review.json
 ```
 
 Skeptical-eval review CLI:
@@ -201,6 +205,7 @@ uv run python scripts/prove_reply_cycle.py
 - [docs/SETUP.md](/Users/Shared/Projects/train/docs/SETUP.md)
 - [docs/EVAL_DATASET_REGISTRY.md](/Users/Shared/Projects/train/docs/EVAL_DATASET_REGISTRY.md)
 - [docs/PERSISTENT_GRADER_SUITES.md](/Users/Shared/Projects/train/docs/PERSISTENT_GRADER_SUITES.md)
+- [docs/HYBRID_EVALUATORS.md](/Users/Shared/Projects/train/docs/HYBRID_EVALUATORS.md)
 - [docs/CODING_STANDARDS.md](/Users/Shared/Projects/train/docs/CODING_STANDARDS.md)
 - [docs/HYPOTHESIS_CONTRACT.md](/Users/Shared/Projects/train/docs/HYPOTHESIS_CONTRACT.md)
 - [docs/POLICY_LOOP_REPO_BREAKDOWN.md](/Users/Shared/Projects/train/docs/POLICY_LOOP_REPO_BREAKDOWN.md)

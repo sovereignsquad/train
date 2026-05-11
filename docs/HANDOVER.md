@@ -22,6 +22,7 @@ Last meaningful tranche:
 - the first bounded skeptical-eval implementation lane now exists in code, API, CLI, and tests for higher-risk proposal review
 - the first bounded eval dataset registry now exists in code, API, dataset/slice persistence, and tests so proposal lanes can reuse corpora instead of raw file lists
 - the first bounded persistent grader-suite layer now exists in code, API, CLI, and tests so datasets can carry reusable evaluation criteria across proposal variants
+- the first bounded hybrid evaluator layer now exists in code, API, CLI, and tests so one replayable run can combine code evaluators with imported model and human review artifacts
 
 Implemented or now present in the active working tree:
 
@@ -45,10 +46,12 @@ Implemented or now present in the active working tree:
 - `docs/TRINITY_SKEPTICAL_EVAL_REPORT_CONTRACT.md`
 - `docs/EVAL_DATASET_REGISTRY.md`
 - `docs/PERSISTENT_GRADER_SUITES.md`
+- `docs/HYBRID_EVALUATORS.md`
 - eval dataset registry service and dataset-slice resolver
 - `/v1/eval-datasets` dataset registry endpoints
 - persistent grader-suite registry and rerun service
 - `/v1/eval-datasets/.../grader-suites` endpoints
+- hybrid evaluator artifact import path and disagreement reporting
 - skeptical-eval report builder from comparison artifacts
 - `/v1/trinity/reviews/skeptical-eval` endpoint
 - `python -m train_core.cli build-skeptical-eval-report` CLI surface
@@ -69,11 +72,12 @@ Verified:
 - targeted skeptical-eval implementation tests for issue `#32`
 - targeted eval dataset registry implementation tests for issue `#36`
 - targeted persistent grader-suite implementation tests for issue `#37`
+- targeted hybrid evaluator implementation tests for issue `#38`
 
 ### What Needs To Happen Next
 
 1. decide whether `{train}` should own supervised API startup helpers or remain API-server passive
-2. build hybrid evaluator support in GitHub issue `#38` on top of the new persistent grader-suite substrate
+2. decide whether the next platform lane should widen runtime-facing learners or extend evaluator execution beyond imported artifacts
 3. keep the Reply-adapter policy lane reproducible and bounded
 4. avoid direct runtime mutation paths
 5. do not let ecosystem inspiration turn `{train}` into a prompt framework
@@ -93,4 +97,4 @@ Verified:
 - do not let future “brain” language blur the ownership line: `{train}` improves exported artifacts, `{trinity}` remains the live runtime
 - do not overstate the current Spot support: `{train}` now has a first bounded Spot proposal/eval lane, not a broad Spot optimizer surface
 - do not drop the new scope discipline: one-company Spot corpora must stay company-scoped unless Trinity’s adoption contract is intentionally widened later
-- do not let public docs drift back to Reply-only wording while dataset-registry, grader-suite, Spot, and skeptical-review support are present in the shipped repo
+- do not let public docs drift back to Reply-only wording while dataset-registry, grader-suite, hybrid-evaluator, Spot, and skeptical-review support are present in the shipped repo

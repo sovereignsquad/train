@@ -204,7 +204,12 @@ def _run_grader_suite(
     comparison = StandardComparisonReport.model_validate(
         json.loads(comparison_path.read_text(encoding="utf-8"))
     )
-    results = tuple(_run_one_grader(grader, comparison) for grader in suite.graders)
+    artifact_inputs = {
+        str(item["grader_key"]): str(item["path"])
+        for item in payload.evaluator_artifact_files
+    }
+    results = tuple(_run_one_grader(grader, comparison, artifact_inputs) for grader in suite.graders)
+    disagreements = tuple(_build_disagreements(results))
     summary = (
         f"Ran grader suite {suite.ref} against proposal {payload.proposal_artifact_version} "
         f"using comparison report {comparison.report_id}."
@@ -217,6 +222,7 @@ def _run_grader_suite(
         "comparison_ref": str(comparison_path),
         "generated_at": datetime.now(UTC).isoformat(),
         "grader_results": results,
+        "disagreements": disagreements,
         "summary": summary,
     }
     output_path = _write_json_file(payload.output_path, report)
@@ -229,18 +235,20 @@ def _run_grader_suite(
 def _run_one_grader(
     grader: GraderDefinition,
     comparison: StandardComparisonReport,
+    artifact_inputs: dict[str, str],
 ) -> dict[str, object]:
     if grader.grader_kind == "model":
-        return {
-            "grader_key": grader.grader_key,
-            "grader_kind": grader.grader_kind,
-            "entrypoint_ref": grader.entrypoint_ref,
-            "metric_name": grader.metric_name,
-            "status": "reference_only",
-            "score": None,
-            "passed": None,
-            "notes": "Model-based grader reference preserved, but only builtin code graders execute in the current bounded lane.",
-        }
+        return _import_external_evaluator_result(
+            grader,
+            artifact_inputs,
+            expected_kind="model",
+        )
+    if grader.grader_kind == "human":
+        return _import_external_evaluator_result(
+            grader,
+            artifact_inputs,
+            expected_kind="human",
+        )
     if grader.entrypoint_ref == "builtin://candidate-vs-incumbent-delta":
         delta = _candidate_delta(comparison, "incumbent")
         return _graded_result(grader, delta, "candidate-incumbent delta")
@@ -259,6 +267,46 @@ def _run_one_grader(
         "score": None,
         "passed": None,
         "notes": "Unknown grader entrypoint_ref.",
+    }
+
+
+def _import_external_evaluator_result(
+    grader: GraderDefinition,
+    artifact_inputs: dict[str, str],
+    *,
+    expected_kind: str,
+) -> dict[str, object]:
+    artifact_path = artifact_inputs.get(grader.grader_key)
+    if artifact_path is None:
+        return {
+            "grader_key": grader.grader_key,
+            "grader_kind": grader.grader_kind,
+            "entrypoint_ref": grader.entrypoint_ref,
+            "metric_name": grader.metric_name,
+            "status": "missing_artifact",
+            "score": None,
+            "passed": None,
+            "notes": f"No imported {expected_kind} evaluator artifact was provided for this grader.",
+        }
+    payload = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+    artifact_kind = str(payload.get("grader_kind") or payload.get("evaluator_kind") or "").strip()
+    if artifact_kind and artifact_kind != expected_kind:
+        raise GraderSuiteError(
+            f"Imported evaluator artifact for '{grader.grader_key}' has kind '{artifact_kind}', "
+            f"expected '{expected_kind}'."
+        )
+    return {
+        "grader_key": grader.grader_key,
+        "grader_kind": grader.grader_kind,
+        "entrypoint_ref": grader.entrypoint_ref,
+        "metric_name": grader.metric_name,
+        "status": "imported",
+        "score": payload.get("score"),
+        "pass_threshold": grader.pass_threshold,
+        "passed": payload.get("passed"),
+        "artifact_ref": artifact_path,
+        "notes": str(payload.get("notes") or f"Imported {expected_kind} evaluator artifact."),
+        "provenance": payload.get("provenance") or {},
     }
 
 
@@ -288,6 +336,30 @@ def _candidate_delta(comparison: StandardComparisonReport, from_label: str) -> f
         if delta.from_label == from_label and delta.to_label == "candidate":
             return delta.score_delta
     return None
+
+
+def _build_disagreements(results: tuple[dict[str, object], ...]) -> list[dict[str, object]]:
+    graded = [item for item in results if item.get("passed") is not None]
+    disagreements: list[dict[str, object]] = []
+    for index, left in enumerate(graded):
+        for right in graded[index + 1 :]:
+            if left.get("passed") == right.get("passed"):
+                continue
+            disagreements.append(
+                {
+                    "left_grader_key": left.get("grader_key"),
+                    "left_grader_kind": left.get("grader_kind"),
+                    "left_passed": left.get("passed"),
+                    "right_grader_key": right.get("grader_key"),
+                    "right_grader_kind": right.get("grader_kind"),
+                    "right_passed": right.get("passed"),
+                    "summary": (
+                        f"{left.get('grader_key')} ({left.get('grader_kind')}) disagrees with "
+                        f"{right.get('grader_key')} ({right.get('grader_kind')})."
+                    ),
+                }
+            )
+    return disagreements
 
 
 def _row_to_definition(row: GraderSuiteRecord) -> GraderSuiteDefinition:

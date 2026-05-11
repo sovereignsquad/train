@@ -4,8 +4,9 @@
 
 This document defines the current local setup path for contributors working on `{train}`.
 
-It now includes the eval dataset registry, persistent grader suites, the bounded Reply and Spot
-policy learner lanes, and the skeptical-eval review lane, not just the earlier benchmark scaffolds.
+It now includes the eval dataset registry, persistent grader suites, hybrid evaluator support, the
+bounded Reply and Spot policy learner lanes, and the skeptical-eval review lane, not just the
+earlier benchmark scaffolds.
 
 ## Required Base Tools
 
@@ -132,7 +133,9 @@ uv run python -m train_core.cli run-grader-suite \
   --suite-version 2026-05-11.1 \
   --proposal-family reply_behavior_policy \
   --proposal-artifact-version reply_behavior_policy.tone.candidate.v2 \
-  --comparison-report-file /absolute/path/to/comparison_report.json
+  --comparison-report-file /absolute/path/to/comparison_report.json \
+  --evaluator-artifact-file model_judge=/absolute/path/to/model_judge.json \
+  --evaluator-artifact-file human_review=/absolute/path/to/human_review.json
 ```
 
 Skeptical review lane:
