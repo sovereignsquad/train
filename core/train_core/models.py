@@ -192,3 +192,72 @@ class GraderSuiteRecord(Base):
         default=utc_now,
         onupdate=utc_now,
     )
+
+
+class TrainingSpecRecord(Base):
+    __tablename__ = "training_specs"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    dataset_key: Mapped[str] = mapped_column(String(120), index=True)
+    dataset_version: Mapped[str] = mapped_column(String(160))
+    dataset_slice_key: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    dataset_slice_version: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    grader_suite_key: Mapped[str] = mapped_column(String(120))
+    grader_suite_version: Mapped[str] = mapped_column(String(160))
+    base_model_ref: Mapped[str] = mapped_column(String(260))
+    base_model_source_kind: Mapped[str] = mapped_column(String(40), default="huggingface")
+    template_ref: Mapped[str] = mapped_column(String(260))
+    tokenizer_ref: Mapped[str | None] = mapped_column(String(260), nullable=True)
+    training_backend: Mapped[str] = mapped_column(String(40), index=True)
+    training_stage: Mapped[str] = mapped_column(String(40))
+    training_method: Mapped[str] = mapped_column(String(40))
+    expected_adapter_family: Mapped[str] = mapped_column(String(120), index=True)
+    output_dir: Mapped[str] = mapped_column(String(520))
+    hyperparameters_json: Mapped[str] = mapped_column(Text)
+    provenance_json: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+
+class AdapterArtifactRecord(Base):
+    __tablename__ = "adapter_artifacts"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    version: Mapped[str] = mapped_column(String(160), primary_key=True)
+    training_spec_key: Mapped[str] = mapped_column(String(120), index=True)
+    training_spec_version: Mapped[str] = mapped_column(String(160))
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    dataset_key: Mapped[str] = mapped_column(String(120), index=True)
+    dataset_version: Mapped[str] = mapped_column(String(160))
+    dataset_slice_key: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    dataset_slice_version: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    grader_suite_key: Mapped[str] = mapped_column(String(120))
+    grader_suite_version: Mapped[str] = mapped_column(String(160))
+    base_model_ref: Mapped[str] = mapped_column(String(260))
+    base_model_source_kind: Mapped[str] = mapped_column(String(40), default="huggingface")
+    template_ref: Mapped[str] = mapped_column(String(260))
+    tokenizer_ref: Mapped[str | None] = mapped_column(String(260), nullable=True)
+    training_backend: Mapped[str] = mapped_column(String(40), index=True)
+    training_stage: Mapped[str] = mapped_column(String(40))
+    training_method: Mapped[str] = mapped_column(String(40))
+    adapter_family: Mapped[str] = mapped_column(String(120), index=True)
+    adapter_format: Mapped[str] = mapped_column(String(40))
+    artifact_path: Mapped[str] = mapped_column(String(520))
+    checkpoint_path: Mapped[str | None] = mapped_column(String(520), nullable=True)
+    training_log_path: Mapped[str | None] = mapped_column(String(520), nullable=True)
+    packaging_metadata_path: Mapped[str | None] = mapped_column(String(520), nullable=True)
+    provenance_json: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=utc_now,
+        onupdate=utc_now,
+    )

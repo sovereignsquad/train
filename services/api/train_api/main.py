@@ -26,6 +26,19 @@ from train_core.datasets import (
     serialize_eval_dataset_slice,
 )
 from train_core.db import get_db, init_db
+from train_core.fine_tuning import (
+    FineTuningContractError,
+    create_adapter_artifact,
+    create_training_spec,
+    delete_adapter_artifact,
+    delete_training_spec,
+    get_adapter_artifact,
+    get_training_spec,
+    list_adapter_artifacts,
+    list_training_specs,
+    serialize_adapter_artifact,
+    serialize_training_spec,
+)
 from train_core.grader_suites import (
     GraderSuiteError,
     create_grader_suite,
@@ -35,7 +48,10 @@ from train_core.grader_suites import (
     run_grader_suite,
     serialize_grader_suite,
 )
+from train_core.health import build_doctor_report, check_training_lane_readiness
+from train_core.mlx_lm_worker import MlxLmWorkerError, run_training_spec_with_mlx_lm
 from train_core.models import ProjectState, RunRecord
+from train_core.ollama_packaging import OllamaPackagingError, package_adapter_artifact_for_ollama
 from train_core.operator import (
     OperatorError,
     build_operator_snapshot,
@@ -68,6 +84,8 @@ from train_core.runner import (
     start_run_record,
 )
 from train_core.schemas import (
+    AdapterArtifactRead,
+    AdapterArtifactWrite,
     AgentAdapterRead,
     AgentLaunchPlanRead,
     AgentStatusRead,
@@ -79,6 +97,9 @@ from train_core.schemas import (
     GraderSuiteRunRead,
     GraderSuiteRunRequest,
     GraderSuiteWrite,
+    HealthReportRead,
+    OllamaPackageRead,
+    OllamaPackageRequest,
     OperatorStatusRead,
     ProviderAdapterRead,
     ProviderStatusRead,
@@ -97,7 +118,15 @@ from train_core.schemas import (
     TrinitySkepticalEvalRequest,
     TrinitySpotPolicyProposalRead,
     TrinitySpotPolicyProposalRequest,
+    SelfLearningCycleRead,
+    SelfLearningCycleRequest,
+    TrainingReadinessRead,
+    TrainingSpecRead,
+    TrainingSpecRunRead,
+    TrainingSpecRunRequest,
+    TrainingSpecWrite,
 )
+from train_core.self_learning_cycle import SelfLearningCycleError, run_daily_self_learning_cycle
 from train_core.trinity_reply_policy_service import propose_reply_policy_from_bundle_files
 from train_core.trinity_skeptical_eval import build_skeptical_eval_report
 from train_core.trinity_spot_policy_service import propose_spot_review_policy_from_bundle_files
@@ -117,6 +146,22 @@ def health() -> dict[str, str]:
         "service": settings.app_name,
         "environment": settings.train_env,
     }
+
+
+@app.get("/v1/doctor", response_model=HealthReportRead)
+def get_doctor_report(
+    workflow: str = "default",
+    api_base_url: str | None = None,
+    trinity_root: str | None = None,
+) -> HealthReportRead:
+    if workflow not in {"default", "training"}:
+        raise HTTPException(status_code=400, detail="workflow must be 'default' or 'training'")
+    report = build_doctor_report(
+        workflow=workflow,
+        api_base_url=api_base_url,
+        trinity_root=trinity_root,
+    )
+    return HealthReportRead.model_validate(report.to_payload())
 
 
 @app.get("/v1/projects", response_model=list[ProjectRead])
@@ -256,6 +301,165 @@ def list_project_states(db: Session = Depends(get_db)) -> list[ProjectState]:
 @app.get("/v1/eval-datasets", response_model=list[EvalDatasetRead])
 def get_eval_datasets(db: Session = Depends(get_db)) -> list[EvalDatasetRead]:
     return [serialize_eval_dataset(dataset) for dataset in list_eval_datasets(db)]
+
+
+@app.get("/v1/training-specs", response_model=list[TrainingSpecRead])
+def get_training_specs_route(db: Session = Depends(get_db)) -> list[TrainingSpecRead]:
+    return [serialize_training_spec(item) for item in list_training_specs(db)]
+
+
+@app.post("/v1/training-specs", response_model=TrainingSpecRead, status_code=201)
+def create_training_spec_route(
+    payload: TrainingSpecWrite,
+    db: Session = Depends(get_db),
+) -> TrainingSpecRead:
+    try:
+        return serialize_training_spec(create_training_spec(db, payload))
+    except (EvalDatasetError, FineTuningContractError, GraderSuiteError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/training-specs/{spec_key}/versions/{spec_version}", response_model=TrainingSpecRead)
+def get_training_spec_by_version(
+    spec_key: str,
+    spec_version: str,
+    db: Session = Depends(get_db),
+) -> TrainingSpecRead:
+    item = get_training_spec(spec_key, spec_version, db)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Training spec not found")
+    return serialize_training_spec(item)
+
+
+@app.get(
+    "/v1/training-specs/{spec_key}/versions/{spec_version}/readiness",
+    response_model=TrainingReadinessRead,
+)
+def get_training_spec_readiness(
+    spec_key: str,
+    spec_version: str,
+    db: Session = Depends(get_db),
+) -> TrainingReadinessRead:
+    spec = get_training_spec(spec_key, spec_version, db)
+    if spec is None:
+        raise HTTPException(status_code=404, detail="Training spec not found")
+    check = check_training_lane_readiness(required=True, spec=spec)
+    return TrainingReadinessRead.model_validate(
+        {
+            "training_spec_ref": spec.ref,
+            "status": check.status,
+            "summary": check.summary,
+            "details": check.details,
+            "remediation": check.remediation,
+        }
+    )
+
+
+@app.delete("/v1/training-specs/{spec_key}/versions/{spec_version}", status_code=204)
+def delete_training_spec_by_version(
+    spec_key: str,
+    spec_version: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        delete_training_spec(db, spec_key, spec_version)
+    except FineTuningContractError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post(
+    "/v1/training-specs/{spec_key}/versions/{spec_version}/runs",
+    response_model=TrainingSpecRunRead,
+    status_code=201,
+)
+def run_training_spec_route(
+    spec_key: str,
+    spec_version: str,
+    payload: TrainingSpecRunRequest,
+    db: Session = Depends(get_db),
+) -> TrainingSpecRunRead:
+    try:
+        return run_training_spec_with_mlx_lm(spec_key, spec_version, payload, db)
+    except (FineTuningContractError, MlxLmWorkerError) as exc:
+        status_code = 404 if "was not found" in str(exc) else 400
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
+
+
+@app.get("/v1/adapter-artifacts", response_model=list[AdapterArtifactRead])
+def get_adapter_artifacts_route(db: Session = Depends(get_db)) -> list[AdapterArtifactRead]:
+    return [serialize_adapter_artifact(item) for item in list_adapter_artifacts(db)]
+
+
+@app.post("/v1/adapter-artifacts", response_model=AdapterArtifactRead, status_code=201)
+def create_adapter_artifact_route(
+    payload: AdapterArtifactWrite,
+    db: Session = Depends(get_db),
+) -> AdapterArtifactRead:
+    try:
+        return serialize_adapter_artifact(create_adapter_artifact(db, payload))
+    except FineTuningContractError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/v1/adapter-artifacts/{artifact_key}/versions/{artifact_version}", response_model=AdapterArtifactRead)
+def get_adapter_artifact_by_version(
+    artifact_key: str,
+    artifact_version: str,
+    db: Session = Depends(get_db),
+) -> AdapterArtifactRead:
+    item = get_adapter_artifact(artifact_key, artifact_version, db)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Adapter artifact not found")
+    return serialize_adapter_artifact(item)
+
+
+@app.post(
+    "/v1/adapter-artifacts/{artifact_key}/versions/{artifact_version}/ollama-package",
+    response_model=OllamaPackageRead,
+    status_code=201,
+)
+def package_adapter_artifact_for_ollama_route(
+    artifact_key: str,
+    artifact_version: str,
+    payload: OllamaPackageRequest,
+    db: Session = Depends(get_db),
+) -> OllamaPackageRead:
+    try:
+        result = package_adapter_artifact_for_ollama(
+            artifact_key=artifact_key,
+            artifact_version=artifact_version,
+            ollama_model_name=payload.ollama_model_name,
+            output_dir=payload.output_dir,
+            temperature=payload.temperature,
+            top_p=payload.top_p,
+            system_prompt=payload.system_prompt,
+            db=db,
+        )
+    except (FineTuningContractError, OllamaPackagingError) as exc:
+        status_code = 404 if "was not found" in str(exc) else 400
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
+    return OllamaPackageRead.model_validate(
+        {
+            "ollama_model_name": result.ollama_model_name,
+            "modelfile_path": result.modelfile_path,
+            "metadata_path": result.metadata_path,
+            "output_dir": result.output_dir,
+            "created_at": result.created_at,
+            "adapter_artifact": result.adapter_artifact.model_dump(mode="json"),
+        }
+    )
+
+
+@app.delete("/v1/adapter-artifacts/{artifact_key}/versions/{artifact_version}", status_code=204)
+def delete_adapter_artifact_by_version(
+    artifact_key: str,
+    artifact_version: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        delete_adapter_artifact(db, artifact_key, artifact_version)
+    except FineTuningContractError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @app.post("/v1/eval-datasets", response_model=EvalDatasetRead, status_code=201)
@@ -450,6 +654,44 @@ def run_grader_suite_route(
         )
     except GraderSuiteError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post(
+    "/v1/training-specs/{spec_key}/versions/{spec_version}/self-learning-cycle",
+    response_model=SelfLearningCycleRead,
+    status_code=201,
+)
+def run_self_learning_cycle_route(
+    spec_key: str,
+    spec_version: str,
+    payload: SelfLearningCycleRequest,
+) -> SelfLearningCycleRead:
+    try:
+        result = run_daily_self_learning_cycle(
+            spec_key=spec_key,
+            spec_version=spec_version,
+            adapter_key=payload.adapter_key,
+            adapter_version=payload.adapter_version,
+            adapter_name=payload.adapter_name,
+            adapter_description=payload.adapter_description,
+            artifact_format=payload.artifact_format,
+            comparison_report_file=payload.comparison_report_file,
+            evaluator_artifact_files=payload.evaluator_artifact_files,
+            grader_output_path=payload.grader_output_path,
+            package_for_ollama=payload.package_for_ollama,
+            ollama_model_name=payload.ollama_model_name,
+            package_output_dir=payload.package_output_dir,
+            temperature=payload.temperature,
+            top_p=payload.top_p,
+            system_prompt=payload.system_prompt,
+            api_base_url=payload.api_base_url,
+            trinity_root=payload.trinity_root,
+            provenance=payload.provenance,
+        )
+    except (SelfLearningCycleError, FineTuningContractError, MlxLmWorkerError, OllamaPackagingError) as exc:
+        status_code = 404 if "was not found" in str(exc) else 400
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
+    return SelfLearningCycleRead.model_validate(result.to_payload())
 
 
 @app.post("/v1/runs", response_model=RunRead)

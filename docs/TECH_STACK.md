@@ -215,14 +215,16 @@ The current implementation baseline includes:
   - stalled-run detection
   - safe resume semantics
 - native macOS shell scaffold with:
+- native macOS shell with:
   - SwiftPM app target
   - local engine supervisor
   - API-backed operator dashboard
-  - release-check scaffold
+  - GitHub-release update source
+  - packaged app bundle build path
 - machine-checkable autonomous guardrails for mutable artifacts, setup artifacts, dependency artifacts, and budget bounds
 - `Next.js` + `Mantine` operator UI for health, providers, projects, runs, project states, and recovery actions
 
-This is now a two-project local baseline with a native shell scaffold. The next lane is runtime bootstrap and packaged desktop delivery, not basic project reuse.
+This is now a two-project local baseline with shipped native shell packaging, release publication, and release-asset preflight. The next lane is not bootstrap; it is harder delivery discipline around signed/notarized desktop distribution and deeper offline training evaluation/promotion.
 
 ## Explicit Non-Goals For MVP
 
@@ -237,3 +239,4 @@ Do not require:
 
 - operator recovery is intentionally narrow and currently covers resume-from-checkpoint, not full workflow orchestration
 - packaged engine update installation and runtime refresh are not implemented yet
+- the published macOS app asset is currently ad-hoc signed, not Developer ID signed or notarized

@@ -158,13 +158,16 @@ Authoritative for:
 
 ### Operations SSOT
 
-- future docs such as:
+- current docs such as:
   - `docs/STATUS.md`
   - `docs/HANDOVER.md`
+  - `docs/SETUP.md`
+  - `docs/ENVIRONMENT.md`
+  - `docs/RECOVERY.md`
+- future docs such as:
   - `docs/RUNBOOKS.md`
   - `docs/DEPLOYMENT.md`
   - `docs/SECRETS.md`
-  - `docs/RECOVERY.md`
 
 Authoritative for:
 

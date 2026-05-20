@@ -19,6 +19,11 @@ Current bounded proposal work in this repo covers:
 - eval dataset registry with versioned corpora and saved slices
 - persistent grader suites attached to datasets and proposal families
 - hybrid evaluator support for code, model-judge, and human-review inputs
+- offline training-spec and adapter-artifact contracts
+- first Apple-Silicon `mlx-lm` worker for bounded `QLoRA` adapter training
+- first relation doctor and training-readiness surfaces
+- deterministic local Ollama packaging for persisted adapter artifacts
+- first bounded daily self-learning cycle entrypoint with explicit eval and packaging gates
 - Trinity training-bundle ingestion
 - tone policy proposal generation
 - brevity policy proposal generation
@@ -64,6 +69,14 @@ Bootstrap:
 ```bash
 cd /Users/Shared/Projects/train
 uv sync --extra dev
+# optional on the Apple-Silicon training machine:
+uv sync --extra dev --extra local-training
+```
+
+Optional shared local model root:
+
+```bash
+export TRAIN_MODELS_ROOT=/Users/Shared/Models
 ```
 
 Validation:
@@ -80,6 +93,8 @@ Delivered or in active working tree:
 - eval dataset registry and saved slice model
 - persistent grader-suite registry and rerun layer
 - hybrid evaluator imports with disagreement reporting
+- offline training-spec registry and adapter-artifact registry
+- first `mlx-lm` worker that exports governed dataset partitions and launches bounded `QLoRA` runs
 - `TrinityTrainingBundleRecord` ingestion schemas
 - `TrinitySpotTrainingBundleRecord` ingestion schemas
 - trace and training-bundle loaders
@@ -98,6 +113,10 @@ Current adapter posture:
 - `{train}` currently consumes Reply adapter artifacts plus the first bounded Spot review-policy artifact family
 - broad multi-adapter training support beyond Reply and the first Spot slice is not implemented yet
 
+Current integration and dependency map:
+
+- see [docs/INTEGRATION_SURFACE.md](/Users/Shared/Projects/train/docs/INTEGRATION_SURFACE.md) for the current forward relations, reverse relations, planned-only hosted references, and the latest local health-check snapshot
+
 ## Setup And Run Surfaces
 
 API:
@@ -113,6 +132,13 @@ Eval dataset registry API:
 - `GET /v1/eval-datasets/{dataset_key}/versions/{dataset_version}`
 - `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/slices`
 - `POST /v1/eval-datasets/{dataset_key}/versions/{dataset_version}/grader-suites`
+- `GET /v1/training-specs`
+- `POST /v1/training-specs`
+- `POST /v1/training-specs/{spec_key}/versions/{spec_version}/runs`
+- `GET /v1/doctor`
+- `GET /v1/training-specs/{spec_key}/versions/{spec_version}/readiness`
+- `POST /v1/adapter-artifacts/{artifact_key}/versions/{artifact_version}/ollama-package`
+- `POST /v1/training-specs/{spec_key}/versions/{spec_version}/self-learning-cycle`
 
 Reply policy proposal CLI:
 
@@ -158,6 +184,49 @@ uv run python -m train_core.cli run-grader-suite \
   --evaluator-artifact-file human_review=/absolute/path/to/human_review.json
 ```
 
+Offline training worker CLI:
+
+```bash
+uv run python -m train_core.cli run-training-spec \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1 \
+  --adapter-key reply_adapter_candidate \
+  --adapter-version 2026-05-13.1 \
+  --adapter-name "Reply Adapter Candidate" \
+  --adapter-description "First mlx-lm QLoRA candidate"
+```
+
+Relation doctor and training-readiness CLI:
+
+```bash
+uv run python -m train_core.cli doctor --workflow default --output-format summary
+uv run python -m train_core.cli check-training-readiness \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1
+```
+
+Ollama packaging CLI:
+
+```bash
+uv run python -m train_core.cli package-adapter-artifact-for-ollama \
+  --artifact-key reply_adapter_candidate \
+  --artifact-version 2026-05-13.1 \
+  --ollama-model-name train-reply-adapter:2026-05-13.1
+```
+
+Bounded daily self-learning cycle CLI:
+
+```bash
+uv run python -m train_core.cli run-daily-self-learning-cycle \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1 \
+  --adapter-key reply_adapter_candidate \
+  --adapter-version 2026-05-13.1 \
+  --adapter-name "Reply Adapter Candidate" \
+  --adapter-description "Daily bounded training candidate" \
+  --comparison-report-file /absolute/path/to/comparison_report.json
+```
+
 Skeptical-eval review CLI:
 
 ```bash
@@ -183,6 +252,24 @@ Reply proof / benchmark lane:
 uv run python scripts/prove_reply_cycle.py
 ```
 
+Operator-client contract smoke:
+
+```bash
+uv run python scripts/check_operator_clients.py
+```
+
+Cross-repo `{trinity}` handoff proof:
+
+```bash
+uv run python scripts/prove_trinity_train_handoff.py
+```
+
+Packaged release contract preflight:
+
+```bash
+uv run python scripts/check_packaged_release_contract.py
+```
+
 ## Product Boundary Rule
 
 `{train}` may:
@@ -206,6 +293,9 @@ uv run python scripts/prove_reply_cycle.py
 - [docs/EVAL_DATASET_REGISTRY.md](/Users/Shared/Projects/train/docs/EVAL_DATASET_REGISTRY.md)
 - [docs/PERSISTENT_GRADER_SUITES.md](/Users/Shared/Projects/train/docs/PERSISTENT_GRADER_SUITES.md)
 - [docs/HYBRID_EVALUATORS.md](/Users/Shared/Projects/train/docs/HYBRID_EVALUATORS.md)
+- [docs/OFFLINE_FINE_TUNING_RECOMMENDATION.md](/Users/Shared/Projects/train/docs/OFFLINE_FINE_TUNING_RECOMMENDATION.md)
+- [docs/OFFLINE_TRAINING_CONTRACTS.md](/Users/Shared/Projects/train/docs/OFFLINE_TRAINING_CONTRACTS.md)
+- [docs/SELF_LEARNING_FINE_TUNING_SYSTEM.md](/Users/Shared/Projects/train/docs/SELF_LEARNING_FINE_TUNING_SYSTEM.md)
 - [docs/CODING_STANDARDS.md](/Users/Shared/Projects/train/docs/CODING_STANDARDS.md)
 - [docs/HYPOTHESIS_CONTRACT.md](/Users/Shared/Projects/train/docs/HYPOTHESIS_CONTRACT.md)
 - [docs/POLICY_LOOP_REPO_BREAKDOWN.md](/Users/Shared/Projects/train/docs/POLICY_LOOP_REPO_BREAKDOWN.md)

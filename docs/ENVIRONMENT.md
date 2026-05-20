@@ -87,6 +87,7 @@ These are the current local variables:
 - `MISTRAL_VIBE_HOME`
 - `OPERATOR_LEASE_GRACE_SECONDS`
 - `OLLAMA_BASE_URL`
+- `TRAIN_MODELS_ROOT`
 - `TRAIN_REPO_ROOT`
 - `TRAIN_ROOT_DIR`
 - `TRAIN_STATE_DIR`
@@ -169,6 +170,16 @@ These are the current local variables:
 - default: `http://127.0.0.1:11434`
 - purpose: overrides the local Ollama API base URL used by the provider adapter
 
+`TRAIN_MODELS_ROOT`
+
+- environments: `local`
+- required: no
+- default: `/Users/Shared/Models`
+- purpose: defines the machine-level local AI asset root used by `{train}` when resolving governed local model references
+- notes:
+  - local model refs should resolve relative to this root
+  - provider adapters remain separate from filesystem storage rules
+
 `OPERATOR_LEASE_GRACE_SECONDS`
 
 - environments: `local`, later `staging` and `production`
@@ -210,6 +221,15 @@ These are the current local variables:
 - required: no
 - default: `http://127.0.0.1:8000`
 - purpose: points the Next.js operator UI at the API base URL
+
+## Optional Dependency Extras
+
+`local-training`
+
+- environments: `local`
+- required: no
+- install shape: `uv sync --extra dev --extra local-training`
+- purpose: installs the Apple-Silicon `mlx-lm` dependency lane used by bounded offline adapter training
 
 ## Environment Ownership
 

@@ -22,6 +22,12 @@
   <string>0.1.0</string>
   <key>CFBundleVersion</key>
   <string>1</string>
+  <key>TRAINReleaseRepositoryName</key>
+  <string>train</string>
+  <key>TRAINReleaseRepositoryOwner</key>
+  <string>sovereignsquad</string>
+  <key>TRAINReleaseSource</key>
+  <string>github-releases</string>
   <key>LSMinimumSystemVersion</key>
   <string>14.0</string>
   <key>NSPrincipalClass</key>

@@ -3,12 +3,15 @@ import Foundation
 
 enum UpdateCheckError: LocalizedError {
     case noPublishedRelease
+    case invalidReleaseConfiguration
     case requestFailed(Int)
 
     var errorDescription: String? {
         switch self {
         case .noPublishedRelease:
-            return "No published release is available yet."
+            return "No published GitHub release is available for the configured train repository yet."
+        case .invalidReleaseConfiguration:
+            return "The app bundle does not declare a valid GitHub release source."
         case .requestFailed(let status):
             return "Update check failed with status \(status)."
         }
@@ -22,11 +25,23 @@ final class UpdateService: ObservableObject {
     @Published var releaseURL: URL?
     @Published var errorMessage: String = ""
 
-    private let releaseEndpoint = URL(string: "https://api.github.com/repos/sovereignsquad/train/releases/latest")!
+    private let releaseEndpoint: URL?
+
+    init() {
+        releaseEndpoint = Self.makeReleaseEndpoint()
+    }
 
     func checkForUpdates(silent: Bool = false) {
         guard !isChecking else { return }
         if silent, latestVersion != nil || !errorMessage.isEmpty {
+            return
+        }
+        guard let releaseEndpoint else {
+            latestVersion = nil
+            releaseURL = nil
+            if !silent {
+                errorMessage = UpdateCheckError.invalidReleaseConfiguration.localizedDescription
+            }
             return
         }
         isChecking = true
@@ -45,6 +60,10 @@ final class UpdateService: ObservableObject {
                     throw APIClientError.invalidResponse
                 }
                 if http.statusCode == 404 {
+                    // A missing latest-release document is still a valid runtime
+                    // condition even though the repo currently publishes v0.1.0.
+                    // Keep the app defensive so new environments or repos can
+                    // surface "no published release" cleanly.
                     latestVersion = nil
                     releaseURL = nil
                     if !silent {
@@ -79,6 +98,21 @@ final class UpdateService: ObservableObject {
     func updateAvailable() -> Bool {
         guard let latestVersion else { return false }
         return compareVersions(currentVersion(), latestVersion) < 0
+    }
+
+    static func makeReleaseEndpoint(bundle: Bundle = .main) -> URL? {
+        guard
+            let info = bundle.infoDictionary,
+            let source = info["TRAINReleaseSource"] as? String,
+            source == "github-releases",
+            let owner = info["TRAINReleaseRepositoryOwner"] as? String,
+            let name = info["TRAINReleaseRepositoryName"] as? String,
+            owner.isEmpty == false,
+            name.isEmpty == false
+        else {
+            return nil
+        }
+        return URL(string: "https://api.github.com/repos/\(owner)/\(name)/releases/latest")
     }
 
     private func compareVersions(_ current: String, _ latest: String) -> Int {

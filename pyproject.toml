@@ -21,6 +21,9 @@ dev = [
   "pytest>=8.4.0",
   "ruff>=0.12.0",
 ]
+local-training = [
+  "mlx-lm[train]",
+]
 
 [build-system]
 requires = ["setuptools>=80.0"]

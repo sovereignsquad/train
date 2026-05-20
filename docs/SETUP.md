@@ -16,6 +16,7 @@ earlier benchmark scaffolds.
 - `Node.js` and `npm` if you need `apps/web`
 - `Swift 6+` and Xcode Command Line Tools if you need `apps/macos`
 - optional: `vibe` via `uv tool install mistral-vibe`
+- optional for the Apple-Silicon fine-tuning lane: `uv sync --extra dev --extra local-training`
 
 ## Python Environment
 
@@ -24,7 +25,20 @@ Bootstrap:
 ```bash
 cd /Users/Shared/Projects/train
 uv sync --extra dev
+uv sync --extra dev --extra local-training
 ```
+
+Optional shared local model root:
+
+```bash
+export TRAIN_MODELS_ROOT=/Users/Shared/Models
+```
+
+Use this when local training specs or future local model inventory should resolve against the
+machine-level shared model vault instead of ad hoc per-user paths.
+
+Use the `local-training` extra only on the Apple-Silicon machine that should execute the `mlx-lm`
+lane. It is optional for general repo development.
 
 Core validation:
 
@@ -47,6 +61,10 @@ Expected local sequence:
 3. generate or load Reply or Spot training bundles
 4. optionally register reusable corpora and saved slices
 5. run learners, comparison helpers, and skeptical review helpers
+
+Current relation map and audit:
+
+- see [docs/INTEGRATION_SURFACE.md](/Users/Shared/Projects/train/docs/INTEGRATION_SURFACE.md) for the current dependency/reference inventory and the latest local health-check results
 
 ## API And UI
 
@@ -138,6 +156,49 @@ uv run python -m train_core.cli run-grader-suite \
   --evaluator-artifact-file human_review=/absolute/path/to/human_review.json
 ```
 
+Apple-Silicon offline training lane:
+
+```bash
+uv run python -m train_core.cli run-training-spec \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1 \
+  --adapter-key reply_adapter_candidate \
+  --adapter-version 2026-05-13.1 \
+  --adapter-name "Reply Adapter Candidate" \
+  --adapter-description "First mlx-lm QLoRA candidate"
+```
+
+Relation doctor and training-readiness lane:
+
+```bash
+uv run python -m train_core.cli doctor --workflow default --output-format summary
+uv run python -m train_core.cli check-training-readiness \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1
+```
+
+Local Ollama packaging lane:
+
+```bash
+uv run python -m train_core.cli package-adapter-artifact-for-ollama \
+  --artifact-key reply_adapter_candidate \
+  --artifact-version 2026-05-13.1 \
+  --ollama-model-name train-reply-adapter:2026-05-13.1
+```
+
+Bounded daily self-learning lane:
+
+```bash
+uv run python -m train_core.cli run-daily-self-learning-cycle \
+  --spec-key reply_sft \
+  --spec-version 2026-05-13.1 \
+  --adapter-key reply_adapter_candidate \
+  --adapter-version 2026-05-13.1 \
+  --adapter-name "Reply Adapter Candidate" \
+  --adapter-description "Daily bounded training candidate" \
+  --comparison-report-file /absolute/path/to/comparison_report.json
+```
+
 Skeptical review lane:
 
 ```bash
@@ -149,6 +210,24 @@ uv run python -m train_core.cli build-skeptical-eval-report \
   --comparison-report-file /absolute/path/to/comparison_report.json \
   --review-scope-kind company \
   --review-scope-value company-1
+```
+
+Operator-client contract smoke:
+
+```bash
+uv run python scripts/check_operator_clients.py
+```
+
+Cross-repo `{trinity}` handoff proof:
+
+```bash
+uv run python scripts/prove_trinity_train_handoff.py
+```
+
+Packaged release contract preflight:
+
+```bash
+uv run python scripts/check_packaged_release_contract.py
 ```
 
 ## Environment Rules
@@ -164,5 +243,5 @@ This setup should not require:
 
 - direct live runtime mutation of `{trinity}`
 - hosted deployment
-- a packaged desktop release flow
+- a signed or notarized desktop release flow for local development
 - broad cloud dependencies beyond the declared local dev surface

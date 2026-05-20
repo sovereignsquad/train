@@ -84,7 +84,7 @@ Today the project is best understood as:
 
 Near term:
 
-- finish native runtime bootstrap and packaged desktop delivery
+- harden signed and notarized desktop delivery on top of the current packaged macOS release path
 - add managed-project bootstrap generation
 - define how raw ideas become reusable project contracts
 - prepare the first `{reply}`-style project template

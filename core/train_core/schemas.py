@@ -5,6 +5,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, model_validator
 
 from train_core.agents import AgentMode
+from train_core.model_resolution import ModelResolutionError, resolve_model_ref
 from train_core.models import GitAction, MetricDirection, RatchetDecision, RunStatus
 from train_core.providers import ProviderKind
 
@@ -439,6 +440,280 @@ class GraderSuiteRunRead(BaseModel):
     disagreements: tuple[dict[str, object], ...] = ()
     summary: str
     output_path: str | None = None
+
+
+class HealthCheckRead(BaseModel):
+    key: str
+    status: str
+    summary: str
+    details: dict[str, object] = Field(default_factory=dict)
+    remediation: str | None = None
+
+
+class HealthReportRead(BaseModel):
+    workflow: str
+    generated_at: str
+    overall_status: str
+    ok: bool
+    warning_count: int
+    failure_count: int
+    checks: tuple[HealthCheckRead, ...]
+
+
+class TrainingReadinessRead(BaseModel):
+    training_spec_ref: str
+    status: str
+    summary: str
+    details: dict[str, object] = Field(default_factory=dict)
+    remediation: str | None = None
+
+
+class TrainingSpecWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    dataset_key: str = Field(min_length=1, max_length=120)
+    dataset_version: str = Field(min_length=1, max_length=160)
+    dataset_slice_key: str | None = Field(default=None, max_length=120)
+    dataset_slice_version: str | None = Field(default=None, max_length=160)
+    grader_suite_key: str = Field(min_length=1, max_length=120)
+    grader_suite_version: str = Field(min_length=1, max_length=160)
+    base_model_ref: str = Field(min_length=1, max_length=260)
+    base_model_source_kind: str = Field(default="huggingface", min_length=1, max_length=40)
+    template_ref: str = Field(min_length=1, max_length=260)
+    tokenizer_ref: str | None = Field(default=None, max_length=260)
+    training_backend: str = Field(min_length=1, max_length=40)
+    training_stage: str = Field(min_length=1, max_length=40)
+    training_method: str = Field(min_length=1, max_length=40)
+    expected_adapter_family: str = Field(min_length=1, max_length=120)
+    output_dir: str = Field(min_length=1)
+    hyperparameters: dict[str, object] = Field(default_factory=dict)
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_training_spec(self) -> "TrainingSpecWrite":
+        if self.dataset_slice_key and not self.dataset_slice_version:
+            raise ValueError("dataset_slice_version is required when dataset_slice_key is set")
+        if self.dataset_slice_version and not self.dataset_slice_key:
+            raise ValueError("dataset_slice_key is required when dataset_slice_version is set")
+        if self.training_backend not in {"mlx-lm", "external"}:
+            raise ValueError("training_backend is invalid")
+        if self.training_stage not in {"sft", "dpo", "orpo", "kto"}:
+            raise ValueError("training_stage is invalid")
+        if self.training_method not in {"qlora", "lora", "full-finetune"}:
+            raise ValueError("training_method is invalid")
+        if self.base_model_source_kind not in {"huggingface", "ollama", "local-path"}:
+            raise ValueError("base_model_source_kind is invalid")
+        try:
+            resolve_model_ref(self.base_model_ref, source_kind=self.base_model_source_kind)
+        except ModelResolutionError as exc:
+            raise ValueError(str(exc)) from exc
+        if self.training_backend == "mlx-lm" and self.base_model_source_kind == "ollama":
+            raise ValueError("mlx-lm training specs do not support ollama base_model_source_kind")
+        if not os.path.isabs(self.output_dir):
+            raise ValueError("output_dir must be absolute")
+        return self
+
+
+class TrainingSpecRead(BaseModel):
+    key: str
+    version: str
+    ref: str
+    name: str
+    description: str
+    dataset_key: str
+    dataset_version: str
+    dataset_ref: str
+    dataset_slice_key: str | None = None
+    dataset_slice_version: str | None = None
+    dataset_slice_ref: str | None = None
+    grader_suite_key: str
+    grader_suite_version: str
+    grader_suite_ref: str
+    base_model_ref: str
+    base_model_source_kind: str
+    template_ref: str
+    tokenizer_ref: str | None = None
+    training_backend: str
+    training_stage: str
+    training_method: str
+    expected_adapter_family: str
+    output_dir: str
+    hyperparameters: dict[str, object] = Field(default_factory=dict)
+    provenance: dict[str, object] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+
+
+class AdapterArtifactWrite(BaseModel):
+    key: str = Field(min_length=1, max_length=120)
+    version: str = Field(min_length=1, max_length=160)
+    training_spec_key: str = Field(min_length=1, max_length=120)
+    training_spec_version: str = Field(min_length=1, max_length=160)
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1)
+    adapter_format: str = Field(min_length=1, max_length=40)
+    artifact_path: str = Field(min_length=1)
+    checkpoint_path: str | None = None
+    training_log_path: str | None = None
+    packaging_metadata_path: str | None = None
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_adapter_artifact(self) -> "AdapterArtifactWrite":
+        if self.adapter_format not in {"safetensors", "gguf", "ollama"}:
+            raise ValueError("adapter_format is invalid")
+        if not os.path.isabs(self.artifact_path):
+            raise ValueError("artifact_path must be absolute")
+        if self.checkpoint_path is not None and not os.path.isabs(self.checkpoint_path):
+            raise ValueError("checkpoint_path must be absolute when provided")
+        if self.training_log_path is not None and not os.path.isabs(self.training_log_path):
+            raise ValueError("training_log_path must be absolute when provided")
+        if self.packaging_metadata_path is not None and not os.path.isabs(self.packaging_metadata_path):
+            raise ValueError("packaging_metadata_path must be absolute when provided")
+        return self
+
+
+class AdapterArtifactRead(BaseModel):
+    key: str
+    version: str
+    ref: str
+    training_spec_key: str
+    training_spec_version: str
+    training_spec_ref: str
+    name: str
+    description: str
+    dataset_key: str
+    dataset_version: str
+    dataset_ref: str
+    dataset_slice_key: str | None = None
+    dataset_slice_version: str | None = None
+    dataset_slice_ref: str | None = None
+    grader_suite_key: str
+    grader_suite_version: str
+    grader_suite_ref: str
+    base_model_ref: str
+    base_model_source_kind: str
+    template_ref: str
+    tokenizer_ref: str | None = None
+    training_backend: str
+    training_stage: str
+    training_method: str
+    adapter_family: str
+    adapter_format: str
+    artifact_path: str
+    checkpoint_path: str | None = None
+    training_log_path: str | None = None
+    packaging_metadata_path: str | None = None
+    provenance: dict[str, object] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+
+
+class OllamaPackageRequest(BaseModel):
+    ollama_model_name: str = Field(min_length=1, max_length=200)
+    output_dir: str | None = None
+    temperature: float | None = None
+    top_p: float | None = None
+    system_prompt: str | None = None
+
+    @model_validator(mode="after")
+    def validate_package_request(self) -> "OllamaPackageRequest":
+        if self.output_dir is not None and not os.path.isabs(self.output_dir):
+            raise ValueError("output_dir must be absolute when provided")
+        return self
+
+
+class OllamaPackageRead(BaseModel):
+    ollama_model_name: str
+    modelfile_path: str
+    metadata_path: str
+    output_dir: str
+    created_at: str
+    adapter_artifact: AdapterArtifactRead
+
+
+class TrainingSpecRunRequest(BaseModel):
+    adapter_key: str = Field(min_length=1, max_length=120)
+    adapter_version: str = Field(min_length=1, max_length=160)
+    adapter_name: str = Field(min_length=1, max_length=200)
+    adapter_description: str = Field(min_length=1)
+    artifact_format: str = Field(default="safetensors", min_length=1, max_length=40)
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_run_request(self) -> "TrainingSpecRunRequest":
+        if self.artifact_format != "safetensors":
+            raise ValueError("artifact_format must be safetensors for the mlx-lm worker")
+        return self
+
+
+class TrainingSpecRunRead(BaseModel):
+    training_spec_ref: str
+    training_backend: str
+    training_method: str
+    data_dir: str
+    adapter_dir: str
+    training_log_path: str
+    metadata_path: str
+    command: tuple[str, ...]
+    adapter_artifact: AdapterArtifactRead
+
+
+class SelfLearningCycleRequest(BaseModel):
+    adapter_key: str = Field(min_length=1, max_length=120)
+    adapter_version: str = Field(min_length=1, max_length=160)
+    adapter_name: str = Field(min_length=1, max_length=200)
+    adapter_description: str = Field(min_length=1)
+    artifact_format: str = Field(default="safetensors", min_length=1, max_length=40)
+    comparison_report_file: str | None = None
+    evaluator_artifact_files: tuple[dict[str, str], ...] = ()
+    grader_output_path: str | None = None
+    package_for_ollama: bool = False
+    ollama_model_name: str | None = None
+    package_output_dir: str | None = None
+    temperature: float | None = None
+    top_p: float | None = None
+    system_prompt: str | None = None
+    api_base_url: str | None = None
+    trinity_root: str | None = None
+    provenance: dict[str, object] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_self_learning_cycle_request(self) -> "SelfLearningCycleRequest":
+        if self.artifact_format != "safetensors":
+            raise ValueError("artifact_format must be safetensors for the mlx-lm worker")
+        if self.comparison_report_file is not None and not os.path.isabs(self.comparison_report_file):
+            raise ValueError("comparison_report_file must be absolute when provided")
+        if self.grader_output_path is not None and not os.path.isabs(self.grader_output_path):
+            raise ValueError("grader_output_path must be absolute when provided")
+        if self.package_output_dir is not None and not os.path.isabs(self.package_output_dir):
+            raise ValueError("package_output_dir must be absolute when provided")
+        for item in self.evaluator_artifact_files:
+            grader_key = str(item.get("grader_key") or "").strip()
+            path = str(item.get("path") or "").strip()
+            if not grader_key:
+                raise ValueError("evaluator_artifact_files entries require grader_key")
+            if not path:
+                raise ValueError("evaluator_artifact_files entries require path")
+            if not os.path.isabs(path):
+                raise ValueError("evaluator artifact path must be absolute")
+        if self.package_for_ollama and not self.ollama_model_name:
+            raise ValueError("ollama_model_name is required when package_for_ollama is enabled")
+        return self
+
+
+class SelfLearningCycleRead(BaseModel):
+    generated_at: str
+    training_spec_ref: str
+    health_report: dict[str, object]
+    training_readiness: dict[str, object]
+    training_run: dict[str, object]
+    grader_suite_run: dict[str, object] | None = None
+    packaging: dict[str, object] | None = None
+    promotion_ready: bool
+    blocked_reasons: tuple[str, ...] = ()
 
 
 class RunCreate(BaseModel):

@@ -10,6 +10,7 @@ APP_DIR_NAME = "train"
 SOURCE_ROOT_DIR = Path(__file__).resolve().parents[2]
 ROOT_DIR = Path(os.environ.get("TRAIN_ROOT_DIR", str(SOURCE_ROOT_DIR))).resolve()
 DEFAULT_VIBE_HOME = ROOT_DIR / "artifacts" / "local" / "vibe-home"
+DEFAULT_MODELS_ROOT = Path("/Users/Shared/Models").resolve()
 
 
 def get_default_state_dir() -> Path:
@@ -60,6 +61,7 @@ class Settings(BaseSettings):
         alias="MISTRAL_VIBE_HOME",
     )
     ollama_base_url: str = Field(default="http://127.0.0.1:11434", alias="OLLAMA_BASE_URL")
+    train_models_root: str = Field(default=str(DEFAULT_MODELS_ROOT), alias="TRAIN_MODELS_ROOT")
     operator_lease_grace_seconds: int = Field(default=30, alias="OPERATOR_LEASE_GRACE_SECONDS")
 
 
