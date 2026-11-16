@@ -152,3 +152,7 @@ Verified:
 - do not let ecosystem training tools pull `{train}` into UI-first training management or direct runtime mutation; the first acceptable shape is a bounded offline worker fed by registered datasets and grader suites
 - do not let the active plan drift back toward `Unsloth`, `Axolotl`, or `LLaMA-Factory` while the actual local delivery target remains Apple Silicon
 - do not skip holdout, disagreement, or promotion evidence in the name of daily learning speed; the system should improve day by day because it learns more honestly, not because it updates more recklessly
+
+## 2026-11-16 board review
+
+Issue #86 records the documentation review. See [manual movement journal](PROJECT_BOARD_MOVEMENT_LOG.md) for the complete captured card register and conditional owner proposals. No board fields or cards were changed. Runtime training, native packaging and adoption remain subject to their original acceptance evidence.
