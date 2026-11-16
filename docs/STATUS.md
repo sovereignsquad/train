@@ -164,3 +164,7 @@ If resuming work, read:
 6. [docs/OFFLINE_TRAINING_CONTRACTS.md](/Users/Shared/Projects/train/docs/OFFLINE_TRAINING_CONTRACTS.md)
 7. [docs/SELF_LEARNING_FINE_TUNING_SYSTEM.md](/Users/Shared/Projects/train/docs/SELF_LEARNING_FINE_TUNING_SYSTEM.md)
 8. [docs/INTEGRATION_SURFACE.md](/Users/Shared/Projects/train/docs/INTEGRATION_SURFACE.md)
+
+## Documentation review — 2026-11-16
+
+The [read-only board review](PROJECT_BOARD_MOVEMENT_LOG.md) records captured issue/card states and unresolved acceptance evidence. It does not change delivery status or authorize runtime promotion. Tracking: #86.

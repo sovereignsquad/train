@@ -303,3 +303,7 @@ uv run python scripts/check_packaged_release_contract.py
 ## License
 
 This project is licensed under `Apache-2.0`.
+
+## Project board review
+
+[Read-only review and manual Scrum journal](docs/PROJECT_BOARD_MOVEMENT_LOG.md).
